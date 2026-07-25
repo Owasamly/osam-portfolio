@@ -2,9 +2,9 @@ import React, { useState, useRef } from 'react';
 import Draggable from 'react-draggable';
 import ParticleBackground from './components/ParticleBackground';
 import DolphinWindow from './components/DolphinWindow';
+import TerminalWindow from './components/TerminalWindow';
 import { Folder, FileText, Mail, Trash2, Terminal, Wifi, Volume2, Grid } from 'lucide-react';
 
-// Draggable Desktop Icon Item with nodeRef wrapper
 function DesktopIcon({ item, onDoubleClick }) {
   const nodeRef = useRef(null);
   const Icon = item.icon;
@@ -26,7 +26,12 @@ function DesktopIcon({ item, onDoubleClick }) {
 }
 
 export default function App() {
-  const [isWindowOpen, setIsWindowOpen] = useState(false); // Closed by default
+  const [isWindowOpen, setIsWindowOpen] = useState(false);
+  const [isWindowMinimized, setIsWindowMinimized] = useState(false);
+
+  const [isTermOpen, setIsTermOpen] = useState(true); // Open by default
+  const [isTermMinimized, setIsTermMinimized] = useState(false);
+
   const [activeTab, setActiveTab] = useState('about');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -35,20 +40,26 @@ export default function App() {
     { id: 'projects', label: 'Projects', icon: Folder, color: 'text-amber-400', defaultPos: { x: 30, y: 130 } },
     { id: 'cv', label: 'cv.txt', icon: FileText, color: 'text-emerald-400', defaultPos: { x: 30, y: 230 } },
     { id: 'contact', label: 'Contact', icon: Mail, color: 'text-orange-400', defaultPos: { x: 30, y: 330 } },
-    { id: 'trash', label: 'Trash', icon: Trash2, color: 'text-gray-400', defaultPos: { x: 30, y: 430 } },
+    { id: 'terminal', label: 'Terminal', icon: Terminal, color: 'text-green-400', defaultPos: { x: 30, y: 430 } },
   ];
 
   const handleIconDoubleClick = (id) => {
-    setActiveTab(id);
-    setIsWindowOpen(true);
+    if (id === 'terminal') {
+      setIsTermOpen(true);
+      setIsTermMinimized(false);
+    } else {
+      setActiveTab(id);
+      setIsWindowOpen(true);
+      setIsWindowMinimized(false);
+    }
   };
 
   return (
     <div className="relative w-screen h-screen overflow-hidden select-none font-mono">
-      {/* 1. Fast & Crisp Canvas Background */}
+      {/* 1. Canvas Background */}
       <ParticleBackground />
 
-      {/* 2. Top Ubuntu Yaru Status Bar */}
+      {/* 2. Top Ubuntu Status Bar */}
       <header className="absolute top-0 left-0 w-full h-8 bg-[#111111]/90 border-b border-[#222222] z-30 px-4 flex justify-between items-center text-xs text-gray-300">
         <div className="flex items-center space-x-4">
           <span className="font-bold text-white hover:text-[#E95420] cursor-pointer">Activities</span>
@@ -66,37 +77,47 @@ export default function App() {
         </div>
       </header>
 
-      {/* 3. Movable Desktop Icons */}
+      {/* 3. Desktop Icons */}
       <div className="relative z-10 pt-8">
         {desktopIcons.map((item) => (
           <DesktopIcon key={item.id} item={item} onDoubleClick={handleIconDoubleClick} />
         ))}
       </div>
 
-      {/* 4. Floating Draggable File Manager Window */}
+      {/* 4. Draggable File Manager Window */}
       <DolphinWindow
         isOpen={isWindowOpen}
+        isMinimized={isWindowMinimized}
         onClose={() => setIsWindowOpen(false)}
+        onMinimize={() => setIsWindowMinimized(!isWindowMinimized)}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
       />
 
-      {/* 5. Ubuntu Start Menu Launcher */}
+      {/* 5. Draggable Interactive Terminal Window (Open by default) */}
+      <TerminalWindow
+        isOpen={isTermOpen}
+        isMinimized={isTermMinimized}
+        onClose={() => setIsTermOpen(false)}
+        onMinimize={() => setIsTermMinimized(!isTermMinimized)}
+      />
+
+      {/* 6. Ubuntu Start Menu Launcher */}
       {isMenuOpen && (
         <div className="absolute bottom-12 left-2 w-64 bg-[#111111]/95 border border-[#333333] rounded-t-lg shadow-2xl z-30 p-2 text-xs text-gray-200 space-y-1 backdrop-blur-md">
           <div className="p-2 font-bold text-[#E95420] border-b border-[#222222] uppercase tracking-wider text-[10px]">Ubuntu Applications</div>
-          <button onClick={() => { setIsWindowOpen(true); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#222222] rounded text-left">
+          <button onClick={() => { setIsWindowOpen(true); setIsWindowMinimized(false); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#222222] rounded text-left">
             <Folder className="w-4 h-4 text-amber-400" />
             <span>Files</span>
           </button>
-          <button onClick={() => setIsMenuOpen(false)} className="w-full flex items-center space-x-2 p-2 hover:bg-[#222222] rounded text-left">
+          <button onClick={() => { setIsTermOpen(true); setIsTermMinimized(false); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#222222] rounded text-left">
             <Terminal className="w-4 h-4 text-green-400" />
             <span>Terminal</span>
           </button>
         </div>
       )}
 
-      {/* 6. Ubuntu Bottom Dock / Panel */}
+      {/* 7. Ubuntu Bottom Dock / Panel */}
       <footer className="absolute bottom-0 left-0 w-full h-10 bg-[#111111]/95 border-t border-[#222222] z-30 px-3 flex justify-between items-center text-xs">
         <div className="flex items-center space-x-3">
           <button
@@ -106,11 +127,29 @@ export default function App() {
             <Grid className="w-4 h-4" />
           </button>
 
+          {/* App indicators in dock */}
           {isWindowOpen && (
-            <div className="flex items-center space-x-2 bg-[#222222] border border-[#333333] px-3 py-1 rounded text-white font-semibold">
+            <button 
+              onClick={() => setIsWindowMinimized(!isWindowMinimized)}
+              className={`flex items-center space-x-2 px-3 py-1 rounded text-white font-semibold transition-colors border ${
+                isWindowMinimized ? 'bg-[#111111] border-[#333333] opacity-60' : 'bg-[#222222] border-[#333333]'
+              }`}
+            >
               <Folder className="w-3.5 h-3.5 text-[#E95420]" />
               <span>Files</span>
-            </div>
+            </button>
+          )}
+
+          {isTermOpen && (
+            <button 
+              onClick={() => setIsTermMinimized(!isTermMinimized)}
+              className={`flex items-center space-x-2 px-3 py-1 rounded text-white font-semibold transition-colors border ${
+                isTermMinimized ? 'bg-[#111111] border-[#333333] opacity-60' : 'bg-[#222222] border-[#333333]'
+              }`}
+            >
+              <Terminal className="w-3.5 h-3.5 text-green-400" />
+              <span>Terminal</span>
+            </button>
           )}
         </div>
 
