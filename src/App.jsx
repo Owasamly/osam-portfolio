@@ -6,7 +6,11 @@ import TerminalWindow from './components/TerminalWindow';
 import PdfViewerWindow from './components/PdfViewerWindow';
 import TextEditorWindow from './components/TextEditorWindow';
 import SystemMonitorWindow from './components/SystemMonitorWindow';
-import { Folder, FileText, Mail, Terminal, Wifi, Volume2, Grid, Activity } from 'lucide-react';
+import BrowserWindow from './components/BrowserWindow';
+import ContactWindow from './components/ContactWindow';
+import VideoPlayerWindow from './components/VideoPlayerWindow';
+import QuickSettingsMenu from './components/QuickSettingsMenu';
+import { Folder, FileText, Mail, Terminal, Wifi, Volume2, VolumeX, Grid, Activity, Globe, Film } from 'lucide-react';
 
 function DesktopIcon({ item, onDoubleClick }) {
   const nodeRef = useRef(null);
@@ -44,11 +48,25 @@ export default function App() {
   const [isEditorMinimized, setIsEditorMinimized] = useState(false);
   const [currentEditorFile, setCurrentEditorFile] = useState('notes.txt');
 
-  const [isMonitorOpen, setIsMonitorOpen] = useState(false);
-  const [isMonitorMinimized, setIsMonitorMinimized] = useState(false);
+  const [isBrowserOpen, setIsBrowserOpen] = useState(false);
+  const [isBrowserMinimized, setIsBrowserMinimized] = useState(false);
 
-  // Theme accent state (defaults to Ubuntu Orange #E95420)
-  const [accentColor, setAccentColor] = useState('#E95420');
+  const [isContactOpen, setIsContactOpen] = useState(false);
+  const [isContactMinimized, setIsContactMinimized] = useState(false);
+
+  const [isVideoOpen, setIsVideoOpen] = useState(false);
+  const [isVideoMinimized, setIsVideoMinimized] = useState(false);
+  const [currentVideoSrc, setCurrentVideoSrc] = useState('');
+  const [currentVideoTitle, setCurrentVideoTitle] = useState('Project Demo');
+
+  // Quick Settings Menu State
+  const [isQuickSettingsOpen, setIsQuickSettingsOpen] = useState(false);
+  const [isWifiOn, setIsWifiOn] = useState(true);
+  const [isBluetoothOn, setIsBluetoothOn] = useState(true);
+  const [volume, setVolume] = useState(80);
+
+  // Theme accent (fixed to clean Ubuntu Orange #E95420)
+  const accentColor = '#E95420';
 
   const [activeTab, setActiveTab] = useState('about');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -58,6 +76,7 @@ export default function App() {
     { id: 'projects', label: 'Projects', icon: Folder, color: 'text-amber-400', defaultPos: { x: 30, y: 130 } },
     { id: 'cv', label: 'cv.pdf', icon: FileText, color: 'text-red-400', defaultPos: { x: 30, y: 230 } },
     { id: 'terminal', label: 'Terminal', icon: Terminal, color: 'text-green-400', defaultPos: { x: 30, y: 330 } },
+    { id: 'contact', label: 'Contact', icon: Mail, color: 'text-sky-400', defaultPos: { x: 30, y: 430 } },
   ];
 
   const handleIconDoubleClick = (id) => {
@@ -68,6 +87,9 @@ export default function App() {
       setCurrentPdfFile('cv.pdf');
       setIsPdfOpen(true);
       setIsPdfMinimized(false);
+    } else if (id === 'contact') {
+      setIsContactOpen(true);
+      setIsContactMinimized(false);
     } else {
       setActiveTab(id);
       setIsWindowOpen(true);
@@ -80,6 +102,10 @@ export default function App() {
       setCurrentPdfFile(fileName);
       setIsPdfOpen(true);
       setIsPdfMinimized(false);
+    } else if (fileName && (fileName.endsWith('.mp4') || fileName.endsWith('.webm'))) {
+      setCurrentVideoTitle(fileName);
+      setIsVideoOpen(true);
+      setIsVideoMinimized(false);
     }
   };
 
@@ -104,12 +130,30 @@ export default function App() {
         <div className="font-semibold text-white">
           {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         </div>
-        <div className="flex items-center space-x-3 text-gray-300">
-          <Wifi className="w-3.5 h-3.5" />
-          <Volume2 className="w-3.5 h-3.5" />
+        
+        {/* Clickable Quick Settings Trigger */}
+        <div 
+          onClick={() => setIsQuickSettingsOpen(!isQuickSettingsOpen)}
+          className="flex items-center space-x-3 text-gray-300 bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded-full cursor-pointer transition-colors"
+        >
+          {isWifiOn ? <Wifi className="w-3.5 h-3.5" /> : <Wifi className="w-3.5 h-3.5 text-gray-500" />}
+          {volume === 0 ? <VolumeX className="w-3.5 h-3.5 text-red-400" /> : <Volume2 className="w-3.5 h-3.5" />}
           <div className="w-2.5 h-2.5 rounded-full bg-green-500"></div>
         </div>
       </header>
+
+      {/* Quick Settings Dropdown Menu */}
+      <QuickSettingsMenu
+        isOpen={isQuickSettingsOpen}
+        onClose={() => setIsQuickSettingsOpen(false)}
+        currentAccent={accentColor}
+        isWifiOn={isWifiOn}
+        setIsWifiOn={setIsWifiOn}
+        isBluetoothOn={isBluetoothOn}
+        setIsBluetoothOn={setIsBluetoothOn}
+        volume={volume}
+        setVolume={setVolume}
+      />
 
       {/* Persistent Desktop Conky Telemetry Widget (Top-Right) */}
       <SystemMonitorWindow currentAccent={accentColor} isWidgetMode={true} />
@@ -156,6 +200,32 @@ export default function App() {
         onMinimize={() => setIsTermMinimized(!isTermMinimized)}
       />
 
+      <BrowserWindow
+        isOpen={isBrowserOpen}
+        isMinimized={isBrowserMinimized}
+        onClose={() => setIsBrowserOpen(false)}
+        onMinimize={() => setIsBrowserMinimized(!isBrowserMinimized)}
+        currentAccent={accentColor}
+      />
+
+      <ContactWindow
+        isOpen={isContactOpen}
+        isMinimized={isContactMinimized}
+        onClose={() => setIsContactOpen(false)}
+        onMinimize={() => setIsContactMinimized(!isContactMinimized)}
+        currentAccent={accentColor}
+      />
+
+      <VideoPlayerWindow
+        isOpen={isVideoOpen}
+        isMinimized={isVideoMinimized}
+        onClose={() => setIsVideoOpen(false)}
+        onMinimize={() => setIsVideoMinimized(!isVideoMinimized)}
+        videoSrc={currentVideoSrc}
+        videoTitle={currentVideoTitle}
+        currentAccent={accentColor}
+      />
+
       {/* Ubuntu Start Menu Launcher */}
       {isMenuOpen && (
         <div className="absolute bottom-12 left-2 w-64 bg-[#111111]/95 border border-[#333333] rounded-t-lg shadow-2xl z-30 p-2 text-xs text-gray-200 space-y-1 backdrop-blur-md">
@@ -163,6 +233,18 @@ export default function App() {
           <button onClick={() => { setIsWindowOpen(true); setIsWindowMinimized(false); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#222222] rounded text-left">
             <Folder className="w-4 h-4 text-amber-400" />
             <span>Files</span>
+          </button>
+          <button onClick={() => { setIsBrowserOpen(true); setIsBrowserMinimized(false); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#222222] rounded text-left">
+            <Globe className="w-4 h-4 text-blue-400" />
+            <span>Firefox Browser</span>
+          </button>
+          <button onClick={() => { setIsContactOpen(true); setIsContactMinimized(false); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#222222] rounded text-left">
+            <Mail className="w-4 h-4 text-sky-400" />
+            <span>Contact Mail</span>
+          </button>
+          <button onClick={() => { setIsVideoOpen(true); setIsVideoMinimized(false); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#222222] rounded text-left">
+            <Film className="w-4 h-4 text-purple-400" />
+            <span>Video Player</span>
           </button>
           <button onClick={() => { setCurrentPdfFile('cv.pdf'); setIsPdfOpen(true); setIsPdfMinimized(false); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#222222] rounded text-left">
             <FileText className="w-4 h-4 text-red-400" />
@@ -190,6 +272,27 @@ export default function App() {
             <button onClick={() => setIsWindowMinimized(!isWindowMinimized)} className={`flex items-center space-x-2 px-3 py-1 rounded text-white font-semibold transition-colors border ${isWindowMinimized ? 'bg-[#111111] border-[#333333] opacity-60' : 'bg-[#222222] border-[#333333]'}`}>
               <Folder className="w-3.5 h-3.5" style={{ color: accentColor }} />
               <span>Files</span>
+            </button>
+          )}
+
+          {isBrowserOpen && (
+            <button onClick={() => setIsBrowserMinimized(!isBrowserMinimized)} className={`flex items-center space-x-2 px-3 py-1 rounded text-white font-semibold transition-colors border ${isBrowserMinimized ? 'bg-[#111111] border-[#333333] opacity-60' : 'bg-[#222222] border-[#333333]'}`}>
+              <Globe className="w-3.5 h-3.5 text-blue-400" />
+              <span>Firefox</span>
+            </button>
+          )}
+
+          {isContactOpen && (
+            <button onClick={() => setIsContactMinimized(!isContactMinimized)} className={`flex items-center space-x-2 px-3 py-1 rounded text-white font-semibold transition-colors border ${isContactMinimized ? 'bg-[#111111] border-[#333333] opacity-60' : 'bg-[#222222] border-[#333333]'}`}>
+              <Mail className="w-3.5 h-3.5 text-sky-400" />
+              <span>Contact</span>
+            </button>
+          )}
+
+          {isVideoOpen && (
+            <button onClick={() => setIsVideoMinimized(!isVideoMinimized)} className={`flex items-center space-x-2 px-3 py-1 rounded text-white font-semibold transition-colors border ${isVideoMinimized ? 'bg-[#111111] border-[#333333] opacity-60' : 'bg-[#222222] border-[#333333]'}`}>
+              <Film className="w-3.5 h-3.5 text-purple-400" />
+              <span className="truncate max-w-[100px]">{currentVideoTitle}</span>
             </button>
           )}
 
