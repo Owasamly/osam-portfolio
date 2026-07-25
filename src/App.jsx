@@ -3,7 +3,10 @@ import Draggable from 'react-draggable';
 import ParticleBackground from './components/ParticleBackground';
 import DolphinWindow from './components/DolphinWindow';
 import TerminalWindow from './components/TerminalWindow';
-import { Folder, FileText, Mail, Trash2, Terminal, Wifi, Volume2, Grid } from 'lucide-react';
+import PdfViewerWindow from './components/PdfViewerWindow';
+import TextEditorWindow from './components/TextEditorWindow';
+import SystemMonitorWindow from './components/SystemMonitorWindow';
+import { Folder, FileText, Mail, Terminal, Wifi, Volume2, Grid, Activity } from 'lucide-react';
 
 function DesktopIcon({ item, onDoubleClick }) {
   const nodeRef = useRef(null);
@@ -26,11 +29,26 @@ function DesktopIcon({ item, onDoubleClick }) {
 }
 
 export default function App() {
+  // Window states
   const [isWindowOpen, setIsWindowOpen] = useState(false);
   const [isWindowMinimized, setIsWindowMinimized] = useState(false);
 
-  const [isTermOpen, setIsTermOpen] = useState(true); // Open by default
+  const [isTermOpen, setIsTermOpen] = useState(true);
   const [isTermMinimized, setIsTermMinimized] = useState(false);
+
+  const [isPdfOpen, setIsPdfOpen] = useState(false);
+  const [isPdfMinimized, setIsPdfMinimized] = useState(false);
+  const [currentPdfFile, setCurrentPdfFile] = useState('cv.pdf');
+
+  const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [isEditorMinimized, setIsEditorMinimized] = useState(false);
+  const [currentEditorFile, setCurrentEditorFile] = useState('notes.txt');
+
+  const [isMonitorOpen, setIsMonitorOpen] = useState(false);
+  const [isMonitorMinimized, setIsMonitorMinimized] = useState(false);
+
+  // Theme accent state (defaults to Ubuntu Orange #E95420)
+  const [accentColor, setAccentColor] = useState('#E95420');
 
   const [activeTab, setActiveTab] = useState('about');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -38,15 +56,18 @@ export default function App() {
   const desktopIcons = [
     { id: 'about', label: 'Home', icon: Folder, color: 'text-amber-400', defaultPos: { x: 30, y: 30 } },
     { id: 'projects', label: 'Projects', icon: Folder, color: 'text-amber-400', defaultPos: { x: 30, y: 130 } },
-    { id: 'cv', label: 'cv.txt', icon: FileText, color: 'text-emerald-400', defaultPos: { x: 30, y: 230 } },
-    { id: 'contact', label: 'Contact', icon: Mail, color: 'text-orange-400', defaultPos: { x: 30, y: 330 } },
-    { id: 'terminal', label: 'Terminal', icon: Terminal, color: 'text-green-400', defaultPos: { x: 30, y: 430 } },
+    { id: 'cv', label: 'cv.pdf', icon: FileText, color: 'text-red-400', defaultPos: { x: 30, y: 230 } },
+    { id: 'terminal', label: 'Terminal', icon: Terminal, color: 'text-green-400', defaultPos: { x: 30, y: 330 } },
   ];
 
   const handleIconDoubleClick = (id) => {
     if (id === 'terminal') {
       setIsTermOpen(true);
       setIsTermMinimized(false);
+    } else if (id === 'cv') {
+      setCurrentPdfFile('cv.pdf');
+      setIsPdfOpen(true);
+      setIsPdfMinimized(false);
     } else {
       setActiveTab(id);
       setIsWindowOpen(true);
@@ -54,22 +75,35 @@ export default function App() {
     }
   };
 
+  const handleFileOpen = (fileName) => {
+    if (fileName && fileName.endsWith('.pdf')) {
+      setCurrentPdfFile(fileName);
+      setIsPdfOpen(true);
+      setIsPdfMinimized(false);
+    }
+  };
+
+  const handleTextEditorOpen = (fileName) => {
+    if (fileName) {
+      setCurrentEditorFile(fileName);
+      setIsEditorOpen(true);
+      setIsEditorMinimized(false);
+    }
+  };
+
   return (
     <div className="relative w-screen h-screen overflow-hidden select-none font-mono">
-      {/* 1. Canvas Background */}
       <ParticleBackground />
 
-      {/* 2. Top Ubuntu Status Bar */}
+      {/* Top Ubuntu Status Bar */}
       <header className="absolute top-0 left-0 w-full h-8 bg-[#111111]/90 border-b border-[#222222] z-30 px-4 flex justify-between items-center text-xs text-gray-300">
         <div className="flex items-center space-x-4">
-          <span className="font-bold text-white hover:text-[#E95420] cursor-pointer">Activities</span>
+          <span className="font-bold text-white hover:opacity-80 cursor-pointer" style={{ color: accentColor }}>Activities</span>
           <span className="text-gray-400 text-[11px]">Ubuntu 24.04 LTS</span>
         </div>
-
         <div className="font-semibold text-white">
           {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         </div>
-
         <div className="flex items-center space-x-3 text-gray-300">
           <Wifi className="w-3.5 h-3.5" />
           <Volume2 className="w-3.5 h-3.5" />
@@ -77,14 +111,17 @@ export default function App() {
         </div>
       </header>
 
-      {/* 3. Desktop Icons */}
+      {/* Persistent Desktop Conky Telemetry Widget (Top-Right) */}
+      <SystemMonitorWindow currentAccent={accentColor} isWidgetMode={true} />
+
+      {/* Desktop Icons */}
       <div className="relative z-10 pt-8">
         {desktopIcons.map((item) => (
           <DesktopIcon key={item.id} item={item} onDoubleClick={handleIconDoubleClick} />
         ))}
       </div>
 
-      {/* 4. Draggable File Manager Window */}
+      {/* Windows */}
       <DolphinWindow
         isOpen={isWindowOpen}
         isMinimized={isWindowMinimized}
@@ -92,9 +129,26 @@ export default function App() {
         onMinimize={() => setIsWindowMinimized(!isWindowMinimized)}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
+        onFileOpen={handleFileOpen}
+        onTextEditorOpen={handleTextEditorOpen}
       />
 
-      {/* 5. Draggable Interactive Terminal Window (Open by default) */}
+      <PdfViewerWindow
+        isOpen={isPdfOpen}
+        isMinimized={isPdfMinimized}
+        onClose={() => setIsPdfOpen(false)}
+        onMinimize={() => setIsPdfMinimized(!isPdfMinimized)}
+        pdfFile={currentPdfFile}
+      />
+
+      <TextEditorWindow
+        isOpen={isEditorOpen}
+        isMinimized={isEditorMinimized}
+        onClose={() => setIsEditorOpen(false)}
+        onMinimize={() => setIsEditorMinimized(!isEditorMinimized)}
+        fileName={currentEditorFile}
+      />
+
       <TerminalWindow
         isOpen={isTermOpen}
         isMinimized={isTermMinimized}
@@ -102,13 +156,21 @@ export default function App() {
         onMinimize={() => setIsTermMinimized(!isTermMinimized)}
       />
 
-      {/* 6. Ubuntu Start Menu Launcher */}
+      {/* Ubuntu Start Menu Launcher */}
       {isMenuOpen && (
         <div className="absolute bottom-12 left-2 w-64 bg-[#111111]/95 border border-[#333333] rounded-t-lg shadow-2xl z-30 p-2 text-xs text-gray-200 space-y-1 backdrop-blur-md">
-          <div className="p-2 font-bold text-[#E95420] border-b border-[#222222] uppercase tracking-wider text-[10px]">Ubuntu Applications</div>
+          <div className="p-2 font-bold border-b border-[#222222] uppercase tracking-wider text-[10px]" style={{ color: accentColor }}>Ubuntu Applications</div>
           <button onClick={() => { setIsWindowOpen(true); setIsWindowMinimized(false); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#222222] rounded text-left">
             <Folder className="w-4 h-4 text-amber-400" />
             <span>Files</span>
+          </button>
+          <button onClick={() => { setCurrentPdfFile('cv.pdf'); setIsPdfOpen(true); setIsPdfMinimized(false); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#222222] rounded text-left">
+            <FileText className="w-4 h-4 text-red-400" />
+            <span>PDF Viewer (CV)</span>
+          </button>
+          <button onClick={() => { setIsEditorOpen(true); setIsEditorMinimized(false); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#222222] rounded text-left">
+            <FileText className="w-4 h-4 text-blue-400" />
+            <span>Text Editor (Gedit)</span>
           </button>
           <button onClick={() => { setIsTermOpen(true); setIsTermMinimized(false); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#222222] rounded text-left">
             <Terminal className="w-4 h-4 text-green-400" />
@@ -117,36 +179,36 @@ export default function App() {
         </div>
       )}
 
-      {/* 7. Ubuntu Bottom Dock / Panel */}
+      {/* Ubuntu Bottom Dock */}
       <footer className="absolute bottom-0 left-0 w-full h-10 bg-[#111111]/95 border-t border-[#222222] z-30 px-3 flex justify-between items-center text-xs">
         <div className="flex items-center space-x-3">
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="p-1.5 rounded hover:bg-white/10 text-[#E95420] transition-colors"
-          >
+          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-1.5 rounded hover:bg-white/10 transition-colors" style={{ color: accentColor }}>
             <Grid className="w-4 h-4" />
           </button>
 
-          {/* App indicators in dock */}
           {isWindowOpen && (
-            <button 
-              onClick={() => setIsWindowMinimized(!isWindowMinimized)}
-              className={`flex items-center space-x-2 px-3 py-1 rounded text-white font-semibold transition-colors border ${
-                isWindowMinimized ? 'bg-[#111111] border-[#333333] opacity-60' : 'bg-[#222222] border-[#333333]'
-              }`}
-            >
-              <Folder className="w-3.5 h-3.5 text-[#E95420]" />
+            <button onClick={() => setIsWindowMinimized(!isWindowMinimized)} className={`flex items-center space-x-2 px-3 py-1 rounded text-white font-semibold transition-colors border ${isWindowMinimized ? 'bg-[#111111] border-[#333333] opacity-60' : 'bg-[#222222] border-[#333333]'}`}>
+              <Folder className="w-3.5 h-3.5" style={{ color: accentColor }} />
               <span>Files</span>
             </button>
           )}
 
+          {isPdfOpen && (
+            <button onClick={() => setIsPdfMinimized(!isPdfMinimized)} className={`flex items-center space-x-2 px-3 py-1 rounded text-white font-semibold transition-colors border ${isPdfMinimized ? 'bg-[#111111] border-[#333333] opacity-60' : 'bg-[#222222] border-[#333333]'}`}>
+              <FileText className="w-3.5 h-3.5 text-red-400" />
+              <span className="truncate max-w-[100px]">{currentPdfFile}</span>
+            </button>
+          )}
+
+          {isEditorOpen && (
+            <button onClick={() => setIsEditorMinimized(!isEditorMinimized)} className={`flex items-center space-x-2 px-3 py-1 rounded text-white font-semibold transition-colors border ${isEditorMinimized ? 'bg-[#111111] border-[#333333] opacity-60' : 'bg-[#222222] border-[#333333]'}`}>
+              <FileText className="w-3.5 h-3.5" style={{ color: accentColor }} />
+              <span className="truncate max-w-[100px]">{currentEditorFile}</span>
+            </button>
+          )}
+
           {isTermOpen && (
-            <button 
-              onClick={() => setIsTermMinimized(!isTermMinimized)}
-              className={`flex items-center space-x-2 px-3 py-1 rounded text-white font-semibold transition-colors border ${
-                isTermMinimized ? 'bg-[#111111] border-[#333333] opacity-60' : 'bg-[#222222] border-[#333333]'
-              }`}
-            >
+            <button onClick={() => setIsTermMinimized(!isTermMinimized)} className={`flex items-center space-x-2 px-3 py-1 rounded text-white font-semibold transition-colors border ${isTermMinimized ? 'bg-[#111111] border-[#333333] opacity-60' : 'bg-[#222222] border-[#333333]'}`}>
               <Terminal className="w-3.5 h-3.5 text-green-400" />
               <span>Terminal</span>
             </button>
