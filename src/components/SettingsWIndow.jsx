@@ -20,7 +20,6 @@ export default function SettingsWindow({
   if (!isOpen || isMinimized) return null;
 
   const wallPapers = [
-    { id: 'ubuntu-orange', name: 'Ubuntu Default Orange', color: '#77216F' },
     { id: 'jammy-jellyfish', name: 'Jammy Dark Purple', color: '#2C001E' },
     { id: 'dark-space', name: 'Deep Space Black', color: '#0d1117' },
     { id: 'baltic-blue', name: 'Baltic Slate Blue', color: '#0f2027' },

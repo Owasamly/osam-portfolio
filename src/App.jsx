@@ -8,11 +8,14 @@ import TextEditorWindow from './components/TextEditorWindow';
 import SystemMonitorWindow from './components/SystemMonitorWindow';
 import BrowserWindow from './components/BrowserWindow';
 import ContactWindow from './components/ContactWindow';
-import VideoPlayerWindow from './components/VideoPlayerWindow';
+import MediaViewerWindow from './components/MediaViewerWindow';
 import QuickSettingsMenu from './components/QuickSettingsMenu';
 import SettingsWindow from './components/SettingsWindow';
 import ContextMenu from './components/ContextMenu';
-import { Folder, FileText, Mail, Terminal, Wifi, Volume2, VolumeX, Grid, Globe, Film, Settings } from 'lucide-react';
+import { 
+  Folder, FileText, Mail, Terminal, Wifi, Volume2, 
+  VolumeX, Grid, Globe, Film, Settings, Image as ImageIcon, Sparkles 
+} from 'lucide-react';
 
 function DesktopIcon({ item, onDoubleClick }) {
   const nodeRef = useRef(null);
@@ -35,7 +38,11 @@ function DesktopIcon({ item, onDoubleClick }) {
 }
 
 export default function App() {
-  // Window states
+  // Global Appearance State (Jammy Dark Purple default)
+  const [isLightMode, setIsLightMode] = useState(false);
+  const [bgPreset, setBgPreset] = useState('#2C001E'); // Passed into ParticleBackground
+
+  // Window visibility states
   const [isWindowOpen, setIsWindowOpen] = useState(false);
   const [isWindowMinimized, setIsWindowMinimized] = useState(false);
 
@@ -56,10 +63,14 @@ export default function App() {
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [isContactMinimized, setIsContactMinimized] = useState(false);
 
-  const [isVideoOpen, setIsVideoOpen] = useState(false);
-  const [isVideoMinimized, setIsVideoMinimized] = useState(false);
-  const [currentVideoSrc, setCurrentVideoSrc] = useState('');
-  const [currentVideoTitle, setCurrentVideoTitle] = useState('Project Demo');
+  // Media Viewer State
+  const [isMediaOpen, setIsMediaOpen] = useState(false);
+  const [isMediaMinimized, setIsMediaMinimized] = useState(false);
+  const [mediaState, setMediaState] = useState({
+    src: '/demo.mp4',
+    title: 'Project Demo',
+    type: 'video' // 'video' | 'image' | 'gif'
+  });
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isSettingsMinimized, setIsSettingsMinimized] = useState(false);
@@ -72,7 +83,7 @@ export default function App() {
     editor: 25,
     browser: 25,
     contact: 25,
-    video: 25,
+    media: 25,
     settings: 32,
     monitor: 20
   });
@@ -80,15 +91,10 @@ export default function App() {
   const bringToFront = (appId) => {
     setZIndices(prev => {
       const highest = Math.max(...Object.values(prev));
-      // Only increment if it's not already on top
       if (prev[appId] === highest) return prev;
       return { ...prev, [appId]: highest + 1 };
     });
   };
-
-  // Appearance states
-  const [isLightMode, setIsLightMode] = useState(false);
-  const [bgPreset, setBgPreset] = useState('#77216F');
 
   const [contextMenuPos, setContextMenuPos] = useState(null);
   const [isQuickSettingsOpen, setIsQuickSettingsOpen] = useState(false);
@@ -126,9 +132,9 @@ export default function App() {
     } else if (appId === 'editor') {
       setIsEditorOpen(true);
       setIsEditorMinimized(false);
-    } else if (appId === 'video') {
-      setIsVideoOpen(true);
-      setIsVideoMinimized(false);
+    } else if (appId === 'video' || appId === 'media') {
+      setIsMediaOpen(true);
+      setIsMediaMinimized(false);
     } else if (appId === 'settings') {
       setIsSettingsOpen(true);
       setIsSettingsMinimized(false);
@@ -142,6 +148,13 @@ export default function App() {
       setIsContactOpen(true);
       setIsContactMinimized(false);
     }
+  };
+
+  const openMediaViewer = (title, src, type = 'image') => {
+    setMediaState({ title, src, type });
+    setIsMediaOpen(true);
+    setIsMediaMinimized(false);
+    bringToFront('media');
   };
 
   const handleIconDoubleClick = (id) => {
@@ -174,6 +187,7 @@ export default function App() {
         isLightMode ? 'text-gray-900' : 'text-gray-200'
       }`}
     >
+      {/* 1. Canvas Background dynamically updates when bgPreset changes */}
       <ParticleBackground bgPreset={bgPreset} />
 
       <ContextMenu 
@@ -191,17 +205,19 @@ export default function App() {
           <span className="font-bold hover:opacity-80 cursor-pointer text-[#E95420]">Activities</span>
           <span className="text-gray-400 text-[11px]">Ubuntu 24.04 LTS</span>
         </div>
-        <div className="font-semibold">
-          {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-        </div>
-        
-        <div 
-          onClick={(e) => { e.stopPropagation(); setIsQuickSettingsOpen(!isQuickSettingsOpen); }}
-          className="flex items-center space-x-3 bg-white/10 hover:bg-white/20 px-2.5 py-1 rounded-full cursor-pointer transition-colors"
-        >
-          {isWifiOn ? <Wifi className="w-3.5 h-3.5" /> : <Wifi className="w-3.5 h-3.5 text-gray-500" />}
-          {volume === 0 ? <VolumeX className="w-3.5 h-3.5 text-red-400" /> : <Volume2 className="w-3.5 h-3.5" />}
-          <div className="w-2.5 h-2.5 rounded-full bg-green-500"></div>
+
+        <div className="flex items-center space-x-3">
+          <div className="font-semibold">
+            {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </div>
+          <div 
+            onClick={(e) => { e.stopPropagation(); setIsQuickSettingsOpen(!isQuickSettingsOpen); }}
+            className="flex items-center space-x-3 bg-white/10 hover:bg-white/20 px-2.5 py-1 rounded-full cursor-pointer transition-colors"
+          >
+            {isWifiOn ? <Wifi className="w-3.5 h-3.5" /> : <Wifi className="w-3.5 h-3.5 text-gray-500" />}
+            {volume === 0 ? <VolumeX className="w-3.5 h-3.5 text-red-400" /> : <Volume2 className="w-3.5 h-3.5" />}
+            <div className="w-2.5 h-2.5 rounded-full bg-green-500"></div>
+          </div>
         </div>
       </header>
 
@@ -226,7 +242,7 @@ export default function App() {
         ))}
       </div>
 
-      {/* Direct Window Rendering with Dynamic zIndex style */}
+      {/* 2. Settings Window linked directly to bgPreset */}
       <SettingsWindow
         isOpen={isSettingsOpen}
         isMinimized={isSettingsMinimized}
@@ -270,7 +286,7 @@ export default function App() {
         onMinimize={() => setIsEditorMinimized(!isEditorMinimized)}
         onFocus={() => bringToFront('editor')}
         fileName={currentEditorFile}
-        currentAccent={bgPreset}
+        currentAccent={accentColor}
         isLightMode={isLightMode}
         zIndex={zIndices.editor}
       />
@@ -307,17 +323,19 @@ export default function App() {
         zIndex={zIndices.contact}
       />
 
-      <VideoPlayerWindow
-        isOpen={isVideoOpen}
-        isMinimized={isVideoMinimized}
-        onClose={() => setIsVideoOpen(false)}
-        onMinimize={() => setIsVideoMinimized(!isVideoMinimized)}
-        onFocus={() => bringToFront('video')}
-        videoSrc={currentVideoSrc}
-        videoTitle={currentVideoTitle}
-        currentAccent={bgPreset}
+      {/* 3. Media Viewer Window Integrated */}
+      <MediaViewerWindow
+        isOpen={isMediaOpen}
+        isMinimized={isMediaMinimized}
+        onClose={() => setIsMediaOpen(false)}
+        onMinimize={() => setIsMediaMinimized(!isMediaMinimized)}
+        onFocus={() => bringToFront('media')}
+        mediaTitle={mediaState.title}
+        mediaSrc={mediaState.src}
+        mediaType={mediaState.type}
+        currentAccent={accentColor}
         isLightMode={isLightMode}
-        zIndex={zIndices.video}
+        zIndex={zIndices.media}
       />
 
       {/* Start Menu Launcher */}
@@ -340,9 +358,9 @@ export default function App() {
             <Mail className="w-4 h-4 text-sky-500" />
             <span>Contact Mail</span>
           </button>
-          <button onClick={() => { handleOpenApp('video'); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#E95420]/20 rounded text-left">
+          <button onClick={() => { openMediaViewer('Research Demo', '/demo.mp4', 'video'); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#E95420]/20 rounded text-left">
             <Film className="w-4 h-4 text-purple-500" />
-            <span>Video Player</span>
+            <span>Media Player</span>
           </button>
           <button onClick={() => { handleOpenApp('cv'); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#E95420]/20 rounded text-left">
             <FileText className="w-4 h-4 text-red-500" />
@@ -350,7 +368,7 @@ export default function App() {
           </button>
           <button onClick={() => { handleOpenApp('editor'); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#E95420]/20 rounded text-left">
             <FileText className="w-4 h-4 text-blue-500" />
-            <span>Text Editor (Gedit)</span>
+            <span>Text Editor</span>
           </button>
           <button onClick={() => { handleOpenApp('terminal'); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#E95420]/20 rounded text-left">
             <Terminal className="w-4 h-4 text-green-500" />
@@ -442,9 +460,9 @@ export default function App() {
             </button>
           )}
 
-          {isVideoOpen && (
+          {isMediaOpen && (
             <button 
-              onClick={() => { bringToFront('video'); setIsVideoMinimized(!isVideoMinimized); }} 
+              onClick={() => { bringToFront('media'); setIsMediaMinimized(!isMediaMinimized); }} 
               className={`flex items-center space-x-2 px-3 py-1 rounded border font-semibold transition-colors ${
                 isLightMode 
                   ? 'bg-white border-gray-300 text-gray-800 shadow-sm' 
@@ -452,7 +470,7 @@ export default function App() {
               }`}
             >
               <Film className="w-3.5 h-3.5 text-purple-400" />
-              <span>Video</span>
+              <span>Media Viewer</span>
             </button>
           )}
 

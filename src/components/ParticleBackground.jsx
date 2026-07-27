@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 
-export default function ParticleBackground({ bgPreset = '#77216F' }) {
+export default function ParticleBackground({ bgPreset = '#0f172a' }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -35,19 +35,22 @@ export default function ParticleBackground({ bgPreset = '#77216F' }) {
     }));
 
     const animate = () => {
-      const gradient = ctx.createRadialGradient(
-        width * 0.4, height * 0.4, 20,
-        width / 2, height / 2, Math.max(width, height)
-      );
-
-      // Ubuntu signature rich dark purple backdrop
-      gradient.addColorStop(0, bgPreset);
-      gradient.addColorStop(0.5, '#2C001E');
-      gradient.addColorStop(1, '#0f020a');
-
-      ctx.fillStyle = gradient;
+      // 1. Pure Solid Base Color
+      ctx.fillStyle = bgPreset;
       ctx.fillRect(0, 0, width, height);
 
+      // 2. Very Faint Edge Shadow (Standard Linux Desktop Vignette)
+      const edgeVignette = ctx.createRadialGradient(
+        width / 2, height / 2, Math.max(width, height) * 0.4,
+        width / 2, height / 2, Math.max(width, height) * 0.75
+      );
+      edgeVignette.addColorStop(0, 'rgba(0, 0, 0, 0)');
+      edgeVignette.addColorStop(1, 'rgba(0, 0, 0, 0.25)'); // Subtle dark tint only at extreme corners
+
+      ctx.fillStyle = edgeVignette;
+      ctx.fillRect(0, 0, width, height);
+
+      // 3. Interactive Nodes & Constellation Lines
       for (let i = 0; i < nodes.length; i++) {
         const node = nodes[i];
         node.x += node.vx;
