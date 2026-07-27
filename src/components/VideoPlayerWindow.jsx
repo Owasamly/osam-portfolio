@@ -1,17 +1,18 @@
 import React, { useState, useRef } from 'react';
 import Draggable from 'react-draggable';
-import { Play, Pause, Volume2, VolumeX, Maximize, X, Minus, Film } from 'lucide-react';
+import { X, Minus, Play, Pause, Volume2, VolumeX, Film, Maximize2 } from 'lucide-react';
 
 export default function VideoPlayerWindow({ 
   isOpen, 
   isMinimized, 
   onClose, 
   onMinimize, 
-  onFocus,
-  videoSrc, 
-  videoTitle, 
+  onFocus, 
+  videoTitle = 'Demo Reel / Research Overview', 
+  videoSrc = '/demo.mp4',
   currentAccent = '#77216F',
-  isLightMode = false
+  isLightMode = false,
+  zIndex = 25
 }) {
   const nodeRef = useRef(null);
   const videoRef = useRef(null);
@@ -42,58 +43,45 @@ export default function VideoPlayerWindow({
   const handleTimeUpdate = () => {
     if (videoRef.current) {
       const current = videoRef.current.currentTime;
-      const duration = videoRef.current.duration;
-      if (duration > 0) {
-        setProgress((current / duration) * 100);
-      }
+      const duration = videoRef.current.duration || 1;
+      setProgress((current / duration) * 100);
     }
   };
 
   const handleSeek = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const pos = (e.clientX - rect.left) / rect.width;
-    if (videoRef.current && videoRef.current.duration) {
-      videoRef.current.currentTime = pos * videoRef.current.duration;
-    }
-  };
-
-  const toggleFullscreen = () => {
+    const seekTime = (e.target.value / 100) * (videoRef.current?.duration || 1);
     if (videoRef.current) {
-      if (videoRef.current.requestFullscreen) {
-        videoRef.current.requestFullscreen();
-      }
+      videoRef.current.currentTime = seekTime;
+      setProgress(e.target.value);
     }
-  };
-
-  const formatTime = (timeInSeconds) => {
-    if (!timeInSeconds || isNaN(timeInSeconds)) return '0:00';
-    const mins = Math.floor(timeInSeconds / 60);
-    const secs = Math.floor(timeInSeconds % 60).toString().padStart(2, '0');
-    return `${mins}:${secs}`;
   };
 
   return (
     <Draggable handle=".video-header" nodeRef={nodeRef}>
       <div 
-        ref={nodeRef}
-        onMouseDown={onFocus}
-        className={`absolute top-20 left-1/4 w-[540px] border rounded-t-lg shadow-2xl flex flex-col z-30 overflow-hidden font-mono text-xs select-none backdrop-blur-md ${
+        ref={nodeRef} 
+        onMouseDownCapture={onFocus}
+        style={{ zIndex }}
+        className={`absolute top-20 left-1/4 w-[680px] border rounded-t-lg shadow-2xl flex flex-col overflow-hidden font-mono text-xs select-none backdrop-blur-md ${
           isLightMode 
             ? 'bg-white border-gray-300 text-gray-900' 
-            : 'bg-[#1e1e1e] border-[#333333] text-gray-200'
+            : 'bg-[#181818] border-[#333333] text-gray-200'
         }`}
       >
-        {/* Window Header */}
-        <div className={`video-header cursor-move px-4 py-2.5 border-b flex justify-between items-center ${
-          isLightMode 
-            ? 'bg-gray-100 border-gray-300 text-gray-800' 
-            : 'bg-[#111111] border-[#2b2b2b] text-gray-200'
-        }`}>
+        {/* Title Bar */}
+        <div 
+          onMouseDown={onFocus}
+          className={`video-header cursor-move px-4 py-2.5 border-b flex justify-between items-center ${
+            isLightMode 
+              ? 'bg-gray-100 border-gray-300 text-gray-800' 
+              : 'bg-[#111111] border-[#2b2b2b] text-gray-200'
+          }`}
+        >
           <div className="flex items-center space-x-2 font-bold truncate">
-            <Film className="w-4 h-4" style={{ color: currentAccent }} />
-            <span className="truncate max-w-[380px]">{videoTitle || 'Project Demo — Video Player'}</span>
+            <Film className="w-4 h-4 text-[#E95420]" />
+            <span className="truncate">VLC Media Player — {videoTitle}</span>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 shrink-0">
             <button 
               onClick={onMinimize} 
               className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${
@@ -102,69 +90,76 @@ export default function VideoPlayerWindow({
             >
               <Minus className="w-3 h-3" />
             </button>
-            <button onClick={onClose} className="w-5 h-5 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center transition-colors">
+            <button 
+              onClick={onClose} 
+              className="w-5 h-5 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center transition-colors"
+            >
               <X className="w-3 h-3" />
             </button>
           </div>
         </div>
 
-        {/* Video Viewport */}
-        <div className="relative bg-black group flex items-center justify-center aspect-video">
-          <video 
+        {/* Video Screen Area */}
+        <div className="relative bg-black aspect-video flex items-center justify-center overflow-hidden group">
+          <video
             ref={videoRef}
-            src={videoSrc || 'https://www.w3schools.com/html/mov_bbb.mp4'}
+            src={videoSrc}
             onTimeUpdate={handleTimeUpdate}
-            onEnded={() => setIsPlaying(false)}
             onClick={togglePlay}
             className="w-full h-full object-contain cursor-pointer"
           />
 
           {!isPlaying && (
-            <div onClick={togglePlay} className="absolute inset-0 flex items-center justify-center bg-black/30 cursor-pointer">
-              <div className="w-14 h-14 rounded-full bg-white/80 border border-gray-300 flex items-center justify-center text-gray-800 hover:scale-110 transition-transform shadow-lg">
-                <Play className="w-6 h-6 ml-0.5" style={{ color: currentAccent }} />
-              </div>
-            </div>
+            <button 
+              onClick={togglePlay} 
+              className="absolute p-4 rounded-full bg-black/60 text-white hover:scale-110 transition-transform backdrop-blur-sm cursor-pointer"
+            >
+              <Play className="w-8 h-8 fill-current ml-0.5" />
+            </button>
           )}
         </div>
 
-        {/* Controls Bar */}
-        <div className={`px-4 py-3 border-t space-y-2 ${
-          isLightMode 
-            ? 'bg-gray-50 border-gray-200' 
-            : 'bg-[#181818] border-[#2d2d2d]'
+        {/* Custom Video Controls */}
+        <div className={`p-3 border-t space-y-2 ${
+          isLightMode ? 'bg-gray-50 border-gray-200' : 'bg-[#121212] border-[#252525]'
         }`}>
-          {/* Progress / Seek bar */}
-          <div 
-            onClick={handleSeek}
-            className={`w-full h-1.5 rounded-full cursor-pointer relative overflow-hidden group ${
-              isLightMode ? 'bg-gray-200' : 'bg-gray-700'
-            }`}
-          >
-            <div 
-              className="h-full rounded-full transition-all" 
-              style={{ width: `${progress}%`, backgroundColor: currentAccent }}
-            />
-          </div>
+          {/* Progress Bar */}
+          <input 
+            type="range" 
+            min="0" 
+            max="100" 
+            value={progress}
+            onChange={handleSeek}
+            className="w-full h-1 bg-gray-600 rounded-lg appearance-none cursor-pointer accent-[#E95420]"
+          />
 
-          <div className={`flex justify-between items-center ${isLightMode ? 'text-gray-700' : 'text-gray-200'}`}>
+          <div className="flex items-center justify-between pt-1">
             <div className="flex items-center space-x-3">
-              <button onClick={togglePlay} className="hover:opacity-75 transition-opacity">
+              <button 
+                onClick={togglePlay} 
+                className={`p-1.5 rounded transition-colors ${
+                  isLightMode ? 'hover:bg-gray-200 text-gray-800' : 'hover:bg-[#282828] text-gray-200'
+                }`}
+              >
                 {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
               </button>
-              <button onClick={toggleMute} className="hover:opacity-75 transition-opacity">
-                {isMuted ? <VolumeX className="w-4 h-4 text-red-500" /> : <Volume2 className="w-4 h-4" />}
+              <button 
+                onClick={toggleMute} 
+                className={`p-1.5 rounded transition-colors ${
+                  isLightMode ? 'hover:bg-gray-200 text-gray-800' : 'hover:bg-[#282828] text-gray-200'
+                }`}
+              >
+                {isMuted ? <VolumeX className="w-4 h-4 text-red-400" /> : <Volume2 className="w-4 h-4" />}
               </button>
             </div>
 
-            <div className={`text-[10px] ${isLightMode ? 'text-gray-500' : 'text-gray-400'}`}>
-              <span>
-                {formatTime(videoRef.current?.currentTime)} / {formatTime(videoRef.current?.duration)}
-              </span>
-            </div>
-
-            <button onClick={toggleFullscreen} className="hover:opacity-75 transition-opacity">
-              <Maximize className="w-3.5 h-3.5" />
+            <button 
+              onClick={() => videoRef.current?.requestFullscreen()}
+              className={`p-1.5 rounded transition-colors ${
+                isLightMode ? 'hover:bg-gray-200 text-gray-800' : 'hover:bg-[#282828] text-gray-200'
+              }`}
+            >
+              <Maximize2 className="w-4 h-4" />
             </button>
           </div>
         </div>

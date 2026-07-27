@@ -10,7 +10,8 @@ export default function PdfViewerWindow({
   onFocus, 
   pdfFile = 'cv.pdf', 
   currentAccent = '#77216F',
-  isLightMode = false
+  isLightMode = false,
+  zIndex = 25
 }) {
   const nodeRef = useRef(null);
   const [zoom, setZoom] = useState(100);
@@ -28,19 +29,22 @@ export default function PdfViewerWindow({
     <Draggable handle=".pdf-header" nodeRef={nodeRef}>
       <div 
         ref={nodeRef} 
-        onMouseDown={onFocus}
-        style={{ display: isMinimized ? 'none' : 'flex' }}
-        className={`absolute top-16 left-1/3 w-[720px] h-[620px] border rounded-t-lg shadow-2xl flex-col z-35 overflow-hidden font-mono text-xs select-none backdrop-blur-md ${
+        onMouseDownCapture={onFocus}
+        style={{ display: isMinimized ? 'none' : 'flex', zIndex }}
+        className={`absolute top-16 left-1/3 w-[720px] h-[620px] border rounded-t-lg shadow-2xl flex-col overflow-hidden font-mono text-xs select-none backdrop-blur-md ${
           isLightMode 
             ? 'bg-white border-gray-300 text-gray-900' 
             : 'bg-[#1e1e1e] border-[#333333] text-gray-200'
         }`}
       >
-        <div className={`pdf-header cursor-move px-4 py-2.5 border-b flex justify-between items-center ${
-          isLightMode 
-            ? 'bg-gray-100 border-gray-300 text-gray-800' 
-            : 'bg-[#111111] border-[#2b2b2b] text-gray-200'
-        }`}>
+        <div 
+          onMouseDown={onFocus}
+          className={`pdf-header cursor-move px-4 py-2.5 border-b flex justify-between items-center ${
+            isLightMode 
+              ? 'bg-gray-100 border-gray-300 text-gray-800' 
+              : 'bg-[#111111] border-[#2b2b2b] text-gray-200'
+          }`}
+        >
           <div className="flex items-center space-x-2 font-bold">
             <FileText className="w-4 h-4" style={{ color: currentAccent }} />
             <span>Document Viewer — {pdfFile}</span>

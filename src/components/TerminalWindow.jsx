@@ -2,7 +2,15 @@ import React, { useState, useRef, useEffect } from 'react';
 import Draggable from 'react-draggable';
 import { X, Minus, Terminal as TerminalIcon } from 'lucide-react';
 
-export default function TerminalWindow({ isOpen, isMinimized, onClose, onMinimize, onFocus, isLightMode }) {
+export default function TerminalWindow({ 
+  isOpen, 
+  isMinimized, 
+  onClose, 
+  onMinimize, 
+  onFocus, 
+  isLightMode,
+  zIndex = 20
+}) {
   const nodeRef = useRef(null);
   const inputRef = useRef(null);
   const bottomRef = useRef(null);
@@ -95,15 +103,18 @@ export default function TerminalWindow({ isOpen, isMinimized, onClose, onMinimiz
     <Draggable handle=".ubuntu-term-header" nodeRef={nodeRef}>
       <div
         ref={nodeRef}
-        onMouseDown={onFocus}
-        style={{ display: isMinimized ? 'none' : 'flex'}}
-        className={`absolute top-20 left-20 w-[700px] h-[450px] border rounded-lg shadow-2xl flex-col z-20 overflow-hidden font-mono text-xs select-none backdrop-blur-xl ${
+        onMouseDownCapture={onFocus}
+        style={{ display: isMinimized ? 'none' : 'flex', zIndex }}
+        className={`absolute top-20 left-20 w-[700px] h-[450px] border rounded-lg shadow-2xl flex-col overflow-hidden font-mono text-xs select-none backdrop-blur-xl ${
           isLightMode ? 'bg-[#f7f7f7]/95 border-gray-300 text-gray-900' : 'bg-[#0d1117]/95 border-[#30363d] text-[#c9d1d9]'
         }`}
       >
-        <div className={`ubuntu-term-header cursor-move px-4 py-2.5 border-b flex justify-between items-center ${
-          isLightMode ? 'bg-[#e3e3e3] border-gray-300 text-gray-800' : 'bg-[#161b22] border-[#30363d] text-gray-200'
-        }`}>
+        <div 
+          onMouseDown={onFocus}
+          className={`ubuntu-term-header cursor-move px-4 py-2.5 border-b flex justify-between items-center ${
+            isLightMode ? 'bg-[#e3e3e3] border-gray-300 text-gray-800' : 'bg-[#161b22] border-[#30363d] text-gray-200'
+          }`}
+        >
           <div className="flex items-center space-x-2 font-semibold text-[11px]">
             <TerminalIcon className="w-4 h-4 text-green-500" />
             <span>guest@ubuntu: {currentPath}</span>

@@ -80,6 +80,8 @@ export default function App() {
   const bringToFront = (appId) => {
     setZIndices(prev => {
       const highest = Math.max(...Object.values(prev));
+      // Only increment if it's not already on top
+      if (prev[appId] === highest) return prev;
       return { ...prev, [appId]: highest + 1 };
     });
   };
@@ -224,107 +226,99 @@ export default function App() {
         ))}
       </div>
 
-      {/* Layered Window Stack */}
-      <div className="relative" style={{ zIndex: zIndices.settings }}>
-        <SettingsWindow
-          isOpen={isSettingsOpen}
-          isMinimized={isSettingsMinimized}
-          onClose={() => setIsSettingsOpen(false)}
-          onMinimize={() => setIsSettingsMinimized(!isSettingsMinimized)}
-          onFocus={() => bringToFront('settings')}
-          isLightMode={isLightMode}
-          setIsLightMode={setIsLightMode}
-          bgPreset={bgPreset}
-          setBgPreset={setBgPreset}
-        />
-      </div>
+      {/* Direct Window Rendering with Dynamic zIndex style */}
+      <SettingsWindow
+        isOpen={isSettingsOpen}
+        isMinimized={isSettingsMinimized}
+        onClose={() => setIsSettingsOpen(false)}
+        onMinimize={() => setIsSettingsMinimized(!isSettingsMinimized)}
+        onFocus={() => bringToFront('settings')}
+        isLightMode={isLightMode}
+        setIsLightMode={setIsLightMode}
+        bgPreset={bgPreset}
+        setBgPreset={setBgPreset}
+        zIndex={zIndices.settings}
+      />
 
-      <div className="relative" style={{ zIndex: zIndices.files }}>
-        <DolphinWindow
-          isOpen={isWindowOpen}
-          isMinimized={isWindowMinimized}
-          onClose={() => setIsWindowOpen(false)}
-          onMinimize={() => setIsWindowMinimized(!isWindowMinimized)}
-          onFocus={() => bringToFront('files')}
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          isLightMode={isLightMode}
-        />
-      </div>
+      <DolphinWindow
+        isOpen={isWindowOpen}
+        isMinimized={isWindowMinimized}
+        onClose={() => setIsWindowOpen(false)}
+        onMinimize={() => setIsWindowMinimized(!isWindowMinimized)}
+        onFocus={() => bringToFront('files')}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        isLightMode={isLightMode}
+        zIndex={zIndices.files}
+      />
 
-      <div className="relative" style={{ zIndex: zIndices.pdf }}>
-        <PdfViewerWindow
-          isOpen={isPdfOpen}
-          isMinimized={isPdfMinimized}
-          onClose={() => setIsPdfOpen(false)}
-          onMinimize={() => setIsPdfMinimized(!isPdfMinimized)}
-          onFocus={() => bringToFront('pdf')}
-          pdfFile={currentPdfFile}
-          isLightMode={isLightMode}
-        />
-      </div>
+      <PdfViewerWindow
+        isOpen={isPdfOpen}
+        isMinimized={isPdfMinimized}
+        onClose={() => setIsPdfOpen(false)}
+        onMinimize={() => setIsPdfMinimized(!isPdfMinimized)}
+        onFocus={() => bringToFront('pdf')}
+        pdfFile={currentPdfFile}
+        isLightMode={isLightMode}
+        zIndex={zIndices.pdf}
+      />
 
-      <div className="relative" style={{ zIndex: zIndices.editor }}>
-        <TextEditorWindow
-          isOpen={isEditorOpen}
-          isMinimized={isEditorMinimized}
-          onClose={() => setIsEditorOpen(false)}
-          onMinimize={() => setIsEditorMinimized(!isEditorMinimized)}
-          onFocus={() => bringToFront('editor')}
-          fileName={currentEditorFile}
-          currentAccent={bgPreset}
-          isLightMode={isLightMode}
-        />
-      </div>
+      <TextEditorWindow
+        isOpen={isEditorOpen}
+        isMinimized={isEditorMinimized}
+        onClose={() => setIsEditorOpen(false)}
+        onMinimize={() => setIsEditorMinimized(!isEditorMinimized)}
+        onFocus={() => bringToFront('editor')}
+        fileName={currentEditorFile}
+        currentAccent={bgPreset}
+        isLightMode={isLightMode}
+        zIndex={zIndices.editor}
+      />
 
-      <div className="relative" style={{ zIndex: zIndices.terminal }}>
-        <TerminalWindow
-          isOpen={isTermOpen}
-          isMinimized={isTermMinimized}
-          onClose={() => setIsTermOpen(false)}
-          onMinimize={() => setIsTermMinimized(!isTermMinimized)}
-          onFocus={() => bringToFront('terminal')}
-          isLightMode={isLightMode}
-        />
-      </div>
+      <TerminalWindow
+        isOpen={isTermOpen}
+        isMinimized={isTermMinimized}
+        onClose={() => setIsTermOpen(false)}
+        onMinimize={() => setIsTermMinimized(!isTermMinimized)}
+        onFocus={() => bringToFront('terminal')}
+        isLightMode={isLightMode}
+        zIndex={zIndices.terminal}
+      />
 
-      <div className="relative" style={{ zIndex: zIndices.browser }}>
-        <BrowserWindow
-          isOpen={isBrowserOpen}
-          isMinimized={isBrowserMinimized}
-          onClose={() => setIsBrowserOpen(false)}
-          onMinimize={() => setIsBrowserMinimized(!isBrowserMinimized)}
-          onFocus={() => bringToFront('browser')}
-          currentAccent={accentColor}
-          isLightMode={isLightMode}
-        />
-      </div>
+      <BrowserWindow
+        isOpen={isBrowserOpen}
+        isMinimized={isBrowserMinimized}
+        onClose={() => setIsBrowserOpen(false)}
+        onMinimize={() => setIsBrowserMinimized(!isBrowserMinimized)}
+        onFocus={() => bringToFront('browser')}
+        currentAccent={accentColor}
+        isLightMode={isLightMode}
+        zIndex={zIndices.browser}
+      />
 
-      <div className="relative" style={{ zIndex: zIndices.contact }}>
-        <ContactWindow
-          isOpen={isContactOpen}
-          isMinimized={isContactMinimized}
-          onClose={() => setIsContactOpen(false)}
-          onMinimize={() => setIsContactMinimized(!isContactMinimized)}
-          onFocus={() => bringToFront('contact')}
-          currentAccent={accentColor}
-          isLightMode={isLightMode}
-        />
-      </div>
+      <ContactWindow
+        isOpen={isContactOpen}
+        isMinimized={isContactMinimized}
+        onClose={() => setIsContactOpen(false)}
+        onMinimize={() => setIsContactMinimized(!isContactMinimized)}
+        onFocus={() => bringToFront('contact')}
+        currentAccent={accentColor}
+        isLightMode={isLightMode}
+        zIndex={zIndices.contact}
+      />
 
-      <div className="relative" style={{ zIndex: zIndices.video }}>
-        <VideoPlayerWindow
-          isOpen={isVideoOpen}
-          isMinimized={isVideoMinimized}
-          onClose={() => setIsVideoOpen(false)}
-          onMinimize={() => setIsVideoMinimized(!isVideoMinimized)}
-          onFocus={() => bringToFront('video')}
-          videoSrc={currentVideoSrc}
-          videoTitle={currentVideoTitle}
-          currentAccent={bgPreset}
-          isLightMode={isLightMode}
-        />
-      </div>
+      <VideoPlayerWindow
+        isOpen={isVideoOpen}
+        isMinimized={isVideoMinimized}
+        onClose={() => setIsVideoOpen(false)}
+        onMinimize={() => setIsVideoMinimized(!isVideoMinimized)}
+        onFocus={() => bringToFront('video')}
+        videoSrc={currentVideoSrc}
+        videoTitle={currentVideoTitle}
+        currentAccent={bgPreset}
+        isLightMode={isLightMode}
+        zIndex={zIndices.video}
+      />
 
       {/* Start Menu Launcher */}
       {isMenuOpen && (
@@ -334,42 +328,42 @@ export default function App() {
           <div className="p-2 font-bold border-b border-gray-500/20 uppercase tracking-wider text-[10px] text-[#E95420]">
             Ubuntu Applications
           </div>
-          <button onClick={() => { bringToFront('files'); setIsWindowOpen(true); setIsWindowMinimized(false); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#E95420]/20 rounded text-left">
+          <button onClick={() => { handleOpenApp('files'); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#E95420]/20 rounded text-left">
             <Folder className="w-4 h-4 text-amber-500" />
             <span>Files</span>
           </button>
-          <button onClick={() => { bringToFront('browser'); setIsBrowserOpen(true); setIsBrowserMinimized(false); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#E95420]/20 rounded text-left">
+          <button onClick={() => { handleOpenApp('browser'); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#E95420]/20 rounded text-left">
             <Globe className="w-4 h-4 text-blue-500" />
             <span>Firefox Browser</span>
           </button>
-          <button onClick={() => { bringToFront('contact'); setIsContactOpen(true); setIsContactMinimized(false); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#E95420]/20 rounded text-left">
+          <button onClick={() => { handleOpenApp('contact'); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#E95420]/20 rounded text-left">
             <Mail className="w-4 h-4 text-sky-500" />
             <span>Contact Mail</span>
           </button>
-          <button onClick={() => { bringToFront('video'); setIsVideoOpen(true); setIsVideoMinimized(false); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#E95420]/20 rounded text-left">
+          <button onClick={() => { handleOpenApp('video'); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#E95420]/20 rounded text-left">
             <Film className="w-4 h-4 text-purple-500" />
             <span>Video Player</span>
           </button>
-          <button onClick={() => { bringToFront('pdf'); setCurrentPdfFile('cv.pdf'); setIsPdfOpen(true); setIsPdfMinimized(false); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#E95420]/20 rounded text-left">
+          <button onClick={() => { handleOpenApp('cv'); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#E95420]/20 rounded text-left">
             <FileText className="w-4 h-4 text-red-500" />
             <span>PDF Viewer (CV)</span>
           </button>
-          <button onClick={() => { bringToFront('editor'); setIsEditorOpen(true); setIsEditorMinimized(false); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#E95420]/20 rounded text-left">
+          <button onClick={() => { handleOpenApp('editor'); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#E95420]/20 rounded text-left">
             <FileText className="w-4 h-4 text-blue-500" />
             <span>Text Editor (Gedit)</span>
           </button>
-          <button onClick={() => { bringToFront('terminal'); setIsTermOpen(true); setIsTermMinimized(false); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#E95420]/20 rounded text-left">
+          <button onClick={() => { handleOpenApp('terminal'); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#E95420]/20 rounded text-left">
             <Terminal className="w-4 h-4 text-green-500" />
             <span>Terminal</span>
           </button>
-          <button onClick={() => { bringToFront('settings'); setIsSettingsOpen(true); setIsSettingsMinimized(false); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#E95420]/20 rounded text-left border-t border-gray-500/20 pt-2">
+          <button onClick={() => { handleOpenApp('settings'); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#E95420]/20 rounded text-left border-t border-gray-500/20 pt-2">
             <Settings className="w-4 h-4 text-gray-500" />
             <span>Settings</span>
           </button>
         </div>
       )}
 
-      {/* Dock Bar Theme Matched to Light & Dark Mode */}
+      {/* Dock Bar */}
       <footer className={`absolute bottom-0 left-0 w-full h-10 border-t z-50 px-3 flex justify-between items-center text-xs backdrop-blur-md transition-colors ${
         isLightMode ? 'bg-[#e5e5e5]/95 border-gray-300 text-gray-800' : 'bg-[#111111]/95 border-[#222222] text-gray-200'
       }`}>

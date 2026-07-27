@@ -9,7 +9,8 @@ export default function ContactWindow({
   onMinimize, 
   onFocus, 
   currentAccent = '#77216F',
-  isLightMode = false
+  isLightMode = false,
+  zIndex = 25
 }) {
   const nodeRef = useRef(null);
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
@@ -30,18 +31,22 @@ export default function ContactWindow({
     <Draggable handle=".contact-header" nodeRef={nodeRef}>
       <div 
         ref={nodeRef} 
-        onMouseDown={onFocus}
-        className={`absolute top-24 left-1/3 w-[460px] border rounded-t-lg shadow-2xl flex flex-col z-30 overflow-hidden font-mono text-xs select-none backdrop-blur-md ${
+        onMouseDownCapture={onFocus}
+        style={{ zIndex }}
+        className={`absolute top-24 left-1/3 w-[460px] border rounded-t-lg shadow-2xl flex flex-col overflow-hidden font-mono text-xs select-none backdrop-blur-md ${
           isLightMode 
             ? 'bg-white border-gray-300 text-gray-900' 
             : 'bg-[#1e1e1e] border-[#333333] text-gray-200'
         }`}
       >
-        <div className={`contact-header cursor-move px-4 py-2.5 border-b flex justify-between items-center ${
-          isLightMode 
-            ? 'bg-gray-100 border-gray-300 text-gray-800' 
-            : 'bg-[#111111] border-[#2b2b2b] text-gray-200'
-        }`}>
+        <div 
+          onMouseDown={onFocus}
+          className={`contact-header cursor-move px-4 py-2.5 border-b flex justify-between items-center ${
+            isLightMode 
+              ? 'bg-gray-100 border-gray-300 text-gray-800' 
+              : 'bg-[#111111] border-[#2b2b2b] text-gray-200'
+          }`}
+        >
           <div className="flex items-center space-x-2 font-bold">
             <Mail className="w-4 h-4" style={{ color: currentAccent }} />
             <span>Send Message — Mail Client</span>

@@ -11,7 +11,8 @@ export default function TextEditorWindow({
   fileName = 'whoami.sh', 
   fileContent = '', 
   currentAccent = '#77216F',
-  isLightMode = false
+  isLightMode = false,
+  zIndex = 35
 }) {
   const nodeRef = useRef(null);
   const [content, setContent] = useState('');
@@ -45,20 +46,23 @@ export default function TextEditorWindow({
     <Draggable handle=".editor-header" nodeRef={nodeRef}>
       <div 
         ref={nodeRef} 
-        onMouseDown={onFocus}
-        style={{ display: isMinimized ? 'none' : 'flex' }}
-        className={`absolute top-24 left-1/4 w-[640px] h-[480px] border rounded-t-lg shadow-2xl flex-col z-35 overflow-hidden font-mono text-xs select-none backdrop-blur-md ${
+        onMouseDownCapture={onFocus}
+        style={{ display: isMinimized ? 'none' : 'flex', zIndex }}
+        className={`absolute top-24 left-1/4 w-[640px] h-[480px] border rounded-t-lg shadow-2xl flex-col overflow-hidden font-mono text-xs select-none backdrop-blur-md ${
           isLightMode 
             ? 'bg-white border-gray-300 text-gray-900' 
             : 'bg-[#1e1e1e] border-[#333333] text-gray-200'
         }`}
       >
         {/* Header */}
-        <div className={`editor-header cursor-move px-4 py-2.5 border-b flex justify-between items-center ${
-          isLightMode 
-            ? 'bg-gray-100 border-gray-300 text-gray-800' 
-            : 'bg-[#111111] border-[#2b2b2b] text-gray-200'
-        }`}>
+        <div 
+          onMouseDown={onFocus}
+          className={`editor-header cursor-move px-4 py-2.5 border-b flex justify-between items-center ${
+            isLightMode 
+              ? 'bg-gray-100 border-gray-300 text-gray-800' 
+              : 'bg-[#111111] border-[#2b2b2b] text-gray-200'
+          }`}
+        >
           <div className="flex items-center space-x-2 font-bold">
             <FileText className="w-4 h-4" style={{ color: currentAccent }} />
             <span>Text Editor — {fileName}</span>

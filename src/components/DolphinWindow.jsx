@@ -13,6 +13,7 @@ export default function DolphinWindow({
   onTextEditorOpen,
   isLightMode,
   onFocus,
+  zIndex = 25
 }) {
   const nodeRef = useRef(null);
 
@@ -110,16 +111,19 @@ export default function DolphinWindow({
     <Draggable handle=".ubuntu-header" nodeRef={nodeRef}>
       <div 
         ref={nodeRef} 
-        onMouseDown={onFocus}
-        style={{ display: isMinimized ? 'none' : 'flex' }}
-        className={`absolute top-20 left-1/2 -translate-x-1/2 w-[740px] h-[520px] rounded-t-lg border shadow-2xl flex-col z-25 overflow-hidden font-mono text-xs select-none backdrop-blur-md ${
+        onMouseDownCapture={onFocus}
+        style={{ display: isMinimized ? 'none' : 'flex', zIndex }}
+        className={`absolute top-20 left-1/2 -translate-x-1/2 w-[740px] h-[520px] rounded-t-lg border shadow-2xl flex-col overflow-hidden font-mono text-xs select-none backdrop-blur-md ${
           isLightMode ? 'bg-[#fafafa] text-gray-800 border-gray-300' : 'bg-[#1e1e1e]/95 text-gray-200 border-[#333333]'
         }`}
       >
         {/* Header */}
-        <div className={`ubuntu-header cursor-move px-4 py-2.5 border-b flex justify-between items-center ${
-          isLightMode ? 'bg-[#e5e5e5] border-gray-300 text-gray-900' : 'bg-[#111111] border-[#2b2b2b] text-gray-200'
-        }`}>
+        <div 
+          onMouseDown={onFocus}
+          className={`ubuntu-header cursor-move px-4 py-2.5 border-b flex justify-between items-center ${
+            isLightMode ? 'bg-[#e5e5e5] border-gray-300 text-gray-900' : 'bg-[#111111] border-[#2b2b2b] text-gray-200'
+          }`}
+        >
           <div className="flex items-center space-x-2 font-bold">
             <Folder className="w-4 h-4 text-[#E95420]" />
             <span>Files — /home/guest/{activeTab}</span>

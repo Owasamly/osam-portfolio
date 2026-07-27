@@ -12,6 +12,7 @@ export default function SettingsWindow({
   bgPreset,
   setBgPreset,
   onFocus,
+  zIndex = 40
 }) {
   const nodeRef = useRef(null);
   const [activeTab, setActiveTab] = useState('appearance');
@@ -30,15 +31,19 @@ export default function SettingsWindow({
     <Draggable handle=".settings-header" nodeRef={nodeRef}>
       <div 
         ref={nodeRef} 
-        onMouseDown={onFocus}
-        className={`absolute top-20 left-1/3 w-[520px] rounded-t-lg border shadow-2xl flex flex-col z-40 overflow-hidden font-mono text-xs select-none backdrop-blur-md ${
+        onMouseDownCapture={onFocus}
+        style={{ zIndex }}
+        className={`absolute top-20 left-1/3 w-[520px] rounded-t-lg border shadow-2xl flex flex-col overflow-hidden font-mono text-xs select-none backdrop-blur-md ${
           isLightMode ? 'bg-[#f4f4f4] text-gray-800 border-gray-300' : 'bg-[#1e1e1e]/95 text-gray-200 border-[#333333]'
         }`}
       >
         {/* Header */}
-        <div className={`settings-header cursor-move px-4 py-2.5 border-b flex justify-between items-center ${
-          isLightMode ? 'bg-[#e5e5e5] border-gray-300 text-gray-900' : 'bg-[#111111] border-[#2b2b2b] text-gray-200'
-        }`}>
+        <div 
+          onMouseDown={onFocus}
+          className={`settings-header cursor-move px-4 py-2.5 border-b flex justify-between items-center ${
+            isLightMode ? 'bg-[#e5e5e5] border-gray-300 text-gray-900' : 'bg-[#111111] border-[#2b2b2b] text-gray-200'
+          }`}
+        >
           <div className="flex items-center space-x-2 font-bold">
             <Settings className="w-4 h-4 text-[#E95420]" />
             <span>Settings — GNOME Control Center</span>
