@@ -10,7 +10,9 @@ import BrowserWindow from './components/BrowserWindow';
 import ContactWindow from './components/ContactWindow';
 import VideoPlayerWindow from './components/VideoPlayerWindow';
 import QuickSettingsMenu from './components/QuickSettingsMenu';
-import { Folder, FileText, Mail, Terminal, Wifi, Volume2, VolumeX, Grid, Activity, Globe, Film } from 'lucide-react';
+import SettingsWindow from './components/SettingsWindow';
+import ContextMenu from './components/ContextMenu';
+import { Folder, FileText, Mail, Terminal, Wifi, Volume2, VolumeX, Grid, Globe, Film, Settings } from 'lucide-react';
 
 function DesktopIcon({ item, onDoubleClick }) {
   const nodeRef = useRef(null);
@@ -46,7 +48,7 @@ export default function App() {
 
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isEditorMinimized, setIsEditorMinimized] = useState(false);
-  const [currentEditorFile, setCurrentEditorFile] = useState('notes.txt');
+  const [currentEditorFile, setCurrentEditorFile] = useState('whoami.sh');
 
   const [isBrowserOpen, setIsBrowserOpen] = useState(false);
   const [isBrowserMinimized, setIsBrowserMinimized] = useState(false);
@@ -59,17 +61,43 @@ export default function App() {
   const [currentVideoSrc, setCurrentVideoSrc] = useState('');
   const [currentVideoTitle, setCurrentVideoTitle] = useState('Project Demo');
 
-  // Quick Settings Menu State
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isSettingsMinimized, setIsSettingsMinimized] = useState(false);
+
+  // Dynamic Window Depth Stacking (Z-Index)
+  const [zIndices, setZIndices] = useState({
+    files: 30,
+    terminal: 31,
+    pdf: 25,
+    editor: 25,
+    browser: 25,
+    contact: 25,
+    video: 25,
+    settings: 32,
+    monitor: 20
+  });
+
+  const bringToFront = (appId) => {
+    setZIndices(prev => {
+      const highest = Math.max(...Object.values(prev));
+      return { ...prev, [appId]: highest + 1 };
+    });
+  };
+
+  // Appearance states
+  const [isLightMode, setIsLightMode] = useState(false);
+  const [bgPreset, setBgPreset] = useState('#77216F');
+
+  const [contextMenuPos, setContextMenuPos] = useState(null);
   const [isQuickSettingsOpen, setIsQuickSettingsOpen] = useState(false);
   const [isWifiOn, setIsWifiOn] = useState(true);
   const [isBluetoothOn, setIsBluetoothOn] = useState(true);
   const [volume, setVolume] = useState(80);
 
-  // Theme accent (fixed to clean Ubuntu Orange #E95420)
-  const accentColor = '#E95420';
-
   const [activeTab, setActiveTab] = useState('about');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const accentColor = '#E95420';
 
   const desktopIcons = [
     { id: 'about', label: 'Home', icon: Folder, color: 'text-amber-400', defaultPos: { x: 30, y: 30 } },
@@ -79,62 +107,95 @@ export default function App() {
     { id: 'contact', label: 'Contact', icon: Mail, color: 'text-sky-400', defaultPos: { x: 30, y: 430 } },
   ];
 
+  const handleContextMenu = (e) => {
+    e.preventDefault();
+    setContextMenuPos({ x: e.clientX, y: e.clientY });
+  };
+
+  const handleOpenApp = (appId) => {
+    bringToFront(appId);
+    if (appId === 'terminal') {
+      setIsTermOpen(true);
+      setIsTermMinimized(false);
+    } else if (appId === 'cv' || appId === 'pdf') {
+      setCurrentPdfFile('cv.pdf');
+      setIsPdfOpen(true);
+      setIsPdfMinimized(false);
+    } else if (appId === 'editor') {
+      setIsEditorOpen(true);
+      setIsEditorMinimized(false);
+    } else if (appId === 'video') {
+      setIsVideoOpen(true);
+      setIsVideoMinimized(false);
+    } else if (appId === 'settings') {
+      setIsSettingsOpen(true);
+      setIsSettingsMinimized(false);
+    } else if (appId === 'files') {
+      setIsWindowOpen(true);
+      setIsWindowMinimized(false);
+    } else if (appId === 'browser') {
+      setIsBrowserOpen(true);
+      setIsBrowserMinimized(false);
+    } else if (appId === 'contact') {
+      setIsContactOpen(true);
+      setIsContactMinimized(false);
+    }
+  };
+
   const handleIconDoubleClick = (id) => {
     if (id === 'terminal') {
+      bringToFront('terminal');
       setIsTermOpen(true);
       setIsTermMinimized(false);
     } else if (id === 'cv') {
+      bringToFront('pdf');
       setCurrentPdfFile('cv.pdf');
       setIsPdfOpen(true);
       setIsPdfMinimized(false);
     } else if (id === 'contact') {
+      bringToFront('contact');
       setIsContactOpen(true);
       setIsContactMinimized(false);
     } else {
+      bringToFront('files');
       setActiveTab(id);
       setIsWindowOpen(true);
       setIsWindowMinimized(false);
     }
   };
 
-  const handleFileOpen = (fileName) => {
-    if (fileName && fileName.endsWith('.pdf')) {
-      setCurrentPdfFile(fileName);
-      setIsPdfOpen(true);
-      setIsPdfMinimized(false);
-    } else if (fileName && (fileName.endsWith('.mp4') || fileName.endsWith('.webm'))) {
-      setCurrentVideoTitle(fileName);
-      setIsVideoOpen(true);
-      setIsVideoMinimized(false);
-    }
-  };
-
-  const handleTextEditorOpen = (fileName) => {
-    if (fileName) {
-      setCurrentEditorFile(fileName);
-      setIsEditorOpen(true);
-      setIsEditorMinimized(false);
-    }
-  };
-
   return (
-    <div className="relative w-screen h-screen overflow-hidden select-none font-mono">
-      <ParticleBackground />
+    <div 
+      onContextMenu={handleContextMenu}
+      onClick={() => setContextMenuPos(null)}
+      className={`relative w-screen h-screen overflow-hidden select-none font-mono transition-colors duration-500 ${
+        isLightMode ? 'text-gray-900' : 'text-gray-200'
+      }`}
+    >
+      <ParticleBackground bgPreset={bgPreset} />
 
-      {/* Top Ubuntu Status Bar */}
-      <header className="absolute top-0 left-0 w-full h-8 bg-[#111111]/90 border-b border-[#222222] z-30 px-4 flex justify-between items-center text-xs text-gray-300">
+      <ContextMenu 
+        position={contextMenuPos} 
+        onClose={() => setContextMenuPos(null)} 
+        onOpenApp={handleOpenApp} 
+        isLightMode={isLightMode}
+      />
+
+      {/* Top Status Bar */}
+      <header className={`absolute top-0 left-0 w-full h-8 border-b z-50 px-4 flex justify-between items-center text-xs backdrop-blur-md transition-colors ${
+        isLightMode ? 'bg-[#f0f0f0]/90 border-gray-300 text-gray-800' : 'bg-[#111111]/90 border-[#222222] text-gray-300'
+      }`}>
         <div className="flex items-center space-x-4">
-          <span className="font-bold text-white hover:opacity-80 cursor-pointer" style={{ color: accentColor }}>Activities</span>
+          <span className="font-bold hover:opacity-80 cursor-pointer text-[#E95420]">Activities</span>
           <span className="text-gray-400 text-[11px]">Ubuntu 24.04 LTS</span>
         </div>
-        <div className="font-semibold text-white">
+        <div className="font-semibold">
           {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         </div>
         
-        {/* Clickable Quick Settings Trigger */}
         <div 
-          onClick={() => setIsQuickSettingsOpen(!isQuickSettingsOpen)}
-          className="flex items-center space-x-3 text-gray-300 bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded-full cursor-pointer transition-colors"
+          onClick={(e) => { e.stopPropagation(); setIsQuickSettingsOpen(!isQuickSettingsOpen); }}
+          className="flex items-center space-x-3 bg-white/10 hover:bg-white/20 px-2.5 py-1 rounded-full cursor-pointer transition-colors"
         >
           {isWifiOn ? <Wifi className="w-3.5 h-3.5" /> : <Wifi className="w-3.5 h-3.5 text-gray-500" />}
           {volume === 0 ? <VolumeX className="w-3.5 h-3.5 text-red-400" /> : <Volume2 className="w-3.5 h-3.5" />}
@@ -142,7 +203,6 @@ export default function App() {
         </div>
       </header>
 
-      {/* Quick Settings Dropdown Menu */}
       <QuickSettingsMenu
         isOpen={isQuickSettingsOpen}
         onClose={() => setIsQuickSettingsOpen(false)}
@@ -155,171 +215,281 @@ export default function App() {
         setVolume={setVolume}
       />
 
-      {/* Persistent Desktop Conky Telemetry Widget (Top-Right) */}
-      <SystemMonitorWindow currentAccent={accentColor} isWidgetMode={true} />
+      <SystemMonitorWindow currentAccent={accentColor} isWidgetMode={true} isLightMode={isLightMode} />
 
-      {/* Desktop Icons */}
       <div className="relative z-10 pt-8">
         {desktopIcons.map((item) => (
           <DesktopIcon key={item.id} item={item} onDoubleClick={handleIconDoubleClick} />
         ))}
       </div>
 
-      {/* Windows */}
-      <DolphinWindow
-        isOpen={isWindowOpen}
-        isMinimized={isWindowMinimized}
-        onClose={() => setIsWindowOpen(false)}
-        onMinimize={() => setIsWindowMinimized(!isWindowMinimized)}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        onFileOpen={handleFileOpen}
-        onTextEditorOpen={handleTextEditorOpen}
-      />
+      {/* Layered Window Stack - Fixed explicit position positioning for z-index stacking */}
+      <div className="relative" style={{ zIndex: zIndices.settings }}>
+        <SettingsWindow
+          isOpen={isSettingsOpen}
+          isMinimized={isSettingsMinimized}
+          onClose={() => setIsSettingsOpen(false)}
+          onMinimize={() => setIsSettingsMinimized(!isSettingsMinimized)}
+          onFocus={() => bringToFront('settings')}
+          isLightMode={isLightMode}
+          setIsLightMode={setIsLightMode}
+          bgPreset={bgPreset}
+          setBgPreset={setBgPreset}
+        />
+      </div>
 
-      <PdfViewerWindow
-        isOpen={isPdfOpen}
-        isMinimized={isPdfMinimized}
-        onClose={() => setIsPdfOpen(false)}
-        onMinimize={() => setIsPdfMinimized(!isPdfMinimized)}
-        pdfFile={currentPdfFile}
-      />
+      <div className="relative" style={{ zIndex: zIndices.files }}>
+        <DolphinWindow
+          isOpen={isWindowOpen}
+          isMinimized={isWindowMinimized}
+          onClose={() => setIsWindowOpen(false)}
+          onMinimize={() => setIsWindowMinimized(!isWindowMinimized)}
+          onFocus={() => bringToFront('files')}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          isLightMode={isLightMode}
+        />
+      </div>
 
-      <TextEditorWindow
-        isOpen={isEditorOpen}
-        isMinimized={isEditorMinimized}
-        onClose={() => setIsEditorOpen(false)}
-        onMinimize={() => setIsEditorMinimized(!isEditorMinimized)}
-        fileName={currentEditorFile}
-      />
+      <div className="relative" style={{ zIndex: zIndices.pdf }}>
+        <PdfViewerWindow
+          isOpen={isPdfOpen}
+          isMinimized={isPdfMinimized}
+          onClose={() => setIsPdfOpen(false)}
+          onMinimize={() => setIsPdfMinimized(!isPdfMinimized)}
+          onFocus={() => bringToFront('pdf')}
+          pdfFile={currentPdfFile}
+          isLightMode={isLightMode}
+        />
+      </div>
 
-      <TerminalWindow
-        isOpen={isTermOpen}
-        isMinimized={isTermMinimized}
-        onClose={() => setIsTermOpen(false)}
-        onMinimize={() => setIsTermMinimized(!isTermMinimized)}
-      />
+      <div className="relative" style={{ zIndex: zIndices.editor }}>
+        <TextEditorWindow
+          isOpen={isEditorOpen}
+          isMinimized={isEditorMinimized}
+          onClose={() => setIsEditorOpen(false)}
+          onMinimize={() => setIsEditorMinimized(!isEditorMinimized)}
+          onFocus={() => bringToFront('editor')}
+          fileName={currentEditorFile}
+          currentAccent={bgPreset}
+        />
+      </div>
 
-      <BrowserWindow
-        isOpen={isBrowserOpen}
-        isMinimized={isBrowserMinimized}
-        onClose={() => setIsBrowserOpen(false)}
-        onMinimize={() => setIsBrowserMinimized(!isBrowserMinimized)}
-        currentAccent={accentColor}
-      />
+      <div className="relative" style={{ zIndex: zIndices.terminal }}>
+        <TerminalWindow
+          isOpen={isTermOpen}
+          isMinimized={isTermMinimized}
+          onClose={() => setIsTermOpen(false)}
+          onMinimize={() => setIsTermMinimized(!isTermMinimized)}
+          onFocus={() => bringToFront('terminal')}
+          isLightMode={isLightMode}
+        />
+      </div>
 
-      <ContactWindow
-        isOpen={isContactOpen}
-        isMinimized={isContactMinimized}
-        onClose={() => setIsContactOpen(false)}
-        onMinimize={() => setIsContactMinimized(!isContactMinimized)}
-        currentAccent={accentColor}
-      />
+      <div className="relative" style={{ zIndex: zIndices.browser }}>
+        <BrowserWindow
+          isOpen={isBrowserOpen}
+          isMinimized={isBrowserMinimized}
+          onClose={() => setIsBrowserOpen(false)}
+          onMinimize={() => setIsBrowserMinimized(!isBrowserMinimized)}
+          onFocus={() => bringToFront('browser')}
+          currentAccent={accentColor}
+          isLightMode={isLightMode}
+        />
+      </div>
 
-      <VideoPlayerWindow
-        isOpen={isVideoOpen}
-        isMinimized={isVideoMinimized}
-        onClose={() => setIsVideoOpen(false)}
-        onMinimize={() => setIsVideoMinimized(!isVideoMinimized)}
-        videoSrc={currentVideoSrc}
-        videoTitle={currentVideoTitle}
-        currentAccent={accentColor}
-      />
+      <div className="relative" style={{ zIndex: zIndices.contact }}>
+        <ContactWindow
+          isOpen={isContactOpen}
+          isMinimized={isContactMinimized}
+          onClose={() => setIsContactOpen(false)}
+          onMinimize={() => setIsContactMinimized(!isContactMinimized)}
+          onFocus={() => bringToFront('contact')}
+          currentAccent={accentColor}
+          isLightMode={isLightMode}
+        />
+      </div>
 
-      {/* Ubuntu Start Menu Launcher */}
+      <div className="relative" style={{ zIndex: zIndices.video }}>
+        <VideoPlayerWindow
+          isOpen={isVideoOpen}
+          isMinimized={isVideoMinimized}
+          onClose={() => setIsVideoOpen(false)}
+          onMinimize={() => setIsVideoMinimized(!isVideoMinimized)}
+          onFocus={() => bringToFront('video')}
+          videoSrc={currentVideoSrc}
+          videoTitle={currentVideoTitle}
+          currentAccent={bgPreset}
+        />
+      </div>
+
+      {/* Start Menu Launcher */}
       {isMenuOpen && (
-        <div className="absolute bottom-12 left-2 w-64 bg-[#111111]/95 border border-[#333333] rounded-t-lg shadow-2xl z-30 p-2 text-xs text-gray-200 space-y-1 backdrop-blur-md">
-          <div className="p-2 font-bold border-b border-[#222222] uppercase tracking-wider text-[10px]" style={{ color: accentColor }}>Ubuntu Applications</div>
-          <button onClick={() => { setIsWindowOpen(true); setIsWindowMinimized(false); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#222222] rounded text-left">
-            <Folder className="w-4 h-4 text-amber-400" />
+        <div className={`absolute bottom-12 left-2 w-64 rounded-t-lg border shadow-2xl z-50 p-2 text-xs space-y-1 backdrop-blur-md ${
+          isLightMode ? 'bg-[#f4f4f4]/95 border-gray-300 text-gray-800' : 'bg-[#111111]/95 border-[#333333] text-gray-200'
+        }`}>
+          <div className="p-2 font-bold border-b border-gray-500/20 uppercase tracking-wider text-[10px] text-[#E95420]">
+            Ubuntu Applications
+          </div>
+          <button onClick={() => { bringToFront('files'); setIsWindowOpen(true); setIsWindowMinimized(false); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#E95420]/20 rounded text-left">
+            <Folder className="w-4 h-4 text-amber-500" />
             <span>Files</span>
           </button>
-          <button onClick={() => { setIsBrowserOpen(true); setIsBrowserMinimized(false); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#222222] rounded text-left">
-            <Globe className="w-4 h-4 text-blue-400" />
+          <button onClick={() => { bringToFront('browser'); setIsBrowserOpen(true); setIsBrowserMinimized(false); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#E95420]/20 rounded text-left">
+            <Globe className="w-4 h-4 text-blue-500" />
             <span>Firefox Browser</span>
           </button>
-          <button onClick={() => { setIsContactOpen(true); setIsContactMinimized(false); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#222222] rounded text-left">
-            <Mail className="w-4 h-4 text-sky-400" />
+          <button onClick={() => { bringToFront('contact'); setIsContactOpen(true); setIsContactMinimized(false); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#E95420]/20 rounded text-left">
+            <Mail className="w-4 h-4 text-sky-500" />
             <span>Contact Mail</span>
           </button>
-          <button onClick={() => { setIsVideoOpen(true); setIsVideoMinimized(false); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#222222] rounded text-left">
-            <Film className="w-4 h-4 text-purple-400" />
+          <button onClick={() => { bringToFront('video'); setIsVideoOpen(true); setIsVideoMinimized(false); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#E95420]/20 rounded text-left">
+            <Film className="w-4 h-4 text-purple-500" />
             <span>Video Player</span>
           </button>
-          <button onClick={() => { setCurrentPdfFile('cv.pdf'); setIsPdfOpen(true); setIsPdfMinimized(false); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#222222] rounded text-left">
-            <FileText className="w-4 h-4 text-red-400" />
+          <button onClick={() => { bringToFront('pdf'); setCurrentPdfFile('cv.pdf'); setIsPdfOpen(true); setIsPdfMinimized(false); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#E95420]/20 rounded text-left">
+            <FileText className="w-4 h-4 text-red-500" />
             <span>PDF Viewer (CV)</span>
           </button>
-          <button onClick={() => { setIsEditorOpen(true); setIsEditorMinimized(false); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#222222] rounded text-left">
-            <FileText className="w-4 h-4 text-blue-400" />
+          <button onClick={() => { bringToFront('editor'); setIsEditorOpen(true); setIsEditorMinimized(false); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#E95420]/20 rounded text-left">
+            <FileText className="w-4 h-4 text-blue-500" />
             <span>Text Editor (Gedit)</span>
           </button>
-          <button onClick={() => { setIsTermOpen(true); setIsTermMinimized(false); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#222222] rounded text-left">
-            <Terminal className="w-4 h-4 text-green-400" />
+          <button onClick={() => { bringToFront('terminal'); setIsTermOpen(true); setIsTermMinimized(false); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#E95420]/20 rounded text-left">
+            <Terminal className="w-4 h-4 text-green-500" />
             <span>Terminal</span>
+          </button>
+          <button onClick={() => { bringToFront('settings'); setIsSettingsOpen(true); setIsSettingsMinimized(false); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#E95420]/20 rounded text-left border-t border-gray-500/20 pt-2">
+            <Settings className="w-4 h-4 text-gray-500" />
+            <span>Settings</span>
           </button>
         </div>
       )}
 
-      {/* Ubuntu Bottom Dock */}
-      <footer className="absolute bottom-0 left-0 w-full h-10 bg-[#111111]/95 border-t border-[#222222] z-30 px-3 flex justify-between items-center text-xs">
+      {/* Dock Bar Theme Matched to Light & Dark Mode */}
+      <footer className={`absolute bottom-0 left-0 w-full h-10 border-t z-50 px-3 flex justify-between items-center text-xs backdrop-blur-md transition-colors ${
+        isLightMode ? 'bg-[#e5e5e5]/95 border-gray-300 text-gray-800' : 'bg-[#111111]/95 border-[#222222] text-gray-200'
+      }`}>
         <div className="flex items-center space-x-3">
-          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-1.5 rounded hover:bg-white/10 transition-colors" style={{ color: accentColor }}>
+          <button onClick={(e) => { e.stopPropagation(); setIsMenuOpen(!isMenuOpen); }} className="p-1.5 rounded hover:bg-black/10 transition-colors text-[#E95420]">
             <Grid className="w-4 h-4" />
           </button>
 
           {isWindowOpen && (
-            <button onClick={() => setIsWindowMinimized(!isWindowMinimized)} className={`flex items-center space-x-2 px-3 py-1 rounded text-white font-semibold transition-colors border ${isWindowMinimized ? 'bg-[#111111] border-[#333333] opacity-60' : 'bg-[#222222] border-[#333333]'}`}>
-              <Folder className="w-3.5 h-3.5" style={{ color: accentColor }} />
+            <button 
+              onClick={() => { bringToFront('files'); setIsWindowMinimized(!isWindowMinimized); }} 
+              className={`flex items-center space-x-2 px-3 py-1 rounded border font-semibold transition-colors ${
+                isLightMode 
+                  ? 'bg-white border-gray-300 text-gray-800 shadow-sm' 
+                  : 'bg-[#222222] border-[#333333] text-white'
+              }`}
+            >
+              <Folder className="w-3.5 h-3.5 text-amber-500" />
               <span>Files</span>
             </button>
           )}
 
           {isBrowserOpen && (
-            <button onClick={() => setIsBrowserMinimized(!isBrowserMinimized)} className={`flex items-center space-x-2 px-3 py-1 rounded text-white font-semibold transition-colors border ${isBrowserMinimized ? 'bg-[#111111] border-[#333333] opacity-60' : 'bg-[#222222] border-[#333333]'}`}>
-              <Globe className="w-3.5 h-3.5 text-blue-400" />
+            <button 
+              onClick={() => { bringToFront('browser'); setIsBrowserMinimized(!isBrowserMinimized); }} 
+              className={`flex items-center space-x-2 px-3 py-1 rounded border font-semibold transition-colors ${
+                isLightMode 
+                  ? 'bg-white border-gray-300 text-gray-800 shadow-sm' 
+                  : 'bg-[#222222] border-[#333333] text-white'
+              }`}
+            >
+              <Globe className="w-3.5 h-3.5 text-blue-500" />
               <span>Firefox</span>
             </button>
           )}
 
+          {isTermOpen && (
+            <button 
+              onClick={() => { bringToFront('terminal'); setIsTermMinimized(!isTermMinimized); }} 
+              className={`flex items-center space-x-2 px-3 py-1 rounded border font-semibold transition-colors ${
+                isLightMode 
+                  ? 'bg-white border-gray-300 text-gray-800 shadow-sm' 
+                  : 'bg-[#222222] border-[#333333] text-white'
+              }`}
+            >
+              <Terminal className="w-3.5 h-3.5 text-green-500" />
+              <span>Terminal</span>
+            </button>
+          )}
+
+          {isEditorOpen && (
+            <button 
+              onClick={() => { bringToFront('editor'); setIsEditorMinimized(!isEditorMinimized); }} 
+              className={`flex items-center space-x-2 px-3 py-1 rounded border font-semibold transition-colors ${
+                isLightMode 
+                  ? 'bg-white border-gray-300 text-gray-800 shadow-sm' 
+                  : 'bg-[#222222] border-[#333333] text-white'
+              }`}
+            >
+              <FileText className="w-3.5 h-3.5 text-blue-400" />
+              <span>Editor</span>
+            </button>
+          )}
+
+          {isPdfOpen && (
+            <button 
+              onClick={() => { bringToFront('pdf'); setIsPdfMinimized(!isPdfMinimized); }} 
+              className={`flex items-center space-x-2 px-3 py-1 rounded border font-semibold transition-colors ${
+                isLightMode 
+                  ? 'bg-white border-gray-300 text-gray-800 shadow-sm' 
+                  : 'bg-[#222222] border-[#333333] text-white'
+              }`}
+            >
+              <FileText className="w-3.5 h-3.5 text-red-500" />
+              <span>PDF</span>
+            </button>
+          )}
+
+          {isVideoOpen && (
+            <button 
+              onClick={() => { bringToFront('video'); setIsVideoMinimized(!isVideoMinimized); }} 
+              className={`flex items-center space-x-2 px-3 py-1 rounded border font-semibold transition-colors ${
+                isLightMode 
+                  ? 'bg-white border-gray-300 text-gray-800 shadow-sm' 
+                  : 'bg-[#222222] border-[#333333] text-white'
+              }`}
+            >
+              <Film className="w-3.5 h-3.5 text-purple-400" />
+              <span>Video</span>
+            </button>
+          )}
+
           {isContactOpen && (
-            <button onClick={() => setIsContactMinimized(!isContactMinimized)} className={`flex items-center space-x-2 px-3 py-1 rounded text-white font-semibold transition-colors border ${isContactMinimized ? 'bg-[#111111] border-[#333333] opacity-60' : 'bg-[#222222] border-[#333333]'}`}>
+            <button 
+              onClick={() => { bringToFront('contact'); setIsContactMinimized(!isContactMinimized); }} 
+              className={`flex items-center space-x-2 px-3 py-1 rounded border font-semibold transition-colors ${
+                isLightMode 
+                  ? 'bg-white border-gray-300 text-gray-800 shadow-sm' 
+                  : 'bg-[#222222] border-[#333333] text-white'
+              }`}
+            >
               <Mail className="w-3.5 h-3.5 text-sky-400" />
               <span>Contact</span>
             </button>
           )}
 
-          {isVideoOpen && (
-            <button onClick={() => setIsVideoMinimized(!isVideoMinimized)} className={`flex items-center space-x-2 px-3 py-1 rounded text-white font-semibold transition-colors border ${isVideoMinimized ? 'bg-[#111111] border-[#333333] opacity-60' : 'bg-[#222222] border-[#333333]'}`}>
-              <Film className="w-3.5 h-3.5 text-purple-400" />
-              <span className="truncate max-w-[100px]">{currentVideoTitle}</span>
-            </button>
-          )}
-
-          {isPdfOpen && (
-            <button onClick={() => setIsPdfMinimized(!isPdfMinimized)} className={`flex items-center space-x-2 px-3 py-1 rounded text-white font-semibold transition-colors border ${isPdfMinimized ? 'bg-[#111111] border-[#333333] opacity-60' : 'bg-[#222222] border-[#333333]'}`}>
-              <FileText className="w-3.5 h-3.5 text-red-400" />
-              <span className="truncate max-w-[100px]">{currentPdfFile}</span>
-            </button>
-          )}
-
-          {isEditorOpen && (
-            <button onClick={() => setIsEditorMinimized(!isEditorMinimized)} className={`flex items-center space-x-2 px-3 py-1 rounded text-white font-semibold transition-colors border ${isEditorMinimized ? 'bg-[#111111] border-[#333333] opacity-60' : 'bg-[#222222] border-[#333333]'}`}>
-              <FileText className="w-3.5 h-3.5" style={{ color: accentColor }} />
-              <span className="truncate max-w-[100px]">{currentEditorFile}</span>
-            </button>
-          )}
-
-          {isTermOpen && (
-            <button onClick={() => setIsTermMinimized(!isTermMinimized)} className={`flex items-center space-x-2 px-3 py-1 rounded text-white font-semibold transition-colors border ${isTermMinimized ? 'bg-[#111111] border-[#333333] opacity-60' : 'bg-[#222222] border-[#333333]'}`}>
-              <Terminal className="w-3.5 h-3.5 text-green-400" />
-              <span>Terminal</span>
+          {isSettingsOpen && (
+            <button 
+              onClick={() => { bringToFront('settings'); setIsSettingsMinimized(!isSettingsMinimized); }} 
+              className={`flex items-center space-x-2 px-3 py-1 rounded border font-semibold transition-colors ${
+                isLightMode 
+                  ? 'bg-white border-gray-300 text-gray-800 shadow-sm' 
+                  : 'bg-[#222222] border-[#333333] text-white'
+              }`}
+            >
+              <Settings className="w-3.5 h-3.5 text-gray-500" />
+              <span>Settings</span>
             </button>
           )}
         </div>
 
         <div className="text-[11px] text-gray-500 font-mono">
-          Double-click icons to open
+          Ubuntu Desktop OS
         </div>
       </footer>
     </div>
