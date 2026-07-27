@@ -7,10 +7,11 @@ export default function TextEditorWindow({
   isMinimized, 
   onClose, 
   onMinimize, 
-  onFocus, // <-- FIXED: Added missing onFocus prop
+  onFocus,
   fileName = 'whoami.sh', 
   fileContent = '', 
-  currentAccent = '#77216F' 
+  currentAccent = '#77216F',
+  isLightMode = false
 }) {
   const nodeRef = useRef(null);
   const [content, setContent] = useState('');
@@ -45,12 +46,20 @@ export default function TextEditorWindow({
       <div 
         ref={nodeRef} 
         onMouseDown={onFocus}
-        style={{ display: isMinimized ? 'none' : 'flex' }} // FIXED: Removed undefined zIndex reference
-        className="absolute top-24 left-1/4 w-[640px] h-[480px] bg-white border border-gray-300 rounded-t-lg shadow-2xl flex-col z-35 overflow-hidden font-mono text-xs select-none"
+        style={{ display: isMinimized ? 'none' : 'flex' }}
+        className={`absolute top-24 left-1/4 w-[640px] h-[480px] border rounded-t-lg shadow-2xl flex-col z-35 overflow-hidden font-mono text-xs select-none backdrop-blur-md ${
+          isLightMode 
+            ? 'bg-white border-gray-300 text-gray-900' 
+            : 'bg-[#1e1e1e] border-[#333333] text-gray-200'
+        }`}
       >
         {/* Header */}
-        <div className="editor-header cursor-move bg-gray-100 px-4 py-2.5 border-b border-gray-300 flex justify-between items-center">
-          <div className="flex items-center space-x-2 text-gray-800 font-bold">
+        <div className={`editor-header cursor-move px-4 py-2.5 border-b flex justify-between items-center ${
+          isLightMode 
+            ? 'bg-gray-100 border-gray-300 text-gray-800' 
+            : 'bg-[#111111] border-[#2b2b2b] text-gray-200'
+        }`}>
+          <div className="flex items-center space-x-2 font-bold">
             <FileText className="w-4 h-4" style={{ color: currentAccent }} />
             <span>Text Editor — {fileName}</span>
           </div>
@@ -58,7 +67,9 @@ export default function TextEditorWindow({
           <div className="flex items-center space-x-2">
             <button 
               onClick={onMinimize}
-              className="w-5 h-5 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-700 flex items-center justify-center transition-colors"
+              className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${
+                isLightMode ? 'bg-gray-200 hover:bg-gray-300 text-gray-700' : 'bg-gray-700 hover:bg-gray-600 text-gray-200'
+              }`}
             >
               <Minus className="w-3 h-3" />
             </button>
@@ -72,20 +83,32 @@ export default function TextEditorWindow({
         </div>
 
         {/* Toolbar */}
-        <div className="bg-gray-50 px-3 py-1.5 border-b border-gray-200 flex items-center justify-between text-gray-700 text-[11px]">
+        <div className={`px-3 py-1.5 border-b flex items-center justify-between text-[11px] ${
+          isLightMode 
+            ? 'bg-gray-50 border-gray-200 text-gray-700' 
+            : 'bg-[#181818] border-[#2d2d2d] text-gray-300'
+        }`}>
           <button 
             onClick={handleSave}
-            className="flex items-center space-x-1.5 bg-white border border-gray-300 hover:bg-gray-100 px-3 py-1 rounded transition-colors text-gray-800 font-medium cursor-pointer"
+            className={`flex items-center space-x-1.5 border px-3 py-1 rounded transition-colors font-medium cursor-pointer ${
+              isLightMode 
+                ? 'bg-white border-gray-300 hover:bg-gray-100 text-gray-800' 
+                : 'bg-[#252525] border-[#3d3d3d] hover:bg-[#303030] text-gray-200'
+            }`}
           >
-            {saved ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Save className="w-3.5 h-3.5" style={{ color: currentAccent }} />}
+            {saved ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Save className="w-3.5 h-3.5" style={{ color: currentAccent }} />}
             <span>{saved ? 'Saved!' : 'Save Changes'}</span>
           </button>
-          <div className="text-[10px] text-gray-500">UTF-8 • Bash/Text Mode</div>
+          <div className={`text-[10px] ${isLightMode ? 'text-gray-500' : 'text-gray-400'}`}>UTF-8 • Bash/Text Mode</div>
         </div>
 
         {/* Editor Body */}
-        <div className="flex-1 bg-white p-3 flex">
-          <div className="w-8 py-1 pr-3 text-right text-gray-400 select-none space-y-1 text-[11px] font-mono border-r border-gray-200">
+        <div className={`flex-1 p-3 flex ${isLightMode ? 'bg-white' : 'bg-[#1e1e1e]'}`}>
+          <div className={`w-8 py-1 pr-3 text-right select-none space-y-1 text-[11px] font-mono border-r ${
+            isLightMode 
+              ? 'text-gray-400 border-gray-200' 
+              : 'text-gray-600 border-[#2d2d2d]'
+          }`}>
             {content.split('\n').map((_, i) => (
               <div key={i}>{i + 1}</div>
             ))}
@@ -93,7 +116,9 @@ export default function TextEditorWindow({
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="flex-1 bg-transparent pl-4 py-1 text-gray-800 font-mono text-xs resize-none focus:outline-none leading-relaxed"
+            className={`flex-1 bg-transparent pl-4 py-1 font-mono text-xs resize-none focus:outline-none leading-relaxed ${
+              isLightMode ? 'text-gray-800' : 'text-gray-200'
+            }`}
             spellCheck="false"
           />
         </div>

@@ -213,6 +213,7 @@ export default function App() {
         setIsBluetoothOn={setIsBluetoothOn}
         volume={volume}
         setVolume={setVolume}
+        isLightMode={isLightMode}
       />
 
       <SystemMonitorWindow currentAccent={accentColor} isWidgetMode={true} isLightMode={isLightMode} />
@@ -223,7 +224,7 @@ export default function App() {
         ))}
       </div>
 
-      {/* Layered Window Stack - Fixed explicit position positioning for z-index stacking */}
+      {/* Layered Window Stack */}
       <div className="relative" style={{ zIndex: zIndices.settings }}>
         <SettingsWindow
           isOpen={isSettingsOpen}
@@ -272,6 +273,7 @@ export default function App() {
           onFocus={() => bringToFront('editor')}
           fileName={currentEditorFile}
           currentAccent={bgPreset}
+          isLightMode={isLightMode}
         />
       </div>
 
@@ -320,6 +322,7 @@ export default function App() {
           videoSrc={currentVideoSrc}
           videoTitle={currentVideoTitle}
           currentAccent={bgPreset}
+          isLightMode={isLightMode}
         />
       </div>
 
