@@ -12,20 +12,39 @@ import MediaViewerWindow from './components/MediaViewerWindow';
 import QuickSettingsMenu from './components/QuickSettingsMenu';
 import SettingsWindow from './components/SettingsWindow';
 import ContextMenu from './components/ContextMenu';
+import useIsMobile from './hooks/useIsMobile';
 import { 
   Folder, FileText, Mail, Terminal, Wifi, Volume2, 
   VolumeX, Grid, Globe, Film, Settings, Image as ImageIcon, Sparkles 
 } from 'lucide-react';
 
-function DesktopIcon({ item, onDoubleClick }) {
+function DesktopIcon({ item, onDoubleClick, isMobile }) {
   const nodeRef = useRef(null);
+  const dragStartX = useRef(0);
+  const dragStartY = useRef(0);
   const Icon = item.icon;
 
   return (
-    <Draggable defaultPosition={item.defaultPos} nodeRef={nodeRef}>
+    <Draggable
+      defaultPosition={item.defaultPos}
+      nodeRef={nodeRef}
+      onStart={(_event, data) => {
+        dragStartX.current = data.x;
+        dragStartY.current = data.y;
+      }}
+      onStop={(_event, data) => {
+        if (!isMobile) return;
+
+        const distance = Math.hypot(data.x - dragStartX.current, data.y - dragStartY.current);
+        if (distance < 5) {
+          // Use onDoubleClick handler so folders ('about', 'projects') correctly open Dolphin
+          onDoubleClick(item.id);
+        }
+      }}
+    >
       <div
         ref={nodeRef}
-        onDoubleClick={() => onDoubleClick(item.id)}
+        onDoubleClick={() => !isMobile && onDoubleClick(item.id)}
         className="absolute w-20 flex flex-col items-center justify-center p-2 rounded hover:bg-white/10 cursor-grab active:cursor-grabbing text-center space-y-1 group transition-colors select-none"
       >
         <Icon className={`w-10 h-10 ${item.color} filter drop-shadow group-hover:scale-105 transition-transform`} />
@@ -38,6 +57,8 @@ function DesktopIcon({ item, onDoubleClick }) {
 }
 
 export default function App() {
+  const isMobile = useIsMobile(768);
+
   // Global Appearance State (Jammy Dark Purple default)
   const [isLightMode, setIsLightMode] = useState(false);
   const [bgPreset, setBgPreset] = useState('#2C001E'); // Passed into ParticleBackground
@@ -96,6 +117,52 @@ export default function App() {
     });
   };
 
+  const windowControls = {
+    files: { isOpen: isWindowOpen, setIsMinimized: setIsWindowMinimized },
+    terminal: { isOpen: isTermOpen, setIsMinimized: setIsTermMinimized },
+    pdf: { isOpen: isPdfOpen, setIsMinimized: setIsPdfMinimized },
+    editor: { isOpen: isEditorOpen, setIsMinimized: setIsEditorMinimized },
+    browser: { isOpen: isBrowserOpen, setIsMinimized: setIsBrowserMinimized },
+    contact: { isOpen: isContactOpen, setIsMinimized: setIsContactMinimized },
+    media: { isOpen: isMediaOpen, setIsMinimized: setIsMediaMinimized },
+    settings: { isOpen: isSettingsOpen, setIsMinimized: setIsSettingsMinimized },
+  };
+
+  const minimizeOtherWindows = (activeAppId) => {
+    if (!isMobile) return;
+
+    Object.entries(windowControls).forEach(([appId, control]) => {
+      if (appId !== activeAppId && control.isOpen) {
+        control.setIsMinimized(true);
+      }
+    });
+  };
+
+  const focusWindow = (appId, setIsMinimized) => {
+    minimizeOtherWindows(appId);
+    setIsMinimized(false);
+    bringToFront(appId);
+  };
+
+  const openWindow = (appId, setIsOpen, setIsMinimized, beforeOpen) => {
+    minimizeOtherWindows(appId);
+    if (beforeOpen) beforeOpen();
+    setIsOpen(true);
+    setIsMinimized(false);
+    bringToFront(appId);
+  };
+
+  const toggleWindowMinimized = (appId, setIsMinimized, isMinimized) => {
+    if (isMinimized) {
+      minimizeOtherWindows(appId);
+      setIsMinimized(false);
+      bringToFront(appId);
+      return;
+    }
+
+    setIsMinimized(true);
+  };
+
   const [contextMenuPos, setContextMenuPos] = useState(null);
   const [isQuickSettingsOpen, setIsQuickSettingsOpen] = useState(false);
   const [isWifiOn, setIsWifiOn] = useState(true);
@@ -121,72 +188,52 @@ export default function App() {
   };
 
   const handleOpenApp = (appId) => {
-    bringToFront(appId);
     if (appId === 'terminal') {
-      setIsTermOpen(true);
-      setIsTermMinimized(false);
+      openWindow('terminal', setIsTermOpen, setIsTermMinimized);
     } else if (appId === 'cv' || appId === 'pdf') {
-      setCurrentPdfFile('cv.pdf');
-      setIsPdfOpen(true);
-      setIsPdfMinimized(false);
+      openWindow('pdf', setIsPdfOpen, setIsPdfMinimized, () => setCurrentPdfFile('cv.pdf'));
     } else if (appId === 'editor') {
-      setIsEditorOpen(true);
-      setIsEditorMinimized(false);
+      openWindow('editor', setIsEditorOpen, setIsEditorMinimized);
     } else if (appId === 'video' || appId === 'media') {
-      setIsMediaOpen(true);
-      setIsMediaMinimized(false);
+      openWindow('media', setIsMediaOpen, setIsMediaMinimized);
     } else if (appId === 'settings') {
-      setIsSettingsOpen(true);
-      setIsSettingsMinimized(false);
+      openWindow('settings', setIsSettingsOpen, setIsSettingsMinimized);
     } else if (appId === 'files') {
-      setIsWindowOpen(true);
-      setIsWindowMinimized(false);
+      openWindow('files', setIsWindowOpen, setIsWindowMinimized);
     } else if (appId === 'browser') {
-      setIsBrowserOpen(true);
-      setIsBrowserMinimized(false);
+      openWindow('browser', setIsBrowserOpen, setIsBrowserMinimized);
     } else if (appId === 'contact') {
-      setIsContactOpen(true);
-      setIsContactMinimized(false);
+      openWindow('contact', setIsContactOpen, setIsContactMinimized);
     }
   };
 
   const openMediaViewer = (title, src, type = 'image') => {
-    setMediaState({ title, src, type });
-    setIsMediaOpen(true);
-    setIsMediaMinimized(false);
-    bringToFront('media');
+    openWindow('media', setIsMediaOpen, setIsMediaMinimized, () => setMediaState({ title, src, type }));
   };
 
   const handleIconDoubleClick = (id) => {
     if (id === 'terminal') {
-      bringToFront('terminal');
-      setIsTermOpen(true);
-      setIsTermMinimized(false);
+      openWindow('terminal', setIsTermOpen, setIsTermMinimized);
     } else if (id === 'cv') {
-      bringToFront('pdf');
-      setCurrentPdfFile('cv.pdf');
-      setIsPdfOpen(true);
-      setIsPdfMinimized(false);
+      openWindow('pdf', setIsPdfOpen, setIsPdfMinimized, () => setCurrentPdfFile('cv.pdf'));
     } else if (id === 'contact') {
-      bringToFront('contact');
-      setIsContactOpen(true);
-      setIsContactMinimized(false);
+      openWindow('contact', setIsContactOpen, setIsContactMinimized);
     } else {
-      bringToFront('files');
-      setActiveTab(id);
-      setIsWindowOpen(true);
-      setIsWindowMinimized(false);
+      openWindow('files', setIsWindowOpen, setIsWindowMinimized, () => setActiveTab(id));
     }
   };
 
   return (
     <div 
-      onContextMenu={handleContextMenu}
-      onClick={() => setContextMenuPos(null)}
-      className={`relative w-screen h-screen overflow-hidden select-none font-mono transition-colors duration-500 ${
-        isLightMode ? 'text-gray-900' : 'text-gray-200'
-      }`}
-    >
+  onContextMenu={handleContextMenu}
+  onClick={() => {
+    setContextMenuPos(null);
+    setIsMenuOpen(false); // Add this to close the start menu on outside clicks
+  }}
+  className={`fixed inset-0 w-full h-[100dvh] overflow-hidden overscroll-none touch-none select-none font-mono transition-colors duration-500 ${
+    isLightMode ? 'text-gray-900' : 'text-gray-200'
+  }`}
+>
       {/* 1. Canvas Background dynamically updates when bgPreset changes */}
       <ParticleBackground bgPreset={bgPreset} />
 
@@ -234,12 +281,17 @@ export default function App() {
         isLightMode={isLightMode}
       />
 
-      <SystemMonitorWindow currentAccent={accentColor} isWidgetMode={true} isLightMode={isLightMode} />
+      <SystemMonitorWindow currentAccent={accentColor} isWidgetMode={true} isLightMode={isLightMode} isMobile={isMobile} />
 
       <div className="relative z-10 pt-8">
         {desktopIcons.map((item) => (
-          <DesktopIcon key={item.id} item={item} onDoubleClick={handleIconDoubleClick} />
-        ))}
+  <DesktopIcon
+    key={item.id}
+    item={item}
+    onDoubleClick={handleIconDoubleClick}
+    isMobile={isMobile}
+  />
+))}
       </div>
 
       {/* 2. Settings Window linked directly to bgPreset */}
@@ -247,80 +299,87 @@ export default function App() {
         isOpen={isSettingsOpen}
         isMinimized={isSettingsMinimized}
         onClose={() => setIsSettingsOpen(false)}
-        onMinimize={() => setIsSettingsMinimized(!isSettingsMinimized)}
-        onFocus={() => bringToFront('settings')}
+        onMinimize={() => toggleWindowMinimized('settings', setIsSettingsMinimized, isSettingsMinimized)}
+        onFocus={() => focusWindow('settings', setIsSettingsMinimized)}
         isLightMode={isLightMode}
         setIsLightMode={setIsLightMode}
         bgPreset={bgPreset}
         setBgPreset={setBgPreset}
         zIndex={zIndices.settings}
+        isMobile={isMobile}
       />
 
       <DolphinWindow
         isOpen={isWindowOpen}
         isMinimized={isWindowMinimized}
         onClose={() => setIsWindowOpen(false)}
-        onMinimize={() => setIsWindowMinimized(!isWindowMinimized)}
-        onFocus={() => bringToFront('files')}
+        onMinimize={() => toggleWindowMinimized('files', setIsWindowMinimized, isWindowMinimized)}
+        onFocus={() => focusWindow('files', setIsWindowMinimized)}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         isLightMode={isLightMode}
         zIndex={zIndices.files}
+        isMobile={isMobile}
       />
 
       <PdfViewerWindow
         isOpen={isPdfOpen}
         isMinimized={isPdfMinimized}
         onClose={() => setIsPdfOpen(false)}
-        onMinimize={() => setIsPdfMinimized(!isPdfMinimized)}
-        onFocus={() => bringToFront('pdf')}
+        onMinimize={() => toggleWindowMinimized('pdf', setIsPdfMinimized, isPdfMinimized)}
+        onFocus={() => focusWindow('pdf', setIsPdfMinimized)}
         pdfFile={currentPdfFile}
         isLightMode={isLightMode}
         zIndex={zIndices.pdf}
+        isMobile={isMobile}
       />
 
       <TextEditorWindow
         isOpen={isEditorOpen}
         isMinimized={isEditorMinimized}
         onClose={() => setIsEditorOpen(false)}
-        onMinimize={() => setIsEditorMinimized(!isEditorMinimized)}
-        onFocus={() => bringToFront('editor')}
+        onMinimize={() => toggleWindowMinimized('editor', setIsEditorMinimized, isEditorMinimized)}
+        onFocus={() => focusWindow('editor', setIsEditorMinimized)}
         fileName={currentEditorFile}
         currentAccent={accentColor}
         isLightMode={isLightMode}
         zIndex={zIndices.editor}
+        isMobile={isMobile}
       />
 
       <TerminalWindow
         isOpen={isTermOpen}
         isMinimized={isTermMinimized}
         onClose={() => setIsTermOpen(false)}
-        onMinimize={() => setIsTermMinimized(!isTermMinimized)}
-        onFocus={() => bringToFront('terminal')}
+        onMinimize={() => toggleWindowMinimized('terminal', setIsTermMinimized, isTermMinimized)}
+        onFocus={() => focusWindow('terminal', setIsTermMinimized)}
         isLightMode={isLightMode}
         zIndex={zIndices.terminal}
+        isMobile={isMobile}
       />
 
       <BrowserWindow
         isOpen={isBrowserOpen}
         isMinimized={isBrowserMinimized}
         onClose={() => setIsBrowserOpen(false)}
-        onMinimize={() => setIsBrowserMinimized(!isBrowserMinimized)}
-        onFocus={() => bringToFront('browser')}
+        onMinimize={() => toggleWindowMinimized('browser', setIsBrowserMinimized, isBrowserMinimized)}
+        onFocus={() => focusWindow('browser', setIsBrowserMinimized)}
         currentAccent={accentColor}
         isLightMode={isLightMode}
         zIndex={zIndices.browser}
+        isMobile={isMobile}
       />
 
       <ContactWindow
         isOpen={isContactOpen}
         isMinimized={isContactMinimized}
         onClose={() => setIsContactOpen(false)}
-        onMinimize={() => setIsContactMinimized(!isContactMinimized)}
-        onFocus={() => bringToFront('contact')}
+        onMinimize={() => toggleWindowMinimized('contact', setIsContactMinimized, isContactMinimized)}
+        onFocus={() => focusWindow('contact', setIsContactMinimized)}
         currentAccent={accentColor}
         isLightMode={isLightMode}
         zIndex={zIndices.contact}
+        isMobile={isMobile}
       />
 
       {/* 3. Media Viewer Window Integrated */}
@@ -328,19 +387,23 @@ export default function App() {
         isOpen={isMediaOpen}
         isMinimized={isMediaMinimized}
         onClose={() => setIsMediaOpen(false)}
-        onMinimize={() => setIsMediaMinimized(!isMediaMinimized)}
-        onFocus={() => bringToFront('media')}
+        onMinimize={() => toggleWindowMinimized('media', setIsMediaMinimized, isMediaMinimized)}
+        onFocus={() => focusWindow('media', setIsMediaMinimized)}
         mediaTitle={mediaState.title}
         mediaSrc={mediaState.src}
         mediaType={mediaState.type}
         currentAccent={accentColor}
         isLightMode={isLightMode}
         zIndex={zIndices.media}
+        isMobile={isMobile}
       />
 
       {/* Start Menu Launcher */}
       {isMenuOpen && (
-        <div className={`absolute bottom-12 left-2 w-64 rounded-t-lg border shadow-2xl z-50 p-2 text-xs space-y-1 backdrop-blur-md ${
+        
+        
+        <div
+        onClick={(e) => e.stopPropagation()} className={`absolute bottom-16 left-2 w-64 rounded-t-lg border shadow-2xl z-50 p-2 text-xs space-y-1 backdrop-blur-md ${
           isLightMode ? 'bg-[#f4f4f4]/95 border-gray-300 text-gray-800' : 'bg-[#111111]/95 border-[#333333] text-gray-200'
         }`}>
           <div className="p-2 font-bold border-b border-gray-500/20 uppercase tracking-wider text-[10px] text-[#E95420]">
@@ -379,20 +442,23 @@ export default function App() {
             <span>Settings</span>
           </button>
         </div>
+        
       )}
 
       {/* Dock Bar */}
-      <footer className={`absolute bottom-0 left-0 w-full h-10 border-t z-50 px-3 flex justify-between items-center text-xs backdrop-blur-md transition-colors ${
-        isLightMode ? 'bg-[#e5e5e5]/95 border-gray-300 text-gray-800' : 'bg-[#111111]/95 border-[#222222] text-gray-200'
-      }`}>
-        <div className="flex items-center space-x-3">
+      <footer className={`fixed left-0 w-full border-t z-50 backdrop-blur-md transition-colors ${
+  isMobile ? 'bottom-0 h-auto min-h-[4rem] px-2 py-2 pb-[env(safe-area-inset-bottom)] flex flex-row items-center justify-between overflow-x-auto overflow-y-hidden flex-shrink-0' : 'bottom-0 h-10 px-3 flex justify-between items-center'
+} ${
+  isLightMode ? 'bg-[#e5e5e5]/95 border-gray-300 text-gray-800' : 'bg-[#111111]/95 border-[#222222] text-gray-200'
+}`}>
+        <div className={`flex items-center space-x-3 ${isMobile ? 'overflow-x-auto overflow-y-hidden flex-shrink-0' : ''}`}>
           <button onClick={(e) => { e.stopPropagation(); setIsMenuOpen(!isMenuOpen); }} className="p-1.5 rounded hover:bg-black/10 transition-colors text-[#E95420]">
             <Grid className="w-4 h-4" />
           </button>
 
           {isWindowOpen && (
             <button 
-              onClick={() => { bringToFront('files'); setIsWindowMinimized(!isWindowMinimized); }} 
+              onClick={() => toggleWindowMinimized('files', setIsWindowMinimized, isWindowMinimized)} 
               className={`flex items-center space-x-2 px-3 py-1 rounded border font-semibold transition-colors ${
                 isLightMode 
                   ? 'bg-white border-gray-300 text-gray-800 shadow-sm' 
@@ -406,7 +472,7 @@ export default function App() {
 
           {isBrowserOpen && (
             <button 
-              onClick={() => { bringToFront('browser'); setIsBrowserMinimized(!isBrowserMinimized); }} 
+              onClick={() => toggleWindowMinimized('browser', setIsBrowserMinimized, isBrowserMinimized)} 
               className={`flex items-center space-x-2 px-3 py-1 rounded border font-semibold transition-colors ${
                 isLightMode 
                   ? 'bg-white border-gray-300 text-gray-800 shadow-sm' 
@@ -420,7 +486,7 @@ export default function App() {
 
           {isTermOpen && (
             <button 
-              onClick={() => { bringToFront('terminal'); setIsTermMinimized(!isTermMinimized); }} 
+              onClick={() => toggleWindowMinimized('terminal', setIsTermMinimized, isTermMinimized)} 
               className={`flex items-center space-x-2 px-3 py-1 rounded border font-semibold transition-colors ${
                 isLightMode 
                   ? 'bg-white border-gray-300 text-gray-800 shadow-sm' 
@@ -434,7 +500,7 @@ export default function App() {
 
           {isEditorOpen && (
             <button 
-              onClick={() => { bringToFront('editor'); setIsEditorMinimized(!isEditorMinimized); }} 
+              onClick={() => toggleWindowMinimized('editor', setIsEditorMinimized, isEditorMinimized)} 
               className={`flex items-center space-x-2 px-3 py-1 rounded border font-semibold transition-colors ${
                 isLightMode 
                   ? 'bg-white border-gray-300 text-gray-800 shadow-sm' 
@@ -448,7 +514,7 @@ export default function App() {
 
           {isPdfOpen && (
             <button 
-              onClick={() => { bringToFront('pdf'); setIsPdfMinimized(!isPdfMinimized); }} 
+              onClick={() => toggleWindowMinimized('pdf', setIsPdfMinimized, isPdfMinimized)} 
               className={`flex items-center space-x-2 px-3 py-1 rounded border font-semibold transition-colors ${
                 isLightMode 
                   ? 'bg-white border-gray-300 text-gray-800 shadow-sm' 
@@ -462,7 +528,7 @@ export default function App() {
 
           {isMediaOpen && (
             <button 
-              onClick={() => { bringToFront('media'); setIsMediaMinimized(!isMediaMinimized); }} 
+              onClick={() => toggleWindowMinimized('media', setIsMediaMinimized, isMediaMinimized)} 
               className={`flex items-center space-x-2 px-3 py-1 rounded border font-semibold transition-colors ${
                 isLightMode 
                   ? 'bg-white border-gray-300 text-gray-800 shadow-sm' 
@@ -476,7 +542,7 @@ export default function App() {
 
           {isContactOpen && (
             <button 
-              onClick={() => { bringToFront('contact'); setIsContactMinimized(!isContactMinimized); }} 
+              onClick={() => toggleWindowMinimized('contact', setIsContactMinimized, isContactMinimized)} 
               className={`flex items-center space-x-2 px-3 py-1 rounded border font-semibold transition-colors ${
                 isLightMode 
                   ? 'bg-white border-gray-300 text-gray-800 shadow-sm' 
@@ -490,7 +556,7 @@ export default function App() {
 
           {isSettingsOpen && (
             <button 
-              onClick={() => { bringToFront('settings'); setIsSettingsMinimized(!isSettingsMinimized); }} 
+              onClick={() => toggleWindowMinimized('settings', setIsSettingsMinimized, isSettingsMinimized)} 
               className={`flex items-center space-x-2 px-3 py-1 rounded border font-semibold transition-colors ${
                 isLightMode 
                   ? 'bg-white border-gray-300 text-gray-800 shadow-sm' 

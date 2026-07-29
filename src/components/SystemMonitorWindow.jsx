@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Draggable from 'react-draggable';
 import { X, Minus, Activity, Cpu, HardDrive, Wifi } from 'lucide-react';
+import useIsMobile from '../hooks/useIsMobile';
 
 export default function SystemMonitorWindow({ 
   isOpen = true, 
@@ -13,6 +14,7 @@ export default function SystemMonitorWindow({
   onFocus
 }) {
   const nodeRef = useRef(null);
+  const isMobile = useIsMobile(768);
 
   const [cpuHistory, setCpuHistory] = useState(Array(20).fill(15));
   const [ramHistory, setRamHistory] = useState(Array(20).fill(42));
@@ -63,6 +65,10 @@ export default function SystemMonitorWindow({
     );
   };
 
+  if (isWidgetMode && isMobile) {
+    return null;
+  }
+
   if (isWidgetMode) {
     return (
       <div className={`absolute top-10 right-4 w-60 backdrop-blur-md border rounded-lg p-3 z-20 font-mono text-xs shadow-2xl pointer-events-none select-none ${
@@ -110,11 +116,15 @@ export default function SystemMonitorWindow({
   if (!isOpen || isMinimized) return null;
 
   return (
-    <Draggable handle=".monitor-header" nodeRef={nodeRef}>
+    <Draggable handle=".monitor-header" nodeRef={nodeRef} disabled={isMobile}>
       <div 
         ref={nodeRef}
         onMouseDown={onFocus}
-        className={`absolute top-24 right-20 w-[340px] backdrop-blur-md border rounded-t-lg shadow-2xl flex flex-col overflow-hidden font-mono text-xs select-none ${
+        onPointerDownCapture={onFocus}
+        style={{ zIndex: isMobile ? 100 : zIndex }}
+        className={`backdrop-blur-md border shadow-2xl flex flex-col overflow-hidden font-mono text-xs select-none ${
+          isMobile ? 'fixed inset-0 w-full h-[100dvh] rounded-none' : 'absolute top-24 right-20 w-[340px] rounded-t-lg'
+        } ${
           isLightMode ? 'bg-[#fafafa] border-gray-300 text-gray-900' : 'bg-[#1e1e1e]/95 border-[#333333] text-gray-200'
         }`}
       >
@@ -127,10 +137,10 @@ export default function SystemMonitorWindow({
           </div>
           
           <div className="flex items-center space-x-2">
-            <button onClick={onMinimize} className="w-5 h-5 rounded-full bg-gray-500/20 hover:bg-gray-500/40 flex items-center justify-center transition-colors">
+            <button onClick={onMinimize} className={`rounded-full bg-gray-500/20 hover:bg-gray-500/40 flex items-center justify-center transition-colors ${isMobile ? 'p-2' : 'w-5 h-5'}`}>
               <Minus className="w-3 h-3" />
             </button>
-            <button onClick={onClose} className="w-5 h-5 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center transition-colors">
+            <button onClick={onClose} className={`rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center transition-colors ${isMobile ? 'p-2' : 'w-5 h-5'}`}>
               <X className="w-3 h-3" />
             </button>
           </div>

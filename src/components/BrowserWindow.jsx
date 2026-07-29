@@ -4,6 +4,7 @@ import {
   X, Minus, Globe, ChevronLeft, ChevronRight, RotateCw, 
   Lock, Star, ExternalLink, ShieldCheck, Terminal, Folder, FileText 
 } from 'lucide-react';
+import useIsMobile from '../hooks/useIsMobile';
 
 export default function BrowserWindow({ 
   isOpen = true, 
@@ -16,6 +17,7 @@ export default function BrowserWindow({
   zIndex = 30
 }) {
   const nodeRef = useRef(null);
+  const isMobile = useIsMobile(768);
   const [urlInput, setUrlInput] = useState('https://portfolio.local/security-research');
   const [currentUrl, setCurrentUrl] = useState('https://portfolio.local/security-research');
   const [history, setHistory] = useState(['https://portfolio.local/security-research']);
@@ -61,12 +63,15 @@ export default function BrowserWindow({
   if (!isOpen || isMinimized) return null;
 
   return (
-    <Draggable handle=".browser-header" nodeRef={nodeRef}>
+    <Draggable handle=".browser-header" nodeRef={nodeRef} disabled={isMobile}>
       <div 
         ref={nodeRef}
         onMouseDownCapture={onFocus}
-        style={{ zIndex }}
-        className={`absolute top-16 left-28 w-[860px] h-[580px] border rounded-t-lg shadow-2xl flex flex-col overflow-hidden font-mono text-xs select-none backdrop-blur-md ${
+        onPointerDownCapture={onFocus}
+        style={{ zIndex: isMobile ? 100 : zIndex }}
+        className={`border shadow-2xl flex flex-col overflow-hidden font-mono text-xs select-none backdrop-blur-md ${
+          isMobile ? 'fixed inset-0 w-full h-[100dvh] rounded-none' : 'absolute top-16 left-28 w-[860px] h-[580px] rounded-t-lg'
+        } ${
           isLightMode 
             ? 'bg-white border-gray-300 text-gray-900' 
             : 'bg-[#1c1b22] border-[#383441] text-gray-100'
@@ -75,6 +80,7 @@ export default function BrowserWindow({
         {/* Title Bar */}
         <div 
           onMouseDown={onFocus}
+          onPointerDown={onFocus}
           className={`browser-header cursor-move px-4 py-2.5 border-b flex justify-between items-center ${
             isLightMode 
               ? 'bg-gray-100 border-gray-300 text-gray-800' 
@@ -89,7 +95,7 @@ export default function BrowserWindow({
           <div className="flex items-center space-x-2 shrink-0">
             <button 
               onClick={onMinimize} 
-              className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${
+              className={`rounded-full flex items-center justify-center transition-colors ${isMobile ? 'p-2' : 'w-5 h-5'} ${
                 isLightMode 
                   ? 'bg-gray-200 hover:bg-gray-300 text-gray-700' 
                   : 'bg-[#2b2a33] hover:bg-[#383441] text-gray-200'
@@ -99,7 +105,7 @@ export default function BrowserWindow({
             </button>
             <button 
               onClick={onClose} 
-              className="w-5 h-5 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center transition-colors"
+              className={`rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center transition-colors ${isMobile ? 'p-2' : 'w-5 h-5'}`}
             >
               <X className="w-3 h-3" />
             </button>

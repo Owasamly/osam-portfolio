@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Draggable from 'react-draggable';
 import { X, Minus, FileText, Save, Check } from 'lucide-react';
+import useIsMobile from '../hooks/useIsMobile';
 
 export default function TextEditorWindow({ 
   isOpen, 
@@ -15,6 +16,7 @@ export default function TextEditorWindow({
   zIndex = 35
 }) {
   const nodeRef = useRef(null);
+  const isMobile = useIsMobile(768);
   const [content, setContent] = useState('');
   const [saved, setSaved] = useState(false);
 
@@ -43,12 +45,15 @@ export default function TextEditorWindow({
   if (!isOpen) return null;
 
   return (
-    <Draggable handle=".editor-header" nodeRef={nodeRef}>
+    <Draggable handle=".editor-header" nodeRef={nodeRef} disabled={isMobile}>
       <div 
         ref={nodeRef} 
         onMouseDownCapture={onFocus}
-        style={{ display: isMinimized ? 'none' : 'flex', zIndex }}
-        className={`absolute top-24 left-1/4 w-[640px] h-[480px] border rounded-t-lg shadow-2xl flex-col overflow-hidden font-mono text-xs select-none backdrop-blur-md ${
+        onPointerDownCapture={onFocus}
+        style={{ display: isMinimized ? 'none' : 'flex', zIndex: isMobile ? 100 : zIndex }}
+        className={`border shadow-2xl flex-col overflow-hidden font-mono text-xs select-none backdrop-blur-md ${
+          isMobile ? 'fixed inset-0 w-full h-[100dvh] rounded-none' : 'absolute top-24 left-1/4 w-[640px] h-[480px] rounded-t-lg'
+        } ${
           isLightMode 
             ? 'bg-white border-gray-300 text-gray-900' 
             : 'bg-[#1e1e1e] border-[#333333] text-gray-200'
@@ -57,6 +62,7 @@ export default function TextEditorWindow({
         {/* Header */}
         <div 
           onMouseDown={onFocus}
+          onPointerDown={onFocus}
           className={`editor-header cursor-move px-4 py-2.5 border-b flex justify-between items-center ${
             isLightMode 
               ? 'bg-gray-100 border-gray-300 text-gray-800' 
@@ -71,7 +77,7 @@ export default function TextEditorWindow({
           <div className="flex items-center space-x-2">
             <button 
               onClick={onMinimize}
-              className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${
+              className={`rounded-full flex items-center justify-center transition-colors ${isMobile ? 'p-2' : 'w-5 h-5'} ${
                 isLightMode ? 'bg-gray-200 hover:bg-gray-300 text-gray-700' : 'bg-gray-700 hover:bg-gray-600 text-gray-200'
               }`}
             >
@@ -79,7 +85,7 @@ export default function TextEditorWindow({
             </button>
             <button 
               onClick={onClose} 
-              className="w-5 h-5 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center transition-colors"
+              className={`rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center transition-colors ${isMobile ? 'p-2' : 'w-5 h-5'}`}
             >
               <X className="w-3 h-3" />
             </button>

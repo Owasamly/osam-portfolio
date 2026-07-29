@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import Draggable from 'react-draggable';
 import { X, Minus, Folder, FileText, ChevronLeft, ChevronRight, LayoutGrid, List, Monitor, Download, Music, Image, Video, Briefcase, User, Archive } from 'lucide-react';
+import useIsMobile from '../hooks/useIsMobile';
 
 export default function DolphinWindow({ 
   isOpen, 
@@ -16,6 +17,7 @@ export default function DolphinWindow({
   zIndex = 25
 }) {
   const nodeRef = useRef(null);
+  const isMobile = useIsMobile(768);
 
   const [history, setHistory] = useState(['about']);
   const [historyIndex, setHistoryIndex] = useState(0);
@@ -94,6 +96,7 @@ export default function DolphinWindow({
   };
 
   const currentItems = directoryContents[activeTab] || [];
+  const isMobileListView = isMobile || viewMode === 'list';
 
   const handleSidebarClick = (id) => navigateTo(id);
 
@@ -108,18 +111,22 @@ export default function DolphinWindow({
   };
 
   return (
-    <Draggable handle=".ubuntu-header" nodeRef={nodeRef}>
+    <Draggable handle=".ubuntu-header" nodeRef={nodeRef} disabled={isMobile}>
       <div 
         ref={nodeRef} 
         onMouseDownCapture={onFocus}
-        style={{ display: isMinimized ? 'none' : 'flex', zIndex }}
-        className={`absolute top-20 left-1/2 -translate-x-1/2 w-[740px] h-[520px] rounded-t-lg border shadow-2xl flex-col overflow-hidden font-mono text-xs select-none backdrop-blur-md ${
+        onPointerDownCapture={onFocus}
+        style={{ display: isMinimized ? 'none' : 'flex', zIndex: isMobile ? 100 : zIndex }}
+        className={`border shadow-2xl flex-col overflow-hidden font-mono text-xs select-none backdrop-blur-md ${
+          isMobile ? 'fixed inset-0 w-full h-[100dvh] rounded-none' : 'absolute top-20 left-1/2 -translate-x-1/2 w-[740px] h-[520px] rounded-t-lg'
+        } ${
           isLightMode ? 'bg-[#fafafa] text-gray-800 border-gray-300' : 'bg-[#1e1e1e]/95 text-gray-200 border-[#333333]'
         }`}
       >
         {/* Header */}
         <div 
           onMouseDown={onFocus}
+          onPointerDown={onFocus}
           className={`ubuntu-header cursor-move px-4 py-2.5 border-b flex justify-between items-center ${
             isLightMode ? 'bg-[#e5e5e5] border-gray-300 text-gray-900' : 'bg-[#111111] border-[#2b2b2b] text-gray-200'
           }`}
@@ -130,12 +137,12 @@ export default function DolphinWindow({
           </div>
           
           <div className="flex items-center space-x-2">
-            <button onClick={onMinimize} className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${
+            <button onClick={onMinimize} className={`rounded-full flex items-center justify-center transition-colors ${isMobile ? 'p-2' : 'w-5 h-5'} ${
               isLightMode ? 'bg-gray-300 hover:bg-gray-400 text-gray-800' : 'bg-[#333333] hover:bg-[#444444] text-gray-300'
             }`}>
               <Minus className="w-3 h-3" />
             </button>
-            <button onClick={onClose} className="w-5 h-5 rounded-full bg-[#E95420] hover:bg-red-600 text-white flex items-center justify-center transition-colors">
+            <button onClick={onClose} className={`rounded-full bg-[#E95420] hover:bg-red-600 text-white flex items-center justify-center transition-colors ${isMobile ? 'p-2' : 'w-5 h-5'}`}>
               <X className="w-3 h-3" />
             </button>
           </div>
@@ -235,6 +242,31 @@ export default function DolphinWindow({
                 <Folder className="w-10 h-10 mx-auto opacity-30" />
                 <div>This folder is empty</div>
               </div>
+            ) : isMobileListView ? (
+              <div className={`flex flex-col space-y-2 ${isLightMode ? 'text-gray-900' : 'text-gray-200'}`}>
+                {currentItems.map((item, idx) => {
+                  const Icon = item.icon;
+                  return (
+                    <div
+                      key={idx}
+                      onDoubleClick={() => handleItemDoubleClick(item)}
+                      className={`flex flex-row items-center space-x-3 w-full p-2 border-b transition-colors cursor-pointer group select-none ${
+                        isLightMode ? 'hover:bg-gray-50 border-gray-200' : 'hover:bg-white/5 border-[#2a2a2a]'
+                      }`}
+                    >
+                      <Icon className={`w-7 h-7 ${item.color} shrink-0`} />
+                      <div className="min-w-0 flex-1">
+                        <div className={`text-[14px] font-medium transition-colors ${isLightMode ? 'text-gray-800' : 'text-gray-200'}`}>
+                          {item.name}
+                        </div>
+                        <div className="text-[11px] text-gray-400">
+                          {item.ext}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             ) : viewMode === 'grid' ? (
               <div className="grid grid-cols-4 gap-4">
                 {currentItems.map((item, idx) => {
@@ -248,7 +280,7 @@ export default function DolphinWindow({
                       }`}
                     >
                       <Icon className={`w-10 h-10 ${item.color} group-hover:scale-105 transition-transform drop-shadow`} />
-                      <span className={`text-[11px] font-medium truncate w-full group-hover:text-[#E95420] transition-colors ${
+                      <span className={`text-[11px] font-medium w-full group-hover:text-[#E95420] transition-colors ${
                         isLightMode ? 'text-gray-800' : 'text-gray-200'
                       }`}>
                         {item.name}
@@ -280,13 +312,13 @@ export default function DolphinWindow({
                       >
                         <div className="col-span-8 flex items-center space-x-2.5">
                           <Icon className={`w-4 h-4 ${item.color} shrink-0`} />
-                          <span className={`group-hover:text-[#E95420] transition-colors font-medium truncate ${
+                          <span className={`group-hover:text-[#E95420] transition-colors font-medium ${
                             isLightMode ? 'text-gray-800' : 'text-gray-200'
                           }`}>
                             {item.name}
                           </span>
                         </div>
-                        <div className="col-span-4 text-gray-400 text-[11px] truncate">
+                        <div className="col-span-4 text-gray-400 text-[11px]">
                           {item.ext}
                         </div>
                       </div>

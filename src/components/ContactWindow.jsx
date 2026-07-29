@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import Draggable from 'react-draggable';
 import { Mail, X, Minus, Send, CheckCircle2 } from 'lucide-react';
+import useIsMobile from '../hooks/useIsMobile';
 
 export default function ContactWindow({ 
   isOpen, 
@@ -13,6 +14,7 @@ export default function ContactWindow({
   zIndex = 25
 }) {
   const nodeRef = useRef(null);
+  const isMobile = useIsMobile(768);
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
 
@@ -28,12 +30,15 @@ export default function ContactWindow({
   };
 
   return (
-    <Draggable handle=".contact-header" nodeRef={nodeRef}>
+    <Draggable handle=".contact-header" nodeRef={nodeRef} disabled={isMobile}>
       <div 
         ref={nodeRef} 
         onMouseDownCapture={onFocus}
-        style={{ zIndex }}
-        className={`absolute top-24 left-1/3 w-[460px] border rounded-t-lg shadow-2xl flex flex-col overflow-hidden font-mono text-xs select-none backdrop-blur-md ${
+        onPointerDownCapture={onFocus}
+        style={{ zIndex: isMobile ? 100 : zIndex }}
+        className={`border shadow-2xl flex flex-col overflow-hidden font-mono text-xs select-none backdrop-blur-md ${
+          isMobile ? 'fixed inset-0 w-full h-[100dvh] rounded-none' : 'absolute top-24 left-1/3 w-[460px] rounded-t-lg'
+        } ${
           isLightMode 
             ? 'bg-white border-gray-300 text-gray-900' 
             : 'bg-[#1e1e1e] border-[#333333] text-gray-200'
@@ -41,6 +46,7 @@ export default function ContactWindow({
       >
         <div 
           onMouseDown={onFocus}
+          onPointerDown={onFocus}
           className={`contact-header cursor-move px-4 py-2.5 border-b flex justify-between items-center ${
             isLightMode 
               ? 'bg-gray-100 border-gray-300 text-gray-800' 
@@ -54,13 +60,13 @@ export default function ContactWindow({
           <div className="flex items-center space-x-2">
             <button 
               onClick={onMinimize} 
-              className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${
+              className={`rounded-full flex items-center justify-center transition-colors ${isMobile ? 'p-2' : 'w-5 h-5'} ${
                 isLightMode ? 'bg-gray-200 hover:bg-gray-300 text-gray-700' : 'bg-gray-700 hover:bg-gray-600 text-gray-200'
               }`}
             >
               <Minus className="w-3 h-3" />
             </button>
-            <button onClick={onClose} className="w-5 h-5 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center transition-colors">
+            <button onClick={onClose} className={`rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center transition-colors ${isMobile ? 'p-2' : 'w-5 h-5'}`}>
               <X className="w-3 h-3" />
             </button>
           </div>
