@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Draggable from 'react-draggable';
 import { 
   X, Minus, Globe, ChevronLeft, ChevronRight, RotateCw, 
@@ -12,33 +12,45 @@ export default function BrowserWindow({
   onClose, 
   onMinimize, 
   onFocus,
+  initialUrl = 'https://portfolio.local/security-research',
   currentAccent = '#77216F',
   isLightMode = false,
   zIndex = 30
 }) {
   const nodeRef = useRef(null);
   const isMobile = useIsMobile(768);
-  const [urlInput, setUrlInput] = useState('https://portfolio.local/security-research');
-  const [currentUrl, setCurrentUrl] = useState('https://portfolio.local/security-research');
-  const [history, setHistory] = useState(['https://portfolio.local/security-research']);
+  
+  const [urlInput, setUrlInput] = useState(initialUrl);
+  const [currentUrl, setCurrentUrl] = useState(initialUrl);
+  const [history, setHistory] = useState([initialUrl]);
   const [historyIndex, setHistoryIndex] = useState(0);
 
+  // Sync internal state if a new initialUrl is passed from outside (e.g. clicking .url files)
+  useEffect(() => {
+    if (initialUrl && initialUrl !== currentUrl) {
+      setUrlInput(initialUrl);
+      setCurrentUrl(initialUrl);
+      setHistory([initialUrl]);
+      setHistoryIndex(0);
+    }
+  }, [initialUrl]);
+
   const handleNavigate = (newUrl) => {
-    setUrlInput(newUrl);
-    setCurrentUrl(newUrl);
+    let formattedUrl = newUrl.trim();
+    if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
+      formattedUrl = 'https://' + formattedUrl;
+    }
+    setUrlInput(formattedUrl);
+    setCurrentUrl(formattedUrl);
     const newHistory = history.slice(0, historyIndex + 1);
-    newHistory.push(newUrl);
+    newHistory.push(formattedUrl);
     setHistory(newHistory);
     setHistoryIndex(newHistory.length - 1);
   };
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
-      let formattedUrl = urlInput.trim();
-      if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
-        formattedUrl = 'https://' + formattedUrl;
-      }
-      handleNavigate(formattedUrl);
+      handleNavigate(urlInput);
     }
   };
 
@@ -176,7 +188,7 @@ export default function BrowserWindow({
         <div className={`flex-1 overflow-y-auto p-6 ${
           isLightMode ? 'bg-gray-50 text-gray-700' : 'bg-[#121117] text-gray-200'
         }`}>
-          {currentUrl.includes('security-research') ? (
+          {currentUrl.includes('security-research') || currentUrl.includes('portfolio.local') ? (
             <div className="space-y-6 max-w-2xl mx-auto">
               <div className={`border rounded-lg p-5 space-y-3 shadow-sm ${
                 isLightMode 
@@ -219,7 +231,7 @@ export default function BrowserWindow({
                     <span>View GitHub Repos</span>
                   </button>
                   <button 
-                    onClick={() => handleNavigate('https://blog.local/writeups')} 
+                    onClick={() => handleNavigate('https://github.com/osamakahsay')} 
                     className={`px-3 py-1.5 rounded border transition-colors flex items-center space-x-1.5 font-medium cursor-pointer ${
                       isLightMode 
                         ? 'bg-gray-100 hover:bg-gray-200 text-gray-800 border-gray-300' 
@@ -227,75 +239,73 @@ export default function BrowserWindow({
                     }`}
                   >
                     <FileText className="w-3.5 h-3.5 text-amber-500" />
-                    <span>Read Writeups</span>
+                    <span>Open Osama's GitHub Profile</span>
                   </button>
                 </div>
               </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className={`p-4 rounded border shadow-sm space-y-2 ${
-                  isLightMode ? 'bg-white border-gray-200' : 'bg-[#1c1b22] border-[#2b2a33]'
-                }`}>
-                  <h3 className={`font-bold flex items-center space-x-1.5 ${
-                    isLightMode ? 'text-gray-900' : 'text-white'
-                  }`}>
-                    <Terminal className="w-4 h-4 text-emerald-500" />
-                    <span>Snippy-app Desktop</span>
-                  </h3>
-                  <p className={`text-[11px] ${isLightMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                    Electron-based AI teaching assistant powered by the Gemini API for local code execution analysis.
-                  </p>
-                </div>
-                <div className={`p-4 rounded border shadow-sm space-y-2 ${
-                  isLightMode ? 'bg-white border-gray-200' : 'bg-[#1c1b22] border-[#2b2a33]'
-                }`}>
-                  <h3 className={`font-bold flex items-center space-x-1.5 ${
-                    isLightMode ? 'text-gray-900' : 'text-white'
-                  }`}>
-                    <Folder className="w-4 h-4 text-amber-500" />
-                    <span>3D Interactive Portfolio</span>
-                  </h3>
-                  <p className={`text-[11px] ${isLightMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                    WebGL and React Three Fiber multi-domain showcase highlighting technical projects and creative design.
-                  </p>
-                </div>
-              </div>
             </div>
-          ) : currentUrl.includes('github.com') ? (
+          ) : currentUrl.includes('github.com') || currentUrl.includes('spotify.com') || currentUrl.includes('youtube.com') || currentUrl.includes('play.google.com') ? (
             <div className="space-y-4 max-w-2xl mx-auto text-center py-10">
               <h2 className={`text-xl font-bold ${isLightMode ? 'text-gray-900' : 'text-white'}`}>
-                GitHub External Redirect Simulated
+                External Link Frame Simulated
               </h2>
               <p className={`text-xs ${isLightMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                You are previewing a mock external navigation frame inside the local development environment.
+                You navigated to <span className="text-[#19B6EE] font-bold">{currentUrl}</span>. Since this is an embedded desktop environment, external services are mocked safely here.
               </p>
-              <button 
-                onClick={() => handleNavigate('https://portfolio.local/security-research')} 
-                className="px-4 py-2 text-white rounded font-bold cursor-pointer" 
-                style={{ backgroundColor: currentAccent }}
-              >
-                Return to Portfolio
-              </button>
+              <div className="pt-4 flex justify-center gap-3">
+                <a 
+                  href={currentUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 text-white rounded font-bold cursor-pointer inline-flex items-center space-x-2"
+                  style={{ backgroundColor: currentAccent }}
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  <span>Open in Real New Tab</span>
+                </a>
+                <button 
+                  onClick={() => handleNavigate('https://portfolio.local/security-research')} 
+                  className={`px-4 py-2 rounded border font-bold cursor-pointer ${
+                    isLightMode 
+                      ? 'bg-gray-200 hover:bg-gray-300 text-gray-800 border-gray-300' 
+                      : 'bg-[#2b2a33] hover:bg-[#383441] text-gray-100 border-[#42414d]'
+                  }`}
+                >
+                  Return to Portfolio
+                </button>
+              </div>
             </div>
           ) : (
             <div className="space-y-4 max-w-xl mx-auto text-center py-12">
               <Globe className={`w-12 h-12 mx-auto ${isLightMode ? 'text-gray-300' : 'text-gray-600'}`} />
               <h2 className={`text-lg font-bold ${isLightMode ? 'text-gray-900' : 'text-white'}`}>
-                Unable to Connect
+                Navigation Complete / Simulated Webpage
               </h2>
               <p className={`text-xs ${isLightMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                Firefox can’t establish a connection to the server at <span className="text-amber-500">{currentUrl}</span>.
+                Loaded destination: <span className="text-amber-500 font-mono">{currentUrl}</span>
               </p>
-              <button 
-                onClick={() => handleNavigate('https://portfolio.local/security-research')} 
-                className={`px-4 py-2 rounded border font-bold cursor-pointer ${
-                  isLightMode 
-                    ? 'bg-gray-200 hover:bg-gray-300 text-gray-800 border-gray-300' 
-                    : 'bg-[#2b2a33] hover:bg-[#383441] text-gray-100 border-[#42414d]'
-                }`}
-              >
-                Go Back Home
-              </button>
+              <div className="pt-2 flex justify-center gap-3">
+                <a 
+                  href={currentUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 text-white rounded font-bold cursor-pointer inline-flex items-center space-x-2"
+                  style={{ backgroundColor: currentAccent }}
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  <span>Open Externally</span>
+                </a>
+                <button 
+                  onClick={() => handleNavigate('https://portfolio.local/security-research')} 
+                  className={`px-4 py-2 rounded border font-bold cursor-pointer ${
+                    isLightMode 
+                      ? 'bg-gray-200 hover:bg-gray-300 text-gray-800 border-gray-300' 
+                      : 'bg-[#2b2a33] hover:bg-[#383441] text-gray-100 border-[#42414d]'
+                  }`}
+                >
+                  Go Back Home
+                </button>
+              </div>
             </div>
           )}
         </div>

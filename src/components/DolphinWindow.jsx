@@ -1,6 +1,11 @@
 import React, { useState, useRef } from 'react';
 import Draggable from 'react-draggable';
-import { X, Minus, Folder, FileText, ChevronLeft, ChevronRight, LayoutGrid, List, Monitor, Download, Music, Image, Video, Briefcase, User, Archive } from 'lucide-react';
+import { 
+  X, Minus, Folder, FileText, ChevronLeft, ChevronRight, 
+  LayoutGrid, List, Monitor, Download, Music, Image, Video, 
+  Briefcase, User, Archive, GraduationCap, Trash2, Link, 
+  Terminal, Mail, FileCode, Globe 
+} from 'lucide-react';
 import useIsMobile from '../hooks/useIsMobile';
 
 export default function DolphinWindow({ 
@@ -12,6 +17,10 @@ export default function DolphinWindow({
   setActiveTab, 
   onFileOpen, 
   onTextEditorOpen,
+  onTerminalOpen,
+  onBrowserOpen,
+  onMediaOpen,
+  onContactOpen,
   isLightMode,
   onFocus,
   zIndex = 25
@@ -53,46 +62,105 @@ export default function DolphinWindow({
 
   const places = [
     { id: 'about', name: 'Home (~)', icon: User },
-    { id: 'desktop', name: 'Desktop', icon: Monitor },
-    { id: 'documents', name: 'Documents', icon: FileText },
-    { id: 'downloads', name: 'Downloads', icon: Download },
     { id: 'projects', name: 'Projects', icon: Folder },
     { id: 'experience', name: 'Experience', icon: Briefcase },
-    { id: 'music', name: 'Music', icon: Music },
+    { id: 'education', name: 'Education', icon: GraduationCap },
+    { id: 'documents', name: 'Documents', icon: FileText },
+    { id: 'downloads', name: 'Downloads', icon: Download },
     { id: 'pictures', name: 'Pictures', icon: Image },
     { id: 'videos', name: 'Videos', icon: Video },
+    { id: 'music', name: 'Music', icon: Music },
+    { id: 'trash', name: 'Trash', icon: Trash2 },
   ];
 
   const directoryContents = {
     about: [
-      { name: 'whoami.sh', type: 'file', ext: 'Shell Script', icon: FileText, color: 'text-emerald-500' },
-      { name: 'projects', type: 'dir', ext: 'Folder', icon: Folder, color: 'text-amber-500', target: 'projects' },
-      { name: 'documents', type: 'dir', ext: 'Folder', icon: Folder, color: 'text-amber-500', target: 'documents' },
-    ],
-    desktop: [
-      { name: 'shortcut_notes.txt', type: 'file', ext: 'Text Document', icon: FileText, color: 'text-emerald-500' },
-      { name: 'config.json', type: 'file', ext: 'JSON Data', icon: FileText, color: 'text-yellow-500' },
-      { name: 'background.png', type: 'file', ext: 'PNG Image', icon: Image, color: 'text-purple-500' },
-    ],
-    documents: [
-      { name: 'cv.pdf', type: 'file', ext: 'PDF Document', icon: FileText, color: 'text-red-500' },
-      { name: 'Research_Paper.pdf', type: 'file', ext: 'PDF Document', icon: FileText, color: 'text-red-500' },
-      { name: 'notes.txt', type: 'file', ext: 'Text Document', icon: FileText, color: 'text-emerald-500' },
-    ],
-    downloads: [
-      { name: 'ubuntu_iso_backup.iso', type: 'file', ext: 'Disk Image', icon: Archive, color: 'text-blue-500' },
-      { name: 'toolkit_v2.tar.gz', type: 'file', ext: 'Compressed Archive', icon: Archive, color: 'text-orange-500' },
+      { name: '00_START_HERE.sh', type: 'file', ext: 'Shell Script', icon: Terminal, color: 'text-emerald-500' },
+      { name: 'About_Me.txt', type: 'file', ext: 'Text Document', icon: FileText, color: 'text-emerald-500' },
+      { name: 'Projects', type: 'dir', ext: 'Folder', icon: Folder, color: 'text-amber-500', target: 'projects' },
+      { name: 'Experience', type: 'dir', ext: 'Folder', icon: Folder, color: 'text-amber-500', target: 'experience' },
+      { name: 'Education', type: 'dir', ext: 'Folder', icon: Folder, color: 'text-amber-500', target: 'education' },
+      { name: 'Technical_Skills.txt', type: 'file', ext: 'Text Document', icon: FileText, color: 'text-emerald-500' },
+      { name: 'Osama_Kahsay_CV.pdf', type: 'file', ext: 'PDF Document', icon: FileText, color: 'text-red-500' },
+      { name: 'GitHub.url', type: 'file', ext: 'Web Link', icon: Globe, color: 'text-blue-400', url: 'https://github.com/osamakahsay' },
+      { name: 'Contact_Me', type: 'file', ext: 'Contact Info', icon: Mail, color: 'text-sky-400' },
     ],
     projects: [
-      { name: 'Snippy App', type: 'dir', ext: 'Folder', icon: Folder, color: 'text-amber-500' },
-      { name: 'Agentic Analyzer', type: 'dir', ext: 'Folder', icon: Folder, color: 'text-amber-500' },
+      { name: '00_PROJECT_INDEX.sh', type: 'file', ext: 'Shell Script', icon: Terminal, color: 'text-emerald-500' },
+      { name: 'Secure_Supply_Chain', type: 'dir', ext: 'Folder', icon: Folder, color: 'text-amber-500' },
+      { name: 'Vault_OIDC_Secrets', type: 'dir', ext: 'Folder', icon: Folder, color: 'text-amber-500', badge: 'In progress' },
+      { name: 'Falco_Runtime_Security', type: 'dir', ext: 'Folder', icon: Folder, color: 'text-amber-500', target: 'falco_runtime_security' },
+      { name: 'Kubernetes_GitOps', type: 'dir', ext: 'Folder', icon: Folder, color: 'text-amber-500' },
+      { name: 'Terraform_OPA_Guardrails', type: 'dir', ext: 'Folder', icon: Folder, color: 'text-amber-500' },
+      { name: 'CI_Security_Pipeline', type: 'dir', ext: 'Folder', icon: Folder, color: 'text-amber-500' },
+      { name: 'MK_Delivery', type: 'dir', ext: 'Folder', icon: Folder, color: 'text-amber-500', target: 'mk_delivery_project' },
+      { name: 'ICT_Resource_System', type: 'dir', ext: 'Folder', icon: Folder, color: 'text-amber-500' },
+      { name: 'GitHub.url', type: 'file', ext: 'Web Link', icon: Globe, color: 'text-blue-400', url: 'https://github.com/osamakahsay' },
+    ],
+    falco_runtime_security: [
+      { name: 'Project_Overview.txt', type: 'file', ext: 'Text Document', icon: FileText, color: 'text-emerald-500' },
+      { name: 'Architecture.png', type: 'file', ext: 'PNG Image', icon: Image, color: 'text-purple-500' },
+      { name: 'Evidence.png', type: 'file', ext: 'PNG Image', icon: Image, color: 'text-purple-500' },
+      { name: 'Demo.mp4', type: 'file', ext: 'Video File', icon: Video, color: 'text-blue-500' },
+      { name: 'GitHub.url', type: 'file', ext: 'Web Link', icon: Globe, color: 'text-blue-400', url: 'https://github.com/osamakahsay' },
+    ],
+    mk_delivery_project: [
+      { name: 'Role_and_Overview.txt', type: 'file', ext: 'Text Document', icon: FileText, color: 'text-emerald-500' },
+      { name: 'App_Home.png', type: 'file', ext: 'PNG Image', icon: Image, color: 'text-purple-500' },
+      { name: 'Restaurant_View.png', type: 'file', ext: 'PNG Image', icon: Image, color: 'text-purple-500' },
+      { name: 'Product_Demo.mp4', type: 'file', ext: 'Video File', icon: Video, color: 'text-blue-500' },
+      { name: 'Google_Play.url', type: 'file', ext: 'Web Link', icon: Globe, color: 'text-blue-400', url: 'https://play.google.com' },
     ],
     experience: [
-      { name: 'cyber_researcher.txt', type: 'file', ext: 'Text Document', icon: FileText, color: 'text-emerald-500' },
+      { name: 'Experience_Timeline.png', type: 'file', ext: 'PNG Image', icon: Image, color: 'text-purple-500' },
+      { name: 'MK_Delivery', type: 'dir', ext: 'Folder', icon: Folder, color: 'text-amber-500', target: 'mk_delivery_project' },
+      { name: 'Mekelle_University_ICT.txt', type: 'file', ext: 'Text Document', icon: FileText, color: 'text-emerald-500' },
     ],
-    music: [],
-    pictures: [],
-    videos: []
+    education: [
+      { name: 'Education_Timeline.png', type: 'file', ext: 'PNG Image', icon: Image, color: 'text-purple-500' },
+      { name: 'HDBW_MSc_Cybersecurity.txt', type: 'file', ext: 'Text Document', icon: FileText, color: 'text-emerald-500' },
+      { name: 'Bachelors_Degree.txt', type: 'file', ext: 'Text Document', icon: FileText, color: 'text-emerald-500' },
+      { name: 'Master_Thesis_Ideas.txt', type: 'file', ext: 'Text Document', icon: FileText, color: 'text-emerald-500' },
+      { name: 'FABA_Concept_Architecture.png', type: 'file', ext: 'PNG Image', icon: Image, color: 'text-purple-500' },
+    ],
+    documents: [
+      { name: 'Osama_Kahsay_CV_EN.pdf', type: 'file', ext: 'PDF Document', icon: FileText, color: 'text-red-500' },
+      { name: 'Osama_Kahsay_CV_DE.pdf', type: 'file', ext: 'PDF Document', icon: FileText, color: 'text-red-500' },
+      { name: 'Master_Thesis_Ideas.txt', type: 'file', ext: 'Text Document', icon: FileText, color: 'text-emerald-500' },
+      { name: 'FABA_Concept_Architecture.png', type: 'file', ext: 'PNG Image', icon: Image, color: 'text-purple-500' },
+    ],
+    downloads: [
+      { name: 'Osama_Kahsay_CV_EN.pdf', type: 'file', ext: 'PDF Document', icon: FileText, color: 'text-red-500' },
+      { name: 'Osama_Kahsay_CV_DE.pdf', type: 'file', ext: 'PDF Document', icon: FileText, color: 'text-red-500' },
+    ],
+    pictures: [
+      { name: 'Osama_Kahsay.jpg', type: 'file', ext: 'JPG Image', icon: Image, color: 'text-purple-500' },
+      { name: 'GitOps_Architecture.png', type: 'file', ext: 'PNG Image', icon: Image, color: 'text-purple-500' },
+      { name: 'ArgoCD_Synchronized.png', type: 'file', ext: 'PNG Image', icon: Image, color: 'text-purple-500' },
+      { name: 'OPA_Policy_Rejection.png', type: 'file', ext: 'PNG Image', icon: Image, color: 'text-purple-500' },
+      { name: 'Falco_Alert.png', type: 'file', ext: 'PNG Image', icon: Image, color: 'text-purple-500' },
+      { name: 'Kubernetes_Cluster.png', type: 'file', ext: 'PNG Image', icon: Image, color: 'text-purple-500' },
+      { name: 'MK_Delivery.png', type: 'file', ext: 'PNG Image', icon: Image, color: 'text-purple-500' },
+      { name: 'FABA_Concept_Architecture.png', type: 'file', ext: 'PNG Image', icon: Image, color: 'text-purple-500' },
+    ],
+    videos: [
+      { name: 'Portfolio_Tour.mp4', type: 'file', ext: 'Video File', icon: Video, color: 'text-blue-500' },
+      { name: 'GitOps_Self_Healing.mp4', type: 'file', ext: 'Video File', icon: Video, color: 'text-blue-500' },
+      { name: 'Falco_Detection.mp4', type: 'file', ext: 'Video File', icon: Video, color: 'text-blue-500' },
+      { name: 'MK_Delivery_Demo.mp4', type: 'file', ext: 'Video File', icon: Video, color: 'text-blue-500' },
+      { name: 'Hobby_Video.mp4', type: 'file', ext: 'Video File', icon: Video, color: 'text-blue-500' },
+      { name: 'Favourite_Videos.url', type: 'file', ext: 'Web Link', icon: Globe, color: 'text-blue-400', url: 'https://youtube.com' },
+    ],
+    music: [
+      { name: 'Focus_Playlist.url', type: 'file', ext: 'Music Playlist', icon: Music, color: 'text-pink-500', url: 'https://spotify.com' },
+      { name: 'Favourite_Music.url', type: 'file', ext: 'Music Playlist', icon: Music, color: 'text-pink-500', url: 'https://spotify.com' },
+      { name: 'About_These_Playlists.txt', type: 'file', ext: 'Text Document', icon: FileText, color: 'text-emerald-500' },
+    ],
+    trash: [
+      { name: 'generic_portfolio_template.zip', type: 'file', ext: 'Archive', icon: Archive, color: 'text-gray-400' },
+      { name: 'hardcoded_passwords.txt', type: 'file', ext: 'Text Document', icon: FileText, color: 'text-gray-400' },
+      { name: 'final_final_CV_v12.pdf', type: 'file', ext: 'PDF Document', icon: FileText, color: 'text-gray-400' },
+    ]
   };
 
   const currentItems = directoryContents[activeTab] || [];
@@ -100,14 +168,40 @@ export default function DolphinWindow({
 
   const handleSidebarClick = (id) => navigateTo(id);
 
-  const handleItemDoubleClick = (item) => {
+  const handleItemAction = (item) => {
     if (item.type === 'dir' && item.target) {
       navigateTo(item.target);
+    } else if (item.type === 'dir') {
+      const slug = item.name.toLowerCase();
+      if (directoryContents[slug]) {
+        navigateTo(slug);
+      }
+    } else if (item.name === 'Contact_Me' || item.ext === 'Contact Info') {
+      if (onContactOpen) onContactOpen();
     } else if (item.name.endsWith('.pdf')) {
-      if (onFileOpen) onFileOpen(item.name);
-    } else if (item.name.endsWith('.sh') || item.name.endsWith('.txt') || item.name.endsWith('.json')) {
+      if (onFileOpen) onFileOpen('../public/cv.pdf');
+    } else if (item.name.endsWith('.sh')) {
+      if (onTerminalOpen) onTerminalOpen(item.name);
+    } else if (item.name.endsWith('.txt') || item.name.endsWith('.json')) {
       if (onTextEditorOpen) onTextEditorOpen(item.name);
+    } else if (item.name.endsWith('.png') || item.name.endsWith('.jpg') || item.name.endsWith('.jpeg')) {
+      if (onMediaOpen) onMediaOpen(item.name, '../public/Sample_image.png', 'image');
+    } else if (item.name.endsWith('.mp4')) {
+      if (onMediaOpen) onMediaOpen(item.name, '../public/sample_video.mp4', 'video');
+    } else if (item.name.endsWith('.url') || item.url) {
+      if (onBrowserOpen) {
+        onBrowserOpen('https://github.com/osamakahsay');
+      } else {
+        window.open('https://github.com/osamakahsay', '_blank');
+      }
     }
+  };
+
+  const getItemInteractions = (item) => {
+    if (isMobile) {
+      return { onClick: () => handleItemAction(item) };
+    }
+    return { onDoubleClick: () => handleItemAction(item) };
   };
 
   return (
@@ -197,9 +291,9 @@ export default function DolphinWindow({
         </div>
 
         {/* Explorer Content */}
-        <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 flex overflow-hidden relative">
           {/* Sidebar */}
-          <div className={`w-44 border-r p-2 space-y-0.5 overflow-y-auto ${
+          <div className={`w-36 sm:w-44 border-r p-1.5 sm:p-2 space-y-0.5 overflow-y-auto shrink-0 ${
             isLightMode ? 'bg-[#eaeaea] border-gray-300' : 'bg-[#141414] border-[#2b2b2b]'
           }`}>
             <div className="text-[10px] text-gray-500 font-bold px-2 py-1 uppercase tracking-wider">Places</div>
@@ -209,7 +303,7 @@ export default function DolphinWindow({
                 <button
                   key={item.id}
                   onClick={() => handleSidebarClick(item.id)}
-                  className={`w-full flex items-center space-x-2.5 px-3 py-1.5 rounded transition-colors text-left ${
+                  className={`w-full flex items-center space-x-2 px-2.5 py-1.5 rounded transition-colors text-left ${
                     activeTab === item.id 
                       ? 'bg-[#E95420] text-white font-bold shadow' 
                       : isLightMode ? 'text-gray-700 hover:bg-black/5' : 'text-gray-300 hover:bg-[#252525]'
@@ -223,14 +317,14 @@ export default function DolphinWindow({
           </div>
 
           {/* Directory Viewer */}
-          <div className={`flex-1 p-5 overflow-y-auto ${
+          <div className={`flex-1 p-4 md:p-6 overflow-y-auto ${
             isLightMode ? 'bg-[#ffffff] text-gray-900' : 'bg-[#1e1e1e] text-gray-200'
           }`}>
             {activeTab === 'about' && (
               <div className={`mb-5 pb-3 border-b ${isLightMode ? 'border-gray-200' : 'border-[#333333]'}`}>
-                <h3 className="text-sm font-bold text-[#E95420] mb-1">whoami.sh</h3>
+                <h3 className="text-sm font-bold text-[#E95420] mb-1">Home Directory (~/guest)</h3>
                 <p className={`text-xs leading-relaxed ${isLightMode ? 'text-gray-600' : 'text-gray-300'}`}>
-                  Cybersecurity researcher & software engineer specializing in automated binary analysis, reverse engineering, and low-level development.
+                  Welcome to my interactive DevSecOps desktop environment. Double click files to open editors/viewers or folders to explore further.
                 </p>
               </div>
             )}
@@ -249,15 +343,22 @@ export default function DolphinWindow({
                   return (
                     <div
                       key={idx}
-                      onDoubleClick={() => handleItemDoubleClick(item)}
-                      className={`flex flex-row items-center space-x-3 w-full p-2 border-b transition-colors cursor-pointer group select-none ${
+                      {...getItemInteractions(item)}
+                      className={`flex flex-row items-center space-x-3 w-full p-2.5 border-b transition-colors cursor-pointer group select-none ${
                         isLightMode ? 'hover:bg-gray-50 border-gray-200' : 'hover:bg-white/5 border-[#2a2a2a]'
                       }`}
                     >
-                      <Icon className={`w-7 h-7 ${item.color} shrink-0`} />
+                      <Icon className={`w-6 h-6 sm:w-7 sm:h-7 ${item.color} shrink-0`} />
                       <div className="min-w-0 flex-1">
-                        <div className={`text-[14px] font-medium transition-colors ${isLightMode ? 'text-gray-800' : 'text-gray-200'}`}>
-                          {item.name}
+                        <div className="flex items-center space-x-2">
+                          <span className={`text-[13px] font-medium transition-colors break-words ${isLightMode ? 'text-gray-800' : 'text-gray-200'}`}>
+                            {item.name}
+                          </span>
+                          {item.badge && (
+                            <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30 uppercase font-semibold shrink-0">
+                              {item.badge}
+                            </span>
+                          )}
                         </div>
                         <div className="text-[11px] text-gray-400">
                           {item.ext}
@@ -268,21 +369,26 @@ export default function DolphinWindow({
                 })}
               </div>
             ) : viewMode === 'grid' ? (
-              <div className="grid grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                 {currentItems.map((item, idx) => {
                   const Icon = item.icon;
                   return (
                     <div
                       key={idx}
-                      onDoubleClick={() => handleItemDoubleClick(item)}
-                      className={`p-2 rounded-lg flex flex-col items-center text-center space-y-1.5 transition-all cursor-pointer group select-none ${
+                      {...getItemInteractions(item)}
+                      className={`p-2 rounded-lg flex flex-col items-center text-center space-y-1.5 transition-all cursor-pointer group select-none relative ${
                         isLightMode ? 'hover:bg-gray-100' : 'hover:bg-white/5'
                       }`}
                     >
-                      <Icon className={`w-10 h-10 ${item.color} group-hover:scale-105 transition-transform drop-shadow`} />
-                      <span className={`text-[11px] font-medium w-full group-hover:text-[#E95420] transition-colors ${
+                      {item.badge && (
+                        <span className="absolute top-1 right-1 text-[8px] px-1 py-0.2 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30 uppercase font-semibold z-10">
+                          {item.badge}
+                        </span>
+                      )}
+                      <Icon className={`w-10 h-10 ${item.color} group-hover:scale-105 transition-transform drop-shadow shrink-0`} />
+                      <span className={`text-[11px] font-medium w-full group-hover:text-[#E95420] transition-colors break-words leading-tight line-clamp-2 ${
                         isLightMode ? 'text-gray-800' : 'text-gray-200'
-                      }`}>
+                      }`} title={item.name}>
                         {item.name}
                       </span>
                     </div>
@@ -305,20 +411,25 @@ export default function DolphinWindow({
                     return (
                       <div
                         key={idx}
-                        onDoubleClick={() => handleItemDoubleClick(item)}
+                        {...getItemInteractions(item)}
                         className={`grid grid-cols-12 px-3 py-2 items-center cursor-pointer transition-colors group select-none ${
                           isLightMode ? 'hover:bg-gray-50' : 'hover:bg-white/5'
                         }`}
                       >
-                        <div className="col-span-8 flex items-center space-x-2.5">
+                        <div className="col-span-8 flex items-center space-x-2.5 min-w-0">
                           <Icon className={`w-4 h-4 ${item.color} shrink-0`} />
-                          <span className={`group-hover:text-[#E95420] transition-colors font-medium ${
+                          <span className={`group-hover:text-[#E95420] transition-colors font-medium truncate ${
                             isLightMode ? 'text-gray-800' : 'text-gray-200'
-                          }`}>
+                          }`} title={item.name}>
                             {item.name}
                           </span>
+                          {item.badge && (
+                            <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30 uppercase font-semibold shrink-0">
+                              {item.badge}
+                            </span>
+                          )}
                         </div>
-                        <div className="col-span-4 text-gray-400 text-[11px]">
+                        <div className="col-span-4 text-gray-400 text-[11px] truncate">
                           {item.ext}
                         </div>
                       </div>

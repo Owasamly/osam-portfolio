@@ -64,10 +64,10 @@ export default function App() {
   const [bgPreset, setBgPreset] = useState('#2C001E'); // Passed into ParticleBackground
 
   // Window visibility states
-  const [isWindowOpen, setIsWindowOpen] = useState(false);
+  const [isWindowOpen, setIsWindowOpen] = useState(true);
   const [isWindowMinimized, setIsWindowMinimized] = useState(false);
 
-  const [isTermOpen, setIsTermOpen] = useState(true);
+  const [isTermOpen, setIsTermOpen] = useState(false);
   const [isTermMinimized, setIsTermMinimized] = useState(false);
 
   const [isPdfOpen, setIsPdfOpen] = useState(false);
@@ -80,7 +80,7 @@ export default function App() {
 
   const [isBrowserOpen, setIsBrowserOpen] = useState(false);
   const [isBrowserMinimized, setIsBrowserMinimized] = useState(false);
-
+  const [browserUrl, setBrowserUrl] = useState('https://portfolio.local/security-research');
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [isContactMinimized, setIsContactMinimized] = useState(false);
 
@@ -88,7 +88,7 @@ export default function App() {
   const [isMediaOpen, setIsMediaOpen] = useState(false);
   const [isMediaMinimized, setIsMediaMinimized] = useState(false);
   const [mediaState, setMediaState] = useState({
-    src: '/demo.mp4',
+    src: '/public/sample_video.mp4',
     title: 'Project Demo',
     type: 'video' // 'video' | 'image' | 'gif'
   });
@@ -98,8 +98,8 @@ export default function App() {
 
   // Dynamic Window Depth Stacking (Z-Index)
   const [zIndices, setZIndices] = useState({
-    files: 30,
-    terminal: 31,
+    files: 32,
+    terminal: 30,
     pdf: 25,
     editor: 25,
     browser: 25,
@@ -132,7 +132,8 @@ export default function App() {
     if (!isMobile) return;
 
     Object.entries(windowControls).forEach(([appId, control]) => {
-      if (appId !== activeAppId && control.isOpen) {
+      // Ignore 'files' so Dolphin stays open underneath on mobile!
+      if (appId !== 'files' && appId !== activeAppId && control.isOpen) {
         control.setIsMinimized(true);
       }
     });
@@ -146,6 +147,7 @@ export default function App() {
 
   const openWindow = (appId, setIsOpen, setIsMinimized, beforeOpen) => {
     minimizeOtherWindows(appId);
+    // Removed minimizeOtherWindows(appId) so other windows (like Files) stay open underneath on mobile!
     if (beforeOpen) beforeOpen();
     setIsOpen(true);
     setIsMinimized(false);
@@ -309,7 +311,7 @@ export default function App() {
         isMobile={isMobile}
       />
 
-      <DolphinWindow
+     <DolphinWindow
         isOpen={isWindowOpen}
         isMinimized={isWindowMinimized}
         onClose={() => setIsWindowOpen(false)}
@@ -320,6 +322,26 @@ export default function App() {
         isLightMode={isLightMode}
         zIndex={zIndices.files}
         isMobile={isMobile}
+        onFileOpen={(fileName) => {
+          setCurrentPdfFile(fileName);
+          openWindow('pdf', setIsPdfOpen, setIsPdfMinimized);
+        }}
+        onTextEditorOpen={(fileName) => {
+          setCurrentEditorFile(fileName);
+          openWindow('editor', setIsEditorOpen, setIsEditorMinimized);
+        }}
+        onTerminalOpen={() => {
+          openWindow('terminal', setIsTermOpen, setIsTermMinimized);
+        }}
+        onBrowserOpen={(url) => {
+          openWindow('browser', setIsBrowserOpen, setIsBrowserMinimized);
+        }}
+        onMediaOpen={(title, src, type) => {
+          openMediaViewer(title, src, type);
+        }}
+        onContactOpen={() => {
+          openWindow('contact', setIsContactOpen, setIsContactMinimized);
+        }}
       />
 
       <PdfViewerWindow
@@ -364,6 +386,7 @@ export default function App() {
         onClose={() => setIsBrowserOpen(false)}
         onMinimize={() => toggleWindowMinimized('browser', setIsBrowserMinimized, isBrowserMinimized)}
         onFocus={() => focusWindow('browser', setIsBrowserMinimized)}
+        initialUrl={browserUrl}
         currentAccent={accentColor}
         isLightMode={isLightMode}
         zIndex={zIndices.browser}
