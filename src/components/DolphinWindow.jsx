@@ -179,15 +179,15 @@ export default function DolphinWindow({
     } else if (item.name === 'Contact_Me' || item.ext === 'Contact Info') {
       if (onContactOpen) onContactOpen();
     } else if (item.name.endsWith('.pdf')) {
-      if (onFileOpen) onFileOpen('../public/cv.pdf');
+      if (onFileOpen) onFileOpen('cv.pdf');
     } else if (item.name.endsWith('.sh')) {
       if (onTerminalOpen) onTerminalOpen(item.name);
     } else if (item.name.endsWith('.txt') || item.name.endsWith('.json')) {
       if (onTextEditorOpen) onTextEditorOpen(item.name);
     } else if (item.name.endsWith('.png') || item.name.endsWith('.jpg') || item.name.endsWith('.jpeg')) {
-      if (onMediaOpen) onMediaOpen(item.name, '../public/Sample_image.png', 'image');
+      if (onMediaOpen) onMediaOpen(item.name, 'Sample_image.png', 'image');
     } else if (item.name.endsWith('.mp4')) {
-      if (onMediaOpen) onMediaOpen(item.name, '../public/sample_video.mp4', 'video');
+      if (onMediaOpen) onMediaOpen(item.name, 'sample_video.mp4', 'video');
     } else if (item.name.endsWith('.url') || item.url) {
       if (onBrowserOpen) {
         onBrowserOpen('https://github.com/osamakahsay');
