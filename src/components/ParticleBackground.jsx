@@ -1,7 +1,9 @@
 import React, { useEffect, useRef } from 'react';
+import useIsMobile from '../hooks/useIsMobile';
 
-export default function ParticleBackground() {
+export default function ParticleBackground({ bgPreset = '#0f172a' }) {
   const canvasRef = useRef(null);
+  const isMobile = useIsMobile(768);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -18,75 +20,100 @@ export default function ParticleBackground() {
     };
     window.addEventListener('resize', handleResize);
 
-    const mouse = { x: -1000, y: -1000, radius: 250 };
-
-    const handleMouseMove = (e) => {
+    const mouse = { x: -1000, y: -1000, radius: isMobile ? 100 : 170 };
+    const handlePointerMove = (e) => {
       mouse.x = e.clientX;
       mouse.y = e.clientY;
     };
-    window.addEventListener('mousemove', handleMouseMove);
+    const handlePointerLeave = () => {
+      mouse.x = -1000;
+      mouse.y = -1000;
+    };
+    const handlePointerUp = () => {
+      mouse.x = -1000;
+      mouse.y = -1000;
+    };
+    canvas.addEventListener('pointermove', handlePointerMove);
+    canvas.addEventListener('pointerleave', handlePointerLeave);
+    canvas.addEventListener('pointerup', handlePointerUp);
 
-    // Fast-moving nodes
-    const nodeCount = Math.floor((width * height) / 7500);
+    const nodeCount = isMobile ? 30 : 100;
     const nodes = Array.from({ length: nodeCount }, () => ({
       x: Math.random() * width,
       y: Math.random() * height,
-      vx: (Math.random() - 0.5) * 1.6, // Higher velocity
-      vy: (Math.random() - 0.5) * 1.6,
+      vx: (Math.random() - 0.5) * 1.5,
+      vy: (Math.random() - 0.5) * 1.5,
       radius: 2,
     }));
 
     const animate = () => {
-      // Crisp dark Ubuntu background render
-      const gradient = ctx.createRadialGradient(
-        width * 0.4, height * 0.4, 10,
-        width / 2, height / 2, Math.max(width, height)
-      );
-      gradient.addColorStop(0, '#3a1331');
-      gradient.addColorStop(0.6, '#1e0517');
-      gradient.addColorStop(1, '#0d020a');
-      ctx.fillStyle = gradient;
+      // 1. Pure Solid Base Color
+      ctx.fillStyle = bgPreset;
       ctx.fillRect(0, 0, width, height);
 
+      // 2. Very Faint Edge Shadow
+      const edgeVignette = ctx.createRadialGradient(
+        width / 2, height / 2, Math.max(width, height) * 0.4,
+        width / 2, height / 2, Math.max(width, height) * 0.75
+      );
+      edgeVignette.addColorStop(0, 'rgba(0, 0, 0, 0)');
+      edgeVignette.addColorStop(1, 'rgba(0, 0, 0, 0.25)');
+      ctx.fillStyle = edgeVignette;
+      ctx.fillRect(0, 0, width, height);
+
+      // 3. Update node positions first
       for (let i = 0; i < nodes.length; i++) {
         const node = nodes[i];
-
         node.x += node.vx;
         node.y += node.vy;
 
         if (node.x < 0 || node.x > width) node.vx *= -1;
         if (node.y < 0 || node.y > height) node.vy *= -1;
+      }
 
+      // 4. Draw background constellation web (Always Visible & Vibrant)
+      for (let i = 0; i < nodes.length; i++) {
+        const node = nodes[i];
+
+        // Check distance to mouse for interactive highlight
         const dx = mouse.x - node.x;
         const dy = mouse.y - node.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
+        const isNearMouse = dist < mouse.radius;
+        const mouseAlpha = isNearMouse ? 1 - dist / mouse.radius : 0;
 
-        // Responsive cursor proximity
-        if (dist < mouse.radius) {
-          const alpha = 1 - dist / mouse.radius;
+        // Draw the node itself (always visible, brighter near mouse)
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, isNearMouse ? node.radius + 1.5 : node.radius, 0, Math.PI * 2);
+        ctx.fillStyle = isNearMouse 
+          ? `rgba(233, 84, 32, ${Math.min(1, mouseAlpha + 0.5)})` 
+          : `rgba(233, 84, 32, 0.35)`; // Baseline soft visibility
+        ctx.fill();
 
-          // Draw sharp node
-          ctx.beginPath();
-          ctx.arc(node.x, node.y, node.radius + 0.5, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(233, 84, 32, ${alpha * 0.95})`; // Ubuntu Orange
-          ctx.fill();
+        // Connect lines to neighboring nodes
+        for (let j = i + 1; j < nodes.length; j++) {
+          const other = nodes[j];
+          const odx = node.x - other.x;
+          const ody = node.y - other.y;
+          const odist = Math.sqrt(odx * odx + ody * ody);
 
-          // Connect nearby nodes with crisp lines
-          for (let j = i + 1; j < nodes.length; j++) {
-            const other = nodes[j];
-            const odx = node.x - other.x;
-            const ody = node.y - other.y;
-            const odist = Math.sqrt(odx * odx + ody * ody);
-
-            if (odist < 140) {
-              const lineAlpha = (1 - odist / 140) * alpha;
-              ctx.beginPath();
-              ctx.moveTo(node.x, node.y);
-              ctx.lineTo(other.x, other.y);
-              ctx.strokeStyle = `rgba(255, 153, 51, ${lineAlpha * 0.85})`;
-              ctx.lineWidth = 1.25;
-              ctx.stroke();
+          if (odist < 130) {
+            const lineAlpha = (1 - odist / 130);
+            
+            ctx.beginPath();
+            ctx.moveTo(node.x, node.y);
+            ctx.lineTo(other.x, other.y);
+            
+            // If near mouse, make those specific lines glow bright orange
+            if (isNearMouse) {
+              ctx.strokeStyle = `rgba(240, 110, 45, ${(lineAlpha * mouseAlpha * 0.9) + 0.15})`;
+              ctx.lineWidth = 1.5;
+            } else {
+              // Subtle background web lines so it's never empty
+              ctx.strokeStyle = `rgba(240, 110, 45, ${lineAlpha * 0.12})`;
+              ctx.lineWidth = 1;
             }
+            ctx.stroke();
           }
         }
       }
@@ -98,15 +125,18 @@ export default function ParticleBackground() {
 
     return () => {
       window.removeEventListener('resize', handleResize);
-      window.removeEventListener('mousemove', handleMouseMove);
+      canvas.removeEventListener('pointermove', handlePointerMove);
+      canvas.removeEventListener('pointerleave', handlePointerLeave);
+      canvas.removeEventListener('pointerup', handlePointerUp);
       cancelAnimationFrame(animationFrameId);
     };
-  }, []);
+  }, [bgPreset, isMobile]);
 
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 pointer-events-none z-0"
+      className="fixed inset-0 z-0"
+      style={{ touchAction: 'none' }}
     />
   );
 }
