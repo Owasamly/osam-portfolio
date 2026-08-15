@@ -70,7 +70,7 @@ export default async function handler(request, response) {
       .slice(0, 100);
 
     const { data, error } = await resend.emails.send({
-     from: 'Osama Portfolio <contact@osamakahsay.dev>',
+     from: 'Osama Portfolio <contact@send.osamakahsay.dev>',
       to: ['ousamnur@gmail.com'],
       replyTo: cleanEmail,
       subject: `Portfolio message from ${subjectName}`,
