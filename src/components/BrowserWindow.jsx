@@ -231,7 +231,7 @@ export default function BrowserWindow({
                     <span>View GitHub Repos</span>
                   </button>
                   <button 
-                    onClick={() => handleNavigate('https://github.com/osamakahsay')} 
+                    onClick={() => handleNavigate('https://github.com/Owasamly')} 
                     className={`px-3 py-1.5 rounded border transition-colors flex items-center space-x-1.5 font-medium cursor-pointer ${
                       isLightMode 
                         ? 'bg-gray-100 hover:bg-gray-200 text-gray-800 border-gray-300' 

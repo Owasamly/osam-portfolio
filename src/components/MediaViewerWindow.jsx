@@ -13,7 +13,7 @@ export default function MediaViewerWindow({
   onMinimize, 
   onFocus, 
   mediaTitle = 'Media Preview', 
-  mediaSrc = '/demo.mp4',
+  mediaSrc = '/sample_video.mp4',
   mediaType = 'video', // 'video' | 'image' | 'gif'
   currentAccent = '#77216F',
   isLightMode = false,

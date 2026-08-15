@@ -16,3 +16,36 @@ body {
   font-family: monospace, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas;
   overflow: hidden; /* Prevents scrollbars over canvas */
 }
+
+.quick-settings-slider {
+  appearance: none;
+  height: 0.375rem;
+  border-radius: 9999px;
+  outline: none;
+  background: linear-gradient(
+    to right,
+    var(--slider-accent) 0%,
+    var(--slider-accent) var(--slider-progress),
+    var(--slider-track) var(--slider-progress),
+    var(--slider-track) 100%
+  );
+}
+
+.quick-settings-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 0.875rem;
+  height: 0.875rem;
+  border: 2px solid white;
+  border-radius: 9999px;
+  background: var(--slider-accent);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 35%);
+}
+
+.quick-settings-slider::-moz-range-thumb {
+  width: 0.75rem;
+  height: 0.75rem;
+  border: 2px solid white;
+  border-radius: 9999px;
+  background: var(--slider-accent);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 35%);
+}

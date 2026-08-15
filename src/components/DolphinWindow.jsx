@@ -1,12 +1,53 @@
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Draggable from 'react-draggable';
 import { 
   X, Minus, Folder, FileText, ChevronLeft, ChevronRight, 
-  LayoutGrid, List, Monitor, Download, Music, Image, Video, 
-  Briefcase, User, Archive, GraduationCap, Trash2, Link, 
-  Terminal, Mail, FileCode, Globe 
+  LayoutGrid, List, Download, Music, Image, Video, 
+  Briefcase, User, Archive, GraduationCap, Trash2, 
+  Terminal, Mail, FileCode, Globe, Camera, Images,
+  FileImage, Film, Clapperboard, MonitorPlay
 } from 'lucide-react';
 import useIsMobile from '../hooks/useIsMobile';
+import { directoryContents, places } from '../data/portfolioFileSystem';
+
+function LinkedInMark({ className = '' }) {
+  return (
+    <span className={`${className} inline-flex items-center justify-center rounded-sm bg-[#0A66C2] font-sans text-[9px] font-black leading-none text-white`}>
+      in
+    </span>
+  );
+}
+
+const iconMap = {
+  archive: Archive,
+  briefcase: Briefcase,
+  camera: Camera,
+  clapperboard: Clapperboard,
+  code: FileCode,
+  download: Download,
+  education: GraduationCap,
+  folder: Folder,
+  film: Film,
+  fileImage: FileImage,
+  globe: Globe,
+  image: Image,
+  images: Images,
+  linkedin: LinkedInMark,
+  mail: Mail,
+  music: Music,
+  monitorPlay: MonitorPlay,
+  terminal: Terminal,
+  text: FileText,
+  trash: Trash2,
+  user: User,
+  video: Video,
+};
+
+const badgeClasses = {
+  amber: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+  blue: 'bg-sky-500/20 text-sky-400 border-sky-500/30',
+  emerald: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+};
 
 export default function DolphinWindow({ 
   isOpen, 
@@ -26,13 +67,42 @@ export default function DolphinWindow({
   zIndex = 25
 }) {
   const nodeRef = useRef(null);
+  const activeTabRef = useRef(activeTab);
+  const statusTimerRef = useRef(null);
   const isMobile = useIsMobile(768);
 
-  const [history, setHistory] = useState(['about']);
+  const [history, setHistory] = useState([activeTab || 'about']);
   const [historyIndex, setHistoryIndex] = useState(0);
   const [viewMode, setViewMode] = useState('grid');
+  const [statusNotice, setStatusNotice] = useState('');
+
+  useEffect(() => {
+    if (activeTabRef.current === activeTab) return;
+
+    activeTabRef.current = activeTab;
+    setHistory((currentHistory) => {
+      const nextHistory = currentHistory.slice(0, historyIndex + 1);
+      if (nextHistory[nextHistory.length - 1] === activeTab) return currentHistory;
+      nextHistory.push(activeTab);
+      setHistoryIndex(nextHistory.length - 1);
+      return nextHistory;
+    });
+  }, [activeTab, historyIndex]);
+
+  useEffect(() => () => {
+    if (statusTimerRef.current) clearTimeout(statusTimerRef.current);
+  }, []);
+
+  const showStatusNotice = (message) => {
+    if (!message) return;
+    setStatusNotice(message);
+    if (statusTimerRef.current) clearTimeout(statusTimerRef.current);
+    statusTimerRef.current = setTimeout(() => setStatusNotice(''), 3200);
+  };
 
   const navigateTo = (tabId, addToHistory = true) => {
+    if (!tabId || tabId === activeTab) return;
+    activeTabRef.current = tabId;
     setActiveTab(tabId);
     if (addToHistory) {
       const newHistory = history.slice(0, historyIndex + 1);
@@ -46,6 +116,7 @@ export default function DolphinWindow({
     if (historyIndex > 0) {
       const newIndex = historyIndex - 1;
       setHistoryIndex(newIndex);
+      activeTabRef.current = history[newIndex];
       setActiveTab(history[newIndex]);
     }
   };
@@ -54,114 +125,12 @@ export default function DolphinWindow({
     if (historyIndex < history.length - 1) {
       const newIndex = historyIndex + 1;
       setHistoryIndex(newIndex);
+      activeTabRef.current = history[newIndex];
       setActiveTab(history[newIndex]);
     }
   };
 
   if (!isOpen) return null;
-
-  const places = [
-    { id: 'about', name: 'Home (~)', icon: User },
-    { id: 'projects', name: 'Projects', icon: Folder },
-    { id: 'experience', name: 'Experience', icon: Briefcase },
-    { id: 'education', name: 'Education', icon: GraduationCap },
-    { id: 'documents', name: 'Documents', icon: FileText },
-    { id: 'downloads', name: 'Downloads', icon: Download },
-    { id: 'pictures', name: 'Pictures', icon: Image },
-    { id: 'videos', name: 'Videos', icon: Video },
-    { id: 'music', name: 'Music', icon: Music },
-    { id: 'trash', name: 'Trash', icon: Trash2 },
-  ];
-
-  const directoryContents = {
-    about: [
-      { name: '00_START_HERE.sh', type: 'file', ext: 'Shell Script', icon: Terminal, color: 'text-emerald-500' },
-      { name: 'About_Me.txt', type: 'file', ext: 'Text Document', icon: FileText, color: 'text-emerald-500' },
-      { name: 'Projects', type: 'dir', ext: 'Folder', icon: Folder, color: 'text-amber-500', target: 'projects' },
-      { name: 'Experience', type: 'dir', ext: 'Folder', icon: Folder, color: 'text-amber-500', target: 'experience' },
-      { name: 'Education', type: 'dir', ext: 'Folder', icon: Folder, color: 'text-amber-500', target: 'education' },
-      { name: 'Technical_Skills.txt', type: 'file', ext: 'Text Document', icon: FileText, color: 'text-emerald-500' },
-      { name: 'Osama_Kahsay_CV.pdf', type: 'file', ext: 'PDF Document', icon: FileText, color: 'text-red-500' },
-      { name: 'GitHub.url', type: 'file', ext: 'Web Link', icon: Globe, color: 'text-blue-400', url: 'https://github.com/osamakahsay' },
-      { name: 'Contact_Me', type: 'file', ext: 'Contact Info', icon: Mail, color: 'text-sky-400' },
-    ],
-    projects: [
-      { name: '00_PROJECT_INDEX.sh', type: 'file', ext: 'Shell Script', icon: Terminal, color: 'text-emerald-500' },
-      { name: 'Secure_Supply_Chain', type: 'dir', ext: 'Folder', icon: Folder, color: 'text-amber-500' },
-      { name: 'Vault_OIDC_Secrets', type: 'dir', ext: 'Folder', icon: Folder, color: 'text-amber-500', badge: 'In progress' },
-      { name: 'Falco_Runtime_Security', type: 'dir', ext: 'Folder', icon: Folder, color: 'text-amber-500', target: 'falco_runtime_security' },
-      { name: 'Kubernetes_GitOps', type: 'dir', ext: 'Folder', icon: Folder, color: 'text-amber-500' },
-      { name: 'Terraform_OPA_Guardrails', type: 'dir', ext: 'Folder', icon: Folder, color: 'text-amber-500' },
-      { name: 'CI_Security_Pipeline', type: 'dir', ext: 'Folder', icon: Folder, color: 'text-amber-500' },
-      { name: 'MK_Delivery', type: 'dir', ext: 'Folder', icon: Folder, color: 'text-amber-500', target: 'mk_delivery_project' },
-      { name: 'ICT_Resource_System', type: 'dir', ext: 'Folder', icon: Folder, color: 'text-amber-500' },
-      { name: 'GitHub.url', type: 'file', ext: 'Web Link', icon: Globe, color: 'text-blue-400', url: 'https://github.com/osamakahsay' },
-    ],
-    falco_runtime_security: [
-      { name: 'Project_Overview.txt', type: 'file', ext: 'Text Document', icon: FileText, color: 'text-emerald-500' },
-      { name: 'Architecture.png', type: 'file', ext: 'PNG Image', icon: Image, color: 'text-purple-500' },
-      { name: 'Evidence.png', type: 'file', ext: 'PNG Image', icon: Image, color: 'text-purple-500' },
-      { name: 'Demo.mp4', type: 'file', ext: 'Video File', icon: Video, color: 'text-blue-500' },
-      { name: 'GitHub.url', type: 'file', ext: 'Web Link', icon: Globe, color: 'text-blue-400', url: 'https://github.com/osamakahsay' },
-    ],
-    mk_delivery_project: [
-      { name: 'Role_and_Overview.txt', type: 'file', ext: 'Text Document', icon: FileText, color: 'text-emerald-500' },
-      { name: 'App_Home.png', type: 'file', ext: 'PNG Image', icon: Image, color: 'text-purple-500' },
-      { name: 'Restaurant_View.png', type: 'file', ext: 'PNG Image', icon: Image, color: 'text-purple-500' },
-      { name: 'Product_Demo.mp4', type: 'file', ext: 'Video File', icon: Video, color: 'text-blue-500' },
-      { name: 'Google_Play.url', type: 'file', ext: 'Web Link', icon: Globe, color: 'text-blue-400', url: 'https://play.google.com' },
-    ],
-    experience: [
-      { name: 'Experience_Timeline.png', type: 'file', ext: 'PNG Image', icon: Image, color: 'text-purple-500' },
-      { name: 'MK_Delivery', type: 'dir', ext: 'Folder', icon: Folder, color: 'text-amber-500', target: 'mk_delivery_project' },
-      { name: 'Mekelle_University_ICT.txt', type: 'file', ext: 'Text Document', icon: FileText, color: 'text-emerald-500' },
-    ],
-    education: [
-      { name: 'Education_Timeline.png', type: 'file', ext: 'PNG Image', icon: Image, color: 'text-purple-500' },
-      { name: 'HDBW_MSc_Cybersecurity.txt', type: 'file', ext: 'Text Document', icon: FileText, color: 'text-emerald-500' },
-      { name: 'Bachelors_Degree.txt', type: 'file', ext: 'Text Document', icon: FileText, color: 'text-emerald-500' },
-      { name: 'Master_Thesis_Ideas.txt', type: 'file', ext: 'Text Document', icon: FileText, color: 'text-emerald-500' },
-      { name: 'FABA_Concept_Architecture.png', type: 'file', ext: 'PNG Image', icon: Image, color: 'text-purple-500' },
-    ],
-    documents: [
-      { name: 'Osama_Kahsay_CV_EN.pdf', type: 'file', ext: 'PDF Document', icon: FileText, color: 'text-red-500' },
-      { name: 'Osama_Kahsay_CV_DE.pdf', type: 'file', ext: 'PDF Document', icon: FileText, color: 'text-red-500' },
-      { name: 'Master_Thesis_Ideas.txt', type: 'file', ext: 'Text Document', icon: FileText, color: 'text-emerald-500' },
-      { name: 'FABA_Concept_Architecture.png', type: 'file', ext: 'PNG Image', icon: Image, color: 'text-purple-500' },
-    ],
-    downloads: [
-      { name: 'Osama_Kahsay_CV_EN.pdf', type: 'file', ext: 'PDF Document', icon: FileText, color: 'text-red-500' },
-      { name: 'Osama_Kahsay_CV_DE.pdf', type: 'file', ext: 'PDF Document', icon: FileText, color: 'text-red-500' },
-    ],
-    pictures: [
-      { name: 'Osama_Kahsay.jpg', type: 'file', ext: 'JPG Image', icon: Image, color: 'text-purple-500' },
-      { name: 'GitOps_Architecture.png', type: 'file', ext: 'PNG Image', icon: Image, color: 'text-purple-500' },
-      { name: 'ArgoCD_Synchronized.png', type: 'file', ext: 'PNG Image', icon: Image, color: 'text-purple-500' },
-      { name: 'OPA_Policy_Rejection.png', type: 'file', ext: 'PNG Image', icon: Image, color: 'text-purple-500' },
-      { name: 'Falco_Alert.png', type: 'file', ext: 'PNG Image', icon: Image, color: 'text-purple-500' },
-      { name: 'Kubernetes_Cluster.png', type: 'file', ext: 'PNG Image', icon: Image, color: 'text-purple-500' },
-      { name: 'MK_Delivery.png', type: 'file', ext: 'PNG Image', icon: Image, color: 'text-purple-500' },
-      { name: 'FABA_Concept_Architecture.png', type: 'file', ext: 'PNG Image', icon: Image, color: 'text-purple-500' },
-    ],
-    videos: [
-      { name: 'Portfolio_Tour.mp4', type: 'file', ext: 'Video File', icon: Video, color: 'text-blue-500' },
-      { name: 'GitOps_Self_Healing.mp4', type: 'file', ext: 'Video File', icon: Video, color: 'text-blue-500' },
-      { name: 'Falco_Detection.mp4', type: 'file', ext: 'Video File', icon: Video, color: 'text-blue-500' },
-      { name: 'MK_Delivery_Demo.mp4', type: 'file', ext: 'Video File', icon: Video, color: 'text-blue-500' },
-      { name: 'Hobby_Video.mp4', type: 'file', ext: 'Video File', icon: Video, color: 'text-blue-500' },
-      { name: 'Favourite_Videos.url', type: 'file', ext: 'Web Link', icon: Globe, color: 'text-blue-400', url: 'https://youtube.com' },
-    ],
-    music: [
-      { name: 'Focus_Playlist.url', type: 'file', ext: 'Music Playlist', icon: Music, color: 'text-pink-500', url: 'https://spotify.com' },
-      { name: 'Favourite_Music.url', type: 'file', ext: 'Music Playlist', icon: Music, color: 'text-pink-500', url: 'https://spotify.com' },
-      { name: 'About_These_Playlists.txt', type: 'file', ext: 'Text Document', icon: FileText, color: 'text-emerald-500' },
-    ],
-    trash: [
-      { name: 'generic_portfolio_template.zip', type: 'file', ext: 'Archive', icon: Archive, color: 'text-gray-400' },
-      { name: 'hardcoded_passwords.txt', type: 'file', ext: 'Text Document', icon: FileText, color: 'text-gray-400' },
-      { name: 'final_final_CV_v12.pdf', type: 'file', ext: 'PDF Document', icon: FileText, color: 'text-gray-400' },
-    ]
-  };
 
   const currentItems = directoryContents[activeTab] || [];
   const isMobileListView = isMobile || viewMode === 'list';
@@ -169,30 +138,32 @@ export default function DolphinWindow({
   const handleSidebarClick = (id) => navigateTo(id);
 
   const handleItemAction = (item) => {
-    if (item.type === 'dir' && item.target) {
+    if (item.disabled) {
+      showStatusNotice(item.statusMessage || `${item.name} is not available.`);
+    } else if (item.type === 'dir' && item.target) {
       navigateTo(item.target);
-    } else if (item.type === 'dir') {
-      const slug = item.name.toLowerCase();
-      if (directoryContents[slug]) {
-        navigateTo(slug);
-      }
-    } else if (item.name === 'Contact_Me' || item.ext === 'Contact Info') {
+    } else if (item.action === 'contact') {
       if (onContactOpen) onContactOpen();
-    } else if (item.name.endsWith('.pdf')) {
-      if (onFileOpen) onFileOpen('cv.pdf');
-    } else if (item.name.endsWith('.sh')) {
+    } else if (item.action === 'pdf') {
+      if (onFileOpen) onFileOpen(item.file || 'cv.pdf');
+    } else if (item.action === 'download') {
+      const link = document.createElement('a');
+      link.href = `/${item.file || 'cv.pdf'}`;
+      link.download = item.downloadName || item.name;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } else if (item.action === 'terminal') {
       if (onTerminalOpen) onTerminalOpen(item.name);
-    } else if (item.name.endsWith('.txt') || item.name.endsWith('.json')) {
-      if (onTextEditorOpen) onTextEditorOpen(item.name);
-    } else if (item.name.endsWith('.png') || item.name.endsWith('.jpg') || item.name.endsWith('.jpeg')) {
-      if (onMediaOpen) onMediaOpen(item.name, 'Sample_image.png', 'image');
-    } else if (item.name.endsWith('.mp4')) {
-      if (onMediaOpen) onMediaOpen(item.name, 'sample_video.mp4', 'video');
-    } else if (item.name.endsWith('.url') || item.url) {
+    } else if (item.action === 'text') {
+      if (onTextEditorOpen) onTextEditorOpen(item.name, item.content || '');
+    } else if (item.action === 'media') {
+      if (onMediaOpen) onMediaOpen(item.name, item.src, item.mediaType);
+    } else if (item.action === 'browser' && item.url) {
       if (onBrowserOpen) {
-        onBrowserOpen('https://github.com/osamakahsay');
+        onBrowserOpen(item.url);
       } else {
-        window.open('https://github.com/osamakahsay', '_blank');
+        window.open(item.url, '_blank', 'noopener,noreferrer');
       }
     }
   };
@@ -227,7 +198,7 @@ export default function DolphinWindow({
         >
           <div className="flex items-center space-x-2 font-bold">
             <Folder className="w-4 h-4 text-[#E95420]" />
-            <span>Files — /home/guest/{activeTab}</span>
+            <span>Files — /home/osama/{activeTab === 'about' ? '' : activeTab}</span>
           </div>
           
           <div className="flex items-center space-x-2">
@@ -268,7 +239,7 @@ export default function DolphinWindow({
             }`}>
               <span onClick={() => handleSidebarClick('about')} className="hover:underline cursor-pointer">home</span>
               <ChevronRight className="w-3 h-3 text-gray-400 shrink-0" />
-              <span onClick={() => handleSidebarClick('about')} className="hover:underline cursor-pointer">guest</span>
+              <span onClick={() => handleSidebarClick('about')} className="hover:underline cursor-pointer">osama</span>
               <ChevronRight className="w-3 h-3 text-gray-400 shrink-0" />
               <span className="text-[#E95420] font-semibold capitalize truncate">{activeTab}</span>
             </div>
@@ -290,6 +261,16 @@ export default function DolphinWindow({
           </div>
         </div>
 
+        {statusNotice && (
+          <div className={`px-4 py-2 border-b text-[11px] font-semibold ${
+            isLightMode
+              ? 'bg-amber-50 border-amber-200 text-amber-800'
+              : 'bg-amber-950/70 border-amber-800/60 text-amber-300'
+          }`} role="status">
+            {statusNotice}
+          </div>
+        )}
+
         {/* Explorer Content */}
         <div className="flex-1 flex overflow-hidden relative">
           {/* Sidebar */}
@@ -298,7 +279,7 @@ export default function DolphinWindow({
           }`}>
             <div className="text-[10px] text-gray-500 font-bold px-2 py-1 uppercase tracking-wider">Places</div>
             {places.map((item) => {
-              const Icon = item.icon;
+              const Icon = iconMap[item.icon] || Folder;
               return (
                 <button
                   key={item.id}
@@ -322,7 +303,7 @@ export default function DolphinWindow({
           }`}>
             {activeTab === 'about' && (
               <div className={`mb-5 pb-3 border-b ${isLightMode ? 'border-gray-200' : 'border-[#333333]'}`}>
-                <h3 className="text-sm font-bold text-[#E95420] mb-1">Home Directory (~/guest)</h3>
+                <h3 className="text-sm font-bold text-[#E95420] mb-1">Home Directory (~/osama)</h3>
                 <p className={`text-xs leading-relaxed ${isLightMode ? 'text-gray-600' : 'text-gray-300'}`}>
                   Welcome to my interactive DevSecOps desktop environment. Double click files to open editors/viewers or folders to explore further.
                 </p>
@@ -339,12 +320,14 @@ export default function DolphinWindow({
             ) : isMobileListView ? (
               <div className={`flex flex-col space-y-2 ${isLightMode ? 'text-gray-900' : 'text-gray-200'}`}>
                 {currentItems.map((item, idx) => {
-                  const Icon = item.icon;
+                  const Icon = iconMap[item.icon] || FileText;
                   return (
                     <div
                       key={idx}
                       {...getItemInteractions(item)}
-                      className={`flex flex-row items-center space-x-3 w-full p-2.5 border-b transition-colors cursor-pointer group select-none ${
+                      className={`flex flex-row items-center space-x-3 w-full p-2.5 border-b transition-colors group select-none ${
+                        item.disabled ? 'opacity-55 cursor-not-allowed' : 'cursor-pointer'
+                      } ${
                         isLightMode ? 'hover:bg-gray-50 border-gray-200' : 'hover:bg-white/5 border-[#2a2a2a]'
                       }`}
                     >
@@ -355,7 +338,9 @@ export default function DolphinWindow({
                             {item.name}
                           </span>
                           {item.badge && (
-                            <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30 uppercase font-semibold shrink-0">
+                            <span className={`text-[9px] px-1.5 py-0.5 rounded border uppercase font-semibold shrink-0 ${
+                              badgeClasses[item.badgeTone] || badgeClasses.amber
+                            }`}>
                               {item.badge}
                             </span>
                           )}
@@ -371,17 +356,21 @@ export default function DolphinWindow({
             ) : viewMode === 'grid' ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                 {currentItems.map((item, idx) => {
-                  const Icon = item.icon;
+                  const Icon = iconMap[item.icon] || FileText;
                   return (
                     <div
                       key={idx}
                       {...getItemInteractions(item)}
-                      className={`p-2 rounded-lg flex flex-col items-center text-center space-y-1.5 transition-all cursor-pointer group select-none relative ${
+                      className={`p-2 rounded-lg flex flex-col items-center text-center space-y-1.5 transition-all group select-none relative ${
+                        item.disabled ? 'opacity-55 cursor-not-allowed' : 'cursor-pointer'
+                      } ${
                         isLightMode ? 'hover:bg-gray-100' : 'hover:bg-white/5'
                       }`}
                     >
                       {item.badge && (
-                        <span className="absolute top-1 right-1 text-[8px] px-1 py-0.2 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30 uppercase font-semibold z-10">
+                        <span className={`absolute top-1 right-1 text-[8px] px-1 py-0.5 rounded border uppercase font-semibold z-10 ${
+                          badgeClasses[item.badgeTone] || badgeClasses.amber
+                        }`}>
                           {item.badge}
                         </span>
                       )}
@@ -407,12 +396,14 @@ export default function DolphinWindow({
                 </div>
                 <div className={`divide-y ${isLightMode ? 'divide-gray-200' : 'divide-[#222222]'}`}>
                   {currentItems.map((item, idx) => {
-                    const Icon = item.icon;
+                    const Icon = iconMap[item.icon] || FileText;
                     return (
                       <div
                         key={idx}
                         {...getItemInteractions(item)}
-                        className={`grid grid-cols-12 px-3 py-2 items-center cursor-pointer transition-colors group select-none ${
+                        className={`grid grid-cols-12 px-3 py-2 items-center transition-colors group select-none ${
+                          item.disabled ? 'opacity-55 cursor-not-allowed' : 'cursor-pointer'
+                        } ${
                           isLightMode ? 'hover:bg-gray-50' : 'hover:bg-white/5'
                         }`}
                       >
@@ -424,7 +415,9 @@ export default function DolphinWindow({
                             {item.name}
                           </span>
                           {item.badge && (
-                            <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30 uppercase font-semibold shrink-0">
+                            <span className={`text-[9px] px-1.5 py-0.5 rounded border uppercase font-semibold shrink-0 ${
+                              badgeClasses[item.badgeTone] || badgeClasses.amber
+                            }`}>
                               {item.badge}
                             </span>
                           )}

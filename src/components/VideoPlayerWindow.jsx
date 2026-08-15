@@ -10,7 +10,7 @@ export default function VideoPlayerWindow({
   onMinimize, 
   onFocus, 
   videoTitle = 'Demo Reel / Research Overview', 
-  videoSrc = '/demo.mp4',
+  videoSrc = '/sample_video.mp4',
   currentAccent = '#77216F',
   isLightMode = false,
   zIndex = 25

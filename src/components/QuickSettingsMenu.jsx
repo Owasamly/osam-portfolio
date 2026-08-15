@@ -13,10 +13,10 @@ export default function QuickSettingsMenu({
   setVolume,
   isLightMode = false
 }) {
-  if (!isOpen) return null;
-
   const [isMuted, setIsMuted] = useState(false);
   const [brightness, setBrightness] = useState(100);
+
+  if (!isOpen) return null;
 
   const toggleMute = () => {
     setIsMuted(!isMuted);
@@ -108,8 +108,12 @@ export default function QuickSettingsMenu({
               max="100" 
               value={isMuted ? 0 : volume}
               onChange={(e) => { setVolume(Number(e.target.value)); if(isMuted) setIsMuted(false); }}
-              className={`w-full h-1.5 rounded-lg appearance-none cursor-pointer ${isLightMode ? 'bg-gray-200' : 'bg-gray-700'}`}
-              style={{ accentColor: currentAccent }}
+              className="quick-settings-slider w-full cursor-pointer"
+              style={{
+                '--slider-accent': currentAccent,
+                '--slider-progress': `${isMuted ? 0 : volume}%`,
+                '--slider-track': isLightMode ? '#e5e7eb' : '#374151',
+              }}
             />
           </div>
 
@@ -128,8 +132,12 @@ export default function QuickSettingsMenu({
               max="100" 
               value={brightness}
               onChange={(e) => setBrightness(Number(e.target.value))}
-              className={`w-full h-1.5 rounded-lg appearance-none cursor-pointer ${isLightMode ? 'bg-gray-200' : 'bg-gray-700'}`}
-              style={{ accentColor: currentAccent }}
+              className="quick-settings-slider w-full cursor-pointer"
+              style={{
+                '--slider-accent': currentAccent,
+                '--slider-progress': `${((brightness - 20) / 80) * 100}%`,
+                '--slider-track': isLightMode ? '#e5e7eb' : '#374151',
+              }}
             />
           </div>
         </div>

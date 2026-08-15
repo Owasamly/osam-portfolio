@@ -15,7 +15,7 @@ import ContextMenu from './components/ContextMenu';
 import useIsMobile from './hooks/useIsMobile';
 import { 
   Folder, FileText, Mail, Terminal, Wifi, Volume2, 
-  VolumeX, Grid, Globe, Film, Settings, Image as ImageIcon, Sparkles 
+  VolumeX, Grid, Globe, Film, Settings
 } from 'lucide-react';
 
 function DesktopIcon({ item, onDoubleClick, isMobile }) {
@@ -69,6 +69,8 @@ export default function App() {
 
   const [isTermOpen, setIsTermOpen] = useState(false);
   const [isTermMinimized, setIsTermMinimized] = useState(false);
+  const terminalScriptIdRef = useRef(0);
+  const [terminalScriptRequest, setTerminalScriptRequest] = useState(null);
 
   const [isPdfOpen, setIsPdfOpen] = useState(false);
   const [isPdfMinimized, setIsPdfMinimized] = useState(false);
@@ -77,6 +79,7 @@ export default function App() {
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isEditorMinimized, setIsEditorMinimized] = useState(false);
   const [currentEditorFile, setCurrentEditorFile] = useState('whoami.sh');
+  const [currentEditorContent, setCurrentEditorContent] = useState('');
 
   const [isBrowserOpen, setIsBrowserOpen] = useState(false);
   const [isBrowserMinimized, setIsBrowserMinimized] = useState(false);
@@ -88,7 +91,7 @@ export default function App() {
   const [isMediaOpen, setIsMediaOpen] = useState(false);
   const [isMediaMinimized, setIsMediaMinimized] = useState(false);
   const [mediaState, setMediaState] = useState({
-    src: '/public/sample_video.mp4',
+    src: '/sample_video.mp4',
     title: 'Project Demo',
     type: 'video' // 'video' | 'image' | 'gif'
   });
@@ -326,15 +329,20 @@ export default function App() {
           setCurrentPdfFile(fileName);
           openWindow('pdf', setIsPdfOpen, setIsPdfMinimized);
         }}
-        onTextEditorOpen={(fileName) => {
+        onTextEditorOpen={(fileName, fileContent) => {
           setCurrentEditorFile(fileName);
+          setCurrentEditorContent(fileContent);
           openWindow('editor', setIsEditorOpen, setIsEditorMinimized);
         }}
-        onTerminalOpen={() => {
+        onTerminalOpen={(scriptName) => {
+          if (scriptName) {
+            terminalScriptIdRef.current += 1;
+            setTerminalScriptRequest({ name: scriptName, id: terminalScriptIdRef.current });
+          }
           openWindow('terminal', setIsTermOpen, setIsTermMinimized);
         }}
         onBrowserOpen={(url) => {
-          openWindow('browser', setIsBrowserOpen, setIsBrowserMinimized);
+          openWindow('browser', setIsBrowserOpen, setIsBrowserMinimized, () => setBrowserUrl(url));
         }}
         onMediaOpen={(title, src, type) => {
           openMediaViewer(title, src, type);
@@ -363,6 +371,7 @@ export default function App() {
         onMinimize={() => toggleWindowMinimized('editor', setIsEditorMinimized, isEditorMinimized)}
         onFocus={() => focusWindow('editor', setIsEditorMinimized)}
         fileName={currentEditorFile}
+        fileContent={currentEditorContent}
         currentAccent={accentColor}
         isLightMode={isLightMode}
         zIndex={zIndices.editor}
@@ -375,6 +384,19 @@ export default function App() {
         onClose={() => setIsTermOpen(false)}
         onMinimize={() => toggleWindowMinimized('terminal', setIsTermMinimized, isTermMinimized)}
         onFocus={() => focusWindow('terminal', setIsTermMinimized)}
+        scriptRequest={terminalScriptRequest}
+        onOpenFiles={(tab) => {
+          openWindow('files', setIsWindowOpen, setIsWindowMinimized, () => setActiveTab(tab));
+        }}
+        onOpenBrowser={(url) => {
+          openWindow('browser', setIsBrowserOpen, setIsBrowserMinimized, () => setBrowserUrl(url));
+        }}
+        onOpenPdf={(fileName) => {
+          openWindow('pdf', setIsPdfOpen, setIsPdfMinimized, () => setCurrentPdfFile(fileName));
+        }}
+        onOpenContact={() => {
+          openWindow('contact', setIsContactOpen, setIsContactMinimized);
+        }}
         isLightMode={isLightMode}
         zIndex={zIndices.terminal}
         isMobile={isMobile}
@@ -444,7 +466,7 @@ export default function App() {
             <Mail className="w-4 h-4 text-sky-500" />
             <span>Contact Mail</span>
           </button>
-          <button onClick={() => { openMediaViewer('Research Demo', '/demo.mp4', 'video'); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#E95420]/20 rounded text-left">
+          <button onClick={() => { openMediaViewer('Portfolio Demo', '/sample_video.mp4', 'video'); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#E95420]/20 rounded text-left">
             <Film className="w-4 h-4 text-purple-500" />
             <span>Media Player</span>
           </button>
