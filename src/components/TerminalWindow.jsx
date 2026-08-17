@@ -263,7 +263,7 @@ export default function TerminalWindow({
       return `Opening ${normalizedTarget} in Files...`;
     }
     if (normalizedTarget === 'cv') {
-      onOpenPdf?.('cv.pdf');
+      onOpenPdf?.('docs/CV_EN.pdf');
       return 'Opening Osama_Kahsay_CV.pdf...';
     }
     if (normalizedTarget === 'github') {

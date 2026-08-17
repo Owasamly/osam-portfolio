@@ -9,7 +9,7 @@ export default function PdfViewerWindow({
   onClose, 
   onMinimize, 
   onFocus, 
-  pdfFile = 'cv.pdf', 
+  pdfFile = 'docs/CV_EN.pdf',
   currentAccent = '#77216F',
   isLightMode = false,
   zIndex = 25
@@ -21,8 +21,8 @@ export default function PdfViewerWindow({
   if (!isOpen) return null;
 
   const getPdfPath = (filename) => {
-    if (!filename) return '/cv.pdf';
-    return `/${filename}`;
+    if (!filename) return '/docs/CV_EN.pdf';
+    return `/${filename.replace(/^\/+/, '')}`;
   };
 
   const fileUri = getPdfPath(pdfFile);

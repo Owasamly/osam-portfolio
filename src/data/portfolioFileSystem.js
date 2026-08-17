@@ -30,7 +30,9 @@ const jsonFile = (name, data, extras = {}) =>
  *
  * If you do not provide a source path, the sample placeholder is used.
  */
-const imageFile = (name, icon = 'image', src = '/Sample_image.png') => {
+const normalizeAssetPath = (src) => src ? `/${src.replace(/^\/+/, '')}` : null;
+
+const imageFile = (name, icon = 'image', src) => {
   const extension = name.split('.').pop()?.toLowerCase();
   const typeLabels = {
     gif: 'GIF Image',
@@ -48,7 +50,9 @@ const imageFile = (name, icon = 'image', src = '/Sample_image.png') => {
     color: 'text-purple-500',
     action: 'media',
     mediaType: extension === 'gif' ? 'gif' : 'image',
-    src,
+    src: normalizeAssetPath(src),
+    disabled: !src,
+    statusMessage: !src ? `${name} has not been added to the portfolio yet.` : undefined,
   };
 };
 
@@ -63,7 +67,7 @@ const imageFile = (name, icon = 'image', src = '/Sample_image.png') => {
  *
  * If you omit the third value, the sample video is used.
  */
-const videoFile = (name, icon = 'video', src = '/sample_video.mp4') => {
+const videoFile = (name, icon = 'video', src) => {
   const extension = name.split('.').pop()?.toLowerCase();
   const typeLabels = {
     avi: 'AVI Video',
@@ -81,18 +85,22 @@ const videoFile = (name, icon = 'video', src = '/sample_video.mp4') => {
     color: 'text-blue-500',
     action: 'media',
     mediaType: 'video',
-    src,
+    src: normalizeAssetPath(src),
+    disabled: !src,
+    statusMessage: !src ? `${name} has not been added to the portfolio yet.` : undefined,
   };
 };
 
-const pdfFile = (name, icon, file) => ({
+const pdfFile = (name, icon = 'text', file) => ({
   name,
   type: 'file',
   ext: 'PDF Document',
   icon,
   color: 'text-red-500',
   action: 'pdf',
-  file,
+  file: normalizeAssetPath(file)?.slice(1),
+  disabled: !file,
+  statusMessage: !file ? `${name} has not been added to the portfolio yet.` : undefined,
 });
 
 const webLink = (name, url, extras = {}) => ({
@@ -289,7 +297,7 @@ export const directoryContents = {
     imageFile(
       'Security_Findings.png',
       'images',
-      '/devsecops_juice_shop/ci-security-findings.png',
+      '/devsecops_juice_shop/security-findings.png',
     ),
 
    
@@ -315,16 +323,30 @@ export const directoryContents = {
   snippy_ai_cursor: [
     textFile(
       'Concept_Overview.txt',
-      `Snippy AI Cursor\n================\n\nSnippy explores an AI-powered desktop cursor assistant that can understand the user's current application context and teach difficult workflows directly inside the interface. A possible use case is guiding someone through video-editing tasks step by step without forcing them to constantly switch to external tutorials.\n\nThe concept combines contextual AI assistance, desktop interaction design and learning-by-doing.`,
+      `Snippy AI Cursor\n================\n\nSnippy is an experimental desktop assistant designed to guide users through unfamiliar software without making them leave the application to search for a tutorial.\n\nThe prototype combines a floating prompt panel with a visual cursor overlay. A user can ask for help, and Snippy can translate the requested workflow into a sequence of on-screen steps. The cursor then moves toward relevant interface areas while short instructions explain what to do next.\n\nPrototype scope\n---------------\n- Electron-based desktop overlay\n- Compact assistant panel with keyboard shortcut\n- Prompt input, response controls and optional audio feedback\n- Cursor-position tracking\n- Multi-step guided sequences\n- In-context learning instead of switching between an application and a tutorial\n\nThe screenshots show the working overlay running above VS Code and the early implementation of the cursor-guidance logic. This is a functional proof of concept, not a finished AI product.`,
     ),
-    imageFile('Prototype.webp', 'images'),
+    imageFile('Assistant_Overlay_Prototype.webp', 'images', '/snippy/snippy-assistant-prototype.webp'),
+    imageFile('Guided_Cursor_Prototype.webp', 'images', '/snippy/snippy-guided-cursor-prototype.webp'),
     jsonFile(
       'Current_Status.json',
       {
-        status: 'Prototype / Paused',
-        challenge: 'Reliable context recognition and application-level guidance made the scope more complex than expected.',
-        representation: 'Experimental prototype, not a completed product.',
-        next_step: 'Narrow the first implementation to one application and a small number of well-defined workflows.',
+        status: 'Functional proof of concept / paused',
+        problem: 'Software tutorials usually force users to repeatedly switch between the task and an external video or article.',
+        proposed_solution: 'A context-aware desktop overlay that explains a workflow and visually guides the cursor through each step inside the active application.',
+        implemented: [
+          'Electron desktop overlay',
+          'Floating assistant prompt panel',
+          'Keyboard shortcut and audio-control interface',
+          'Cursor-position updates',
+          'Scripted multi-step guidance sequences',
+        ],
+        screenshots: {
+          Assistant_Overlay_Prototype: 'The compact Snippy Assistant panel running above VS Code.',
+          Guided_Cursor_Prototype: 'The visual cursor and the code responsible for advancing through guided steps.',
+        },
+        main_challenge: 'Reliable application-context recognition and safe interaction across different desktop interfaces made the original scope too broad.',
+        honest_positioning: 'A functional interaction prototype that validates the interface concept; it is not presented as a production-ready autonomous agent.',
+        next_step: 'Limit the first complete version to one application and a small set of well-defined, testable workflows.',
       },
     ),
     webLink('GitHub.url', `${GITHUB}/Snippy-app`),
@@ -366,7 +388,7 @@ export const directoryContents = {
   ],
 
   documents: [
-    pdfFile('Osama_Kahsay_CV_EN.pdf'),
+    pdfFile('Osama_Kahsay_CV_EN.pdf', 'text', 'docs/CV_EN.pdf'),
     jsonFile(
       'Master_Thesis_Ideas.json',
       {
@@ -384,7 +406,7 @@ export const directoryContents = {
     ),
     textFile(
       'Portfolio_README.txt',
-      `Welcome to Osama's interactive Linux portfolio.\n\nDouble-click items on desktop or single-tap on mobile. Project folders contain concise overviews, evidence, demonstrations and direct repository links. Placeholder media will be replaced as project assets are prepared.`,
+      `Welcome to Osama's interactive Linux portfolio.\n\nClick or tap items once to open them. Project folders contain concise overviews, evidence, demonstrations and direct repository links. Placeholder media will be replaced as project assets are prepared.`,
     ),
     textFile(
       'Reading_List.txt',
@@ -393,25 +415,22 @@ export const directoryContents = {
   ],
 
   downloads: [
-    pdfFile('Osama_Kahsay_CV_EN.pdf'),
-    pdfFile('Osama_Kahsay_CV_DE.pdf'),
+    pdfFile('Osama_Kahsay_CV_EN.pdf', 'text', 'docs/CV_EN.pdf'),
+    pdfFile('Osama_Kahsay_CV_DE.pdf', 'text', 'docs/CV_DE.pdf'),
   ],
 
   pictures: [
-    imageFile('Osama_Kahsay.jpg', 'camera'),
-    imageFile('GitOps_Architecture.png'),
-    imageFile('ArgoCD_Synchronized.jpeg', 'fileImage'),
-    imageFile('OPA_Policy_Rejection.webp', 'images'),
-    imageFile('Falco_Alert.png', 'fileImage'),
-    imageFile('Kubernetes_Cluster.jpg', 'camera'),
-    imageFile('MK_Delivery.gif', 'images'),
+    imageFile('GitOps_Architecture.png', 'image', '/local_kubernetes_gitops/local-kubernetes-gitops-architecture.png'),
+    imageFile('ArgoCD_Synchronized.png', 'fileImage', '/local_kubernetes_gitops/argocd-synced-resources.png'),
+    imageFile('OPA_Policy_Rejection.png', 'images', '/devsecops_policy_as_code/policy-violations-detected.png'),
+    imageFile('Falco_Alert.png', 'fileImage', '/runtime_security/falco-runtime-alerts.png'),
+    imageFile('MK_Delivery_Home.png', 'camera', '/mk_delivery/Home.png'),
   ],
 
   videos: [
-    videoFile('Portfolio_Tour.mp4', 'film'),
-    videoFile('GitOps_Self_Healing.webm', 'monitorPlay'),
-    videoFile('Falco_Detection.mkv', 'video'),
-    videoFile('MK_Delivery_Demo.mov', 'clapperboard'),
+    videoFile('GitOps_Self_Healing.mp4', 'monitorPlay', '/local_kubernetes_gitops/self_healing_demo.mp4'),
+    videoFile('Falco_Runtime_Detection.mp4', 'video', '/runtime_security/runtime-security-demo.mp4'),
+    videoFile('DevSecOps_Pipeline_Demo.mp4', 'film', '/devsecops_juice_shop/juice-shop-demo.mp4'),
   ],
 
   music: [

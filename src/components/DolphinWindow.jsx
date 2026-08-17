@@ -5,7 +5,7 @@ import {
   LayoutGrid, List, Download, Music, Image, Video, 
   Briefcase, User, Archive, GraduationCap, Trash2, 
   Terminal, Mail, FileCode, Globe, Camera, Images,
-  FileImage, Film, Clapperboard, MonitorPlay
+  FileImage, Film, Clapperboard, MonitorPlay, ArrowRight, MapPin, ShieldCheck
 } from 'lucide-react';
 import useIsMobile from '../hooks/useIsMobile';
 import { directoryContents, places } from '../data/portfolioFileSystem';
@@ -49,7 +49,92 @@ const badgeClasses = {
   emerald: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
 };
 
-export default function DolphinWindow({ 
+function RecruiterHome({ isLightMode, onProjects, onCv, onContact, onClassicView }) {
+  const strengths = [
+    ['Secure delivery', 'Security checks integrated into CI/CD before software reaches production.'],
+    ['Cloud-native security', 'Kubernetes controls, runtime monitoring and infrastructure guardrails.'],
+    ['Practical automation', 'Repeatable systems using GitOps, Terraform and policy-as-code.'],
+  ];
+
+  return (
+    <div className="mx-auto max-w-3xl space-y-5 pb-4">
+      <section className={`relative overflow-hidden rounded-2xl border p-5 sm:p-7 ${
+        isLightMode ? 'border-orange-200 bg-[#fffaf3]' : 'border-[#4a332b] bg-[#211b19]'
+      }`}>
+        <div className="absolute -right-12 -top-12 h-40 w-40 rounded-full bg-[#E95420]/10" />
+        <div className="relative">
+          <div className="mb-4 flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-[0.16em] text-[#E95420]">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#E95420]/25 bg-[#E95420]/10 px-2.5 py-1">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Open to opportunities
+            </span>
+            <span className={`inline-flex items-center gap-1 ${isLightMode ? 'text-gray-500' : 'text-gray-400'}`}>
+              <MapPin className="h-3 w-3" /> Munich, Germany
+            </span>
+          </div>
+
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-7">
+            <img
+              src="/osama-portfolio-headshot-v2.png"
+              alt="Osama Nurhussen Kahsay, DevSecOps and cybersecurity engineer"
+              className="mx-auto h-32 w-32 shrink-0 rounded-2xl border-2 border-white object-cover shadow-md ring-1 ring-[#E95420]/25 sm:order-2 sm:mx-0 sm:h-40 sm:w-40"
+            />
+            <div className="min-w-0 flex-1 sm:order-1">
+              <p className={`mb-1 text-xs font-semibold ${isLightMode ? 'text-gray-500' : 'text-gray-400'}`}>Hello, I’m</p>
+              <h1 className={`text-2xl font-black tracking-tight sm:text-3xl ${isLightMode ? 'text-gray-950' : 'text-white'}`}>
+                Osama Nurhussen Kahsay
+              </h1>
+              <h2 className="mt-2 text-base font-bold text-[#E95420] sm:text-lg">DevSecOps &amp; Cybersecurity Engineer</h2>
+              <p className={`mt-3 max-w-2xl text-[12px] leading-6 ${isLightMode ? 'text-gray-600' : 'text-gray-300'}`}>
+                I build secure cloud infrastructure and automated delivery pipelines, with hands-on work across Kubernetes, GitOps, policy-as-code and runtime security.
+              </p>
+
+              <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                <button onClick={onProjects} className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#E95420] px-4 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-[#cf4318]">
+                  View selected projects <ArrowRight className="h-3.5 w-3.5" />
+                </button>
+                <button onClick={onCv} className={`inline-flex items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-xs font-bold transition ${isLightMode ? 'border-gray-300 bg-white text-gray-800 hover:border-[#E95420]' : 'border-[#444] bg-[#161616] text-gray-100 hover:border-[#E95420]'}`}>
+                  <Download className="h-3.5 w-3.5" /> View CV
+                </button>
+                <button onClick={onContact} className={`inline-flex items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-xs font-bold transition ${isLightMode ? 'border-gray-300 bg-white text-gray-800 hover:border-[#E95420]' : 'border-[#444] bg-[#161616] text-gray-100 hover:border-[#E95420]'}`}>
+                  <Mail className="h-3.5 w-3.5" /> Contact me
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div className="mb-3 flex items-end justify-between gap-3">
+          <div>
+            <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#E95420]">At a glance</p>
+            <h3 className={`mt-1 text-sm font-bold sm:text-base ${isLightMode ? 'text-gray-900' : 'text-white'}`}>What I can bring to your team</h3>
+          </div>
+          <span className={`hidden text-[10px] sm:block ${isLightMode ? 'text-gray-400' : 'text-gray-500'}`}>profile_summary.md</span>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-3">
+          {strengths.map(([title, description]) => (
+            <article key={title} className={`rounded-xl border p-4 ${isLightMode ? 'border-gray-200 bg-white' : 'border-[#333] bg-[#181818]'}`}>
+              <ShieldCheck className="mb-2 h-5 w-5 text-[#E95420]" />
+              <h4 className={`text-xs font-bold ${isLightMode ? 'text-gray-900' : 'text-gray-100'}`}>{title}</h4>
+              <p className={`mt-1.5 text-[10px] leading-4 ${isLightMode ? 'text-gray-500' : 'text-gray-400'}`}>{description}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <div className={`flex flex-col items-start justify-between gap-3 rounded-xl border px-4 py-3 sm:flex-row sm:items-center ${isLightMode ? 'border-gray-200 bg-gray-50' : 'border-[#333] bg-[#161616]'}`}>
+        <div>
+          <p className={`text-[11px] font-bold ${isLightMode ? 'text-gray-800' : 'text-gray-200'}`}>Want the full Linux experience?</p>
+          <p className={`mt-0.5 text-[10px] ${isLightMode ? 'text-gray-500' : 'text-gray-400'}`}>Browse the portfolio as files, folders and terminal commands.</p>
+        </div>
+        <button onClick={onClassicView} className="shrink-0 text-[10px] font-bold text-[#E95420] hover:underline">Open classic file view →</button>
+      </div>
+    </div>
+  );
+}
+
+export default function DolphinWindow({
   isOpen, 
   isMinimized, 
   onClose, 
@@ -75,6 +160,8 @@ export default function DolphinWindow({
   const [historyIndex, setHistoryIndex] = useState(0);
   const [viewMode, setViewMode] = useState('grid');
   const [statusNotice, setStatusNotice] = useState('');
+  const [showHomeFiles, setShowHomeFiles] = useState(false);
+  const [showHomeViewControl, setShowHomeViewControl] = useState(false);
 
   useEffect(() => {
     if (activeTabRef.current === activeTab) return;
@@ -145,10 +232,10 @@ export default function DolphinWindow({
     } else if (item.action === 'contact') {
       if (onContactOpen) onContactOpen();
     } else if (item.action === 'pdf') {
-      if (onFileOpen) onFileOpen(item.file || 'cv.pdf');
+      if (onFileOpen) onFileOpen(item.file || 'docs/CV_EN.pdf');
     } else if (item.action === 'download') {
       const link = document.createElement('a');
-      link.href = `/${item.file || 'cv.pdf'}`;
+      link.href = `/${item.file || 'docs/CV_EN.pdf'}`;
       link.download = item.downloadName || item.name;
       document.body.appendChild(link);
       link.click();
@@ -168,12 +255,9 @@ export default function DolphinWindow({
     }
   };
 
-  const getItemInteractions = (item) => {
-    if (isMobile) {
-      return { onClick: () => handleItemAction(item) };
-    }
-    return { onDoubleClick: () => handleItemAction(item) };
-  };
+  const getItemInteractions = (item) => ({
+    onClick: () => handleItemAction(item),
+  });
 
   return (
     <Draggable handle=".ubuntu-header" nodeRef={nodeRef} disabled={isMobile}>
@@ -183,7 +267,7 @@ export default function DolphinWindow({
         onPointerDownCapture={onFocus}
         style={{ display: isMinimized ? 'none' : 'flex', zIndex: isMobile ? 100 : zIndex }}
         className={`border shadow-2xl flex-col overflow-hidden font-mono text-xs select-none backdrop-blur-md ${
-          isMobile ? 'fixed inset-0 w-full h-[100dvh] rounded-none' : 'absolute top-20 left-1/2 -translate-x-1/2 w-[740px] h-[520px] rounded-t-lg'
+          isMobile ? 'fixed inset-0 w-full h-[100dvh] rounded-none' : 'absolute top-10 left-1/2 -translate-x-1/2 w-[min(1080px,calc(100vw-150px))] h-[min(720px,calc(100vh-80px))] rounded-t-lg'
         } ${
           isLightMode ? 'bg-[#fafafa] text-gray-800 border-gray-300' : 'bg-[#1e1e1e]/95 text-gray-200 border-[#333333]'
         }`}
@@ -198,7 +282,7 @@ export default function DolphinWindow({
         >
           <div className="flex items-center space-x-2 font-bold">
             <Folder className="w-4 h-4 text-[#E95420]" />
-            <span>Files — /home/osama/{activeTab === 'about' ? '' : activeTab}</span>
+            <span>{activeTab === 'about' ? 'Welcome — Osama Kahsay' : `Files — /home/osama/${activeTab}`}</span>
           </div>
           
           <div className="flex items-center space-x-2">
@@ -273,8 +357,41 @@ export default function DolphinWindow({
 
         {/* Explorer Content */}
         <div className="flex-1 flex overflow-hidden relative">
+          {activeTab === 'about' && (
+            <div className={`absolute right-3 top-2 z-20 transition-all duration-300 sm:right-5 sm:top-3 ${
+              showHomeViewControl ? 'translate-y-0 opacity-100' : '-translate-y-2 pointer-events-none opacity-0'
+            }`}>
+              <div className={`grid grid-cols-2 rounded-lg border p-0.5 shadow-lg backdrop-blur-md ${
+                isLightMode ? 'border-gray-200 bg-white/90' : 'border-[#3a3a3a] bg-[#111]/90'
+              }`} role="group" aria-label="Home page display mode">
+                <button
+                  onClick={() => setShowHomeFiles(false)}
+                  aria-pressed={!showHomeFiles}
+                  className={`flex items-center justify-center gap-1 rounded-md px-2 py-1.5 text-[9px] font-semibold transition sm:px-3 ${
+                    !showHomeFiles
+                      ? isLightMode ? 'bg-orange-50 text-[#C84418]' : 'bg-[#E95420]/15 text-orange-300'
+                      : isLightMode ? 'text-gray-500 hover:bg-gray-50' : 'text-gray-400 hover:bg-white/5'
+                  }`}
+                >
+                  <User className="h-3 w-3" /> Overview
+                </button>
+                <button
+                  onClick={() => setShowHomeFiles(true)}
+                  aria-pressed={showHomeFiles}
+                  className={`flex items-center justify-center gap-1 rounded-md px-2 py-1.5 text-[9px] font-semibold transition sm:px-3 ${
+                    showHomeFiles
+                      ? isLightMode ? 'bg-orange-50 text-[#C84418]' : 'bg-[#E95420]/15 text-orange-300'
+                      : isLightMode ? 'text-gray-500 hover:bg-gray-50' : 'text-gray-400 hover:bg-white/5'
+                  }`}
+                >
+                  <Folder className="h-3 w-3" /> Files
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Sidebar */}
-          <div className={`w-36 sm:w-44 border-r p-1.5 sm:p-2 space-y-0.5 overflow-y-auto shrink-0 ${
+          <div className={`${activeTab === 'about' ? 'hidden md:block' : 'w-36 sm:w-44'} md:w-44 border-r p-1.5 sm:p-2 space-y-0.5 overflow-y-auto shrink-0 ${
             isLightMode ? 'bg-[#eaeaea] border-gray-300' : 'bg-[#141414] border-[#2b2b2b]'
           }`}>
             <div className="text-[10px] text-gray-500 font-bold px-2 py-1 uppercase tracking-wider">Places</div>
@@ -298,19 +415,35 @@ export default function DolphinWindow({
           </div>
 
           {/* Directory Viewer */}
-          <div className={`flex-1 p-4 md:p-6 overflow-y-auto ${
+          <div
+            onScroll={(event) => {
+              if (activeTab === 'about' && event.currentTarget.scrollTop > 24) {
+                setShowHomeViewControl(true);
+              }
+            }}
+            className={`flex-1 p-4 md:p-6 overflow-y-auto ${
             isLightMode ? 'bg-[#ffffff] text-gray-900' : 'bg-[#1e1e1e] text-gray-200'
           }`}>
-            {activeTab === 'about' && (
-              <div className={`mb-5 pb-3 border-b ${isLightMode ? 'border-gray-200' : 'border-[#333333]'}`}>
-                <h3 className="text-sm font-bold text-[#E95420] mb-1">Home Directory (~/osama)</h3>
-                <p className={`text-xs leading-relaxed ${isLightMode ? 'text-gray-600' : 'text-gray-300'}`}>
-                  Welcome to my interactive DevSecOps desktop environment. Double click files to open editors/viewers or folders to explore further.
-                </p>
-              </div>
-            )}
+            {activeTab === 'about' && !showHomeFiles ? (
+              <RecruiterHome
+                isLightMode={isLightMode}
+                onProjects={() => navigateTo('projects')}
+                onCv={() => onFileOpen?.('docs/CV_EN.pdf')}
+                onContact={() => onContactOpen?.()}
+                onClassicView={() => setShowHomeFiles(true)}
+              />
+            ) : (
+              <>
+                {activeTab === 'about' && (
+                  <div className={`mb-5 border-b pb-3 ${isLightMode ? 'border-gray-200' : 'border-[#333333]'}`}>
+                    <div>
+                      <h3 className="text-sm font-bold text-[#E95420]">Home Directory (~/osama)</h3>
+                      <p className={`mt-1 text-xs ${isLightMode ? 'text-gray-600' : 'text-gray-300'}`}>Click any item once to open it.</p>
+                    </div>
+                  </div>
+                )}
 
-            <div className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-3">Contents</div>
+                <div className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-3">Contents</div>
             
             {currentItems.length === 0 ? (
               <div className="text-center py-12 text-gray-400 space-y-2">
@@ -430,6 +563,8 @@ export default function DolphinWindow({
                   })}
                 </div>
               </div>
+                )}
+              </>
             )}
           </div>
         </div>
