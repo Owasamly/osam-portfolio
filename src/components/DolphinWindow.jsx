@@ -266,7 +266,7 @@ export default function DolphinWindow({
         onPointerDownCapture={onFocus}
         style={{ display: isMinimized ? 'none' : 'flex', zIndex: isMobile ? 100 : zIndex }}
         className={`border shadow-2xl flex-col overflow-hidden font-mono text-xs select-none backdrop-blur-md ${
-          isMobile ? 'fixed inset-0 w-full h-[100dvh] rounded-none' : 'absolute top-14 left-1/2 -translate-x-1/2 w-[min(920px,calc(100vw-220px))] h-[min(640px,calc(100vh-110px))] rounded-t-lg'
+          isMobile ? 'fixed inset-0 w-full h-[100dvh] rounded-none' : 'absolute top-10 left-1/2 -translate-x-1/2 w-[min(1080px,calc(100vw-150px))] h-[min(720px,calc(100vh-80px))] rounded-t-lg'
         } ${
           isLightMode ? 'bg-[#fafafa] text-gray-800 border-gray-300' : 'bg-[#1e1e1e]/95 text-gray-200 border-[#333333]'
         }`}
@@ -345,25 +345,26 @@ export default function DolphinWindow({
         </div>
 
         {activeTab === 'about' && (
-          <div className={`border-b px-3 py-2.5 sm:px-4 ${
-            isLightMode ? 'border-gray-200 bg-white' : 'border-[#333] bg-[#171717]'
+          <div className={`border-b px-3 py-1.5 sm:px-4 sm:py-2 ${
+            isLightMode ? 'border-gray-200 bg-gray-50/70' : 'border-[#2b2b2b] bg-[#171717]/80'
           }`}>
-            <div className="mx-auto flex max-w-3xl flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <div className="min-w-0">
-                <p className={`text-[11px] font-bold ${isLightMode ? 'text-gray-900' : 'text-white'}`}>Choose how to explore</p>
-                <p className={`text-[9px] ${isLightMode ? 'text-gray-500' : 'text-gray-400'}`}>
+            <div className="mx-auto flex max-w-4xl items-center justify-between gap-2">
+              <div className="hidden min-w-0 sm:block">
+                <p className={`text-[10px] font-semibold ${isLightMode ? 'text-gray-600' : 'text-gray-300'}`}>Choose how to explore</p>
+                <p className={`text-[9px] ${isLightMode ? 'text-gray-400' : 'text-gray-500'}`}>
                   Start with the quick summary or browse the complete Linux-style directory.
                 </p>
               </div>
-              <div className={`grid grid-cols-2 rounded-lg border p-1 sm:w-[300px] ${
-                isLightMode ? 'border-gray-300 bg-gray-100' : 'border-[#3a3a3a] bg-[#101010]'
+              <span className={`shrink-0 text-[9px] font-semibold sm:hidden ${isLightMode ? 'text-gray-500' : 'text-gray-400'}`}>Home view</span>
+              <div className={`grid min-w-0 flex-1 grid-cols-2 rounded-md border p-0.5 sm:max-w-[270px] ${
+                isLightMode ? 'border-gray-200 bg-white' : 'border-[#343434] bg-[#101010]'
               }`} role="group" aria-label="Home page display mode">
                 <button
                   onClick={() => setShowHomeFiles(false)}
                   aria-pressed={!showHomeFiles}
-                  className={`flex items-center justify-center gap-1.5 rounded-md px-3 py-2 text-[10px] font-bold transition ${
+                  className={`flex items-center justify-center gap-1.5 rounded px-2 py-1.5 text-[9px] font-semibold transition sm:text-[10px] ${
                     !showHomeFiles
-                      ? 'bg-[#E95420] text-white shadow-sm'
+                      ? isLightMode ? 'bg-orange-50 text-[#C84418] ring-1 ring-orange-200' : 'bg-[#E95420]/15 text-orange-300 ring-1 ring-[#E95420]/30'
                       : isLightMode ? 'text-gray-600 hover:bg-white' : 'text-gray-400 hover:bg-white/5'
                   }`}
                 >
@@ -372,9 +373,9 @@ export default function DolphinWindow({
                 <button
                   onClick={() => setShowHomeFiles(true)}
                   aria-pressed={showHomeFiles}
-                  className={`flex items-center justify-center gap-1.5 rounded-md px-3 py-2 text-[10px] font-bold transition ${
+                  className={`flex items-center justify-center gap-1.5 rounded px-2 py-1.5 text-[9px] font-semibold transition sm:text-[10px] ${
                     showHomeFiles
-                      ? 'bg-[#E95420] text-white shadow-sm'
+                      ? isLightMode ? 'bg-orange-50 text-[#C84418] ring-1 ring-orange-200' : 'bg-[#E95420]/15 text-orange-300 ring-1 ring-[#E95420]/30'
                       : isLightMode ? 'text-gray-600 hover:bg-white' : 'text-gray-400 hover:bg-white/5'
                   }`}
                 >
