@@ -612,9 +612,6 @@ export default function App() {
           )}
         </div>
 
-        <div className="text-[11px] text-gray-500 font-mono">
-          Ubuntu Desktop OS
-        </div>
       </footer>
     </div>
   );

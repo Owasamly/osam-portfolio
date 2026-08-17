@@ -323,16 +323,30 @@ export const directoryContents = {
   snippy_ai_cursor: [
     textFile(
       'Concept_Overview.txt',
-      `Snippy AI Cursor\n================\n\nSnippy explores an AI-powered desktop cursor assistant that can understand the user's current application context and teach difficult workflows directly inside the interface. A possible use case is guiding someone through video-editing tasks step by step without forcing them to constantly switch to external tutorials.\n\nThe concept combines contextual AI assistance, desktop interaction design and learning-by-doing.`,
+      `Snippy AI Cursor\n================\n\nSnippy is an experimental desktop assistant designed to guide users through unfamiliar software without making them leave the application to search for a tutorial.\n\nThe prototype combines a floating prompt panel with a visual cursor overlay. A user can ask for help, and Snippy can translate the requested workflow into a sequence of on-screen steps. The cursor then moves toward relevant interface areas while short instructions explain what to do next.\n\nPrototype scope\n---------------\n- Electron-based desktop overlay\n- Compact assistant panel with keyboard shortcut\n- Prompt input, response controls and optional audio feedback\n- Cursor-position tracking\n- Multi-step guided sequences\n- In-context learning instead of switching between an application and a tutorial\n\nThe screenshots show the working overlay running above VS Code and the early implementation of the cursor-guidance logic. This is a functional proof of concept, not a finished AI product.`,
     ),
-    imageFile('Prototype.webp', 'images'),
+    imageFile('Assistant_Overlay_Prototype.webp', 'images', '/snippy/snippy-assistant-prototype.webp'),
+    imageFile('Guided_Cursor_Prototype.webp', 'images', '/snippy/snippy-guided-cursor-prototype.webp'),
     jsonFile(
       'Current_Status.json',
       {
-        status: 'Prototype / Paused',
-        challenge: 'Reliable context recognition and application-level guidance made the scope more complex than expected.',
-        representation: 'Experimental prototype, not a completed product.',
-        next_step: 'Narrow the first implementation to one application and a small number of well-defined workflows.',
+        status: 'Functional proof of concept / paused',
+        problem: 'Software tutorials usually force users to repeatedly switch between the task and an external video or article.',
+        proposed_solution: 'A context-aware desktop overlay that explains a workflow and visually guides the cursor through each step inside the active application.',
+        implemented: [
+          'Electron desktop overlay',
+          'Floating assistant prompt panel',
+          'Keyboard shortcut and audio-control interface',
+          'Cursor-position updates',
+          'Scripted multi-step guidance sequences',
+        ],
+        screenshots: {
+          Assistant_Overlay_Prototype: 'The compact Snippy Assistant panel running above VS Code.',
+          Guided_Cursor_Prototype: 'The visual cursor and the code responsible for advancing through guided steps.',
+        },
+        main_challenge: 'Reliable application-context recognition and safe interaction across different desktop interfaces made the original scope too broad.',
+        honest_positioning: 'A functional interaction prototype that validates the interface concept; it is not presented as a production-ready autonomous agent.',
+        next_step: 'Limit the first complete version to one application and a small set of well-defined, testable workflows.',
       },
     ),
     webLink('GitHub.url', `${GITHUB}/Snippy-app`),

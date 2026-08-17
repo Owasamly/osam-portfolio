@@ -161,6 +161,7 @@ export default function DolphinWindow({
   const [viewMode, setViewMode] = useState('grid');
   const [statusNotice, setStatusNotice] = useState('');
   const [showHomeFiles, setShowHomeFiles] = useState(false);
+  const [showHomeViewControl, setShowHomeViewControl] = useState(false);
 
   useEffect(() => {
     if (activeTabRef.current === activeTab) return;
@@ -344,48 +345,6 @@ export default function DolphinWindow({
           </div>
         </div>
 
-        {activeTab === 'about' && (
-          <div className={`border-b px-3 py-1.5 sm:px-4 sm:py-2 ${
-            isLightMode ? 'border-gray-200 bg-gray-50/70' : 'border-[#2b2b2b] bg-[#171717]/80'
-          }`}>
-            <div className="mx-auto flex max-w-4xl items-center justify-between gap-2">
-              <div className="hidden min-w-0 sm:block">
-                <p className={`text-[10px] font-semibold ${isLightMode ? 'text-gray-600' : 'text-gray-300'}`}>Choose how to explore</p>
-                <p className={`text-[9px] ${isLightMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                  Start with the quick summary or browse the complete Linux-style directory.
-                </p>
-              </div>
-              <span className={`shrink-0 text-[9px] font-semibold sm:hidden ${isLightMode ? 'text-gray-500' : 'text-gray-400'}`}>Home view</span>
-              <div className={`grid min-w-0 flex-1 grid-cols-2 rounded-md border p-0.5 sm:max-w-[270px] ${
-                isLightMode ? 'border-gray-200 bg-white' : 'border-[#343434] bg-[#101010]'
-              }`} role="group" aria-label="Home page display mode">
-                <button
-                  onClick={() => setShowHomeFiles(false)}
-                  aria-pressed={!showHomeFiles}
-                  className={`flex items-center justify-center gap-1.5 rounded px-2 py-1.5 text-[9px] font-semibold transition sm:text-[10px] ${
-                    !showHomeFiles
-                      ? isLightMode ? 'bg-orange-50 text-[#C84418] ring-1 ring-orange-200' : 'bg-[#E95420]/15 text-orange-300 ring-1 ring-[#E95420]/30'
-                      : isLightMode ? 'text-gray-600 hover:bg-white' : 'text-gray-400 hover:bg-white/5'
-                  }`}
-                >
-                  <User className="h-3.5 w-3.5" /> Quick overview
-                </button>
-                <button
-                  onClick={() => setShowHomeFiles(true)}
-                  aria-pressed={showHomeFiles}
-                  className={`flex items-center justify-center gap-1.5 rounded px-2 py-1.5 text-[9px] font-semibold transition sm:text-[10px] ${
-                    showHomeFiles
-                      ? isLightMode ? 'bg-orange-50 text-[#C84418] ring-1 ring-orange-200' : 'bg-[#E95420]/15 text-orange-300 ring-1 ring-[#E95420]/30'
-                      : isLightMode ? 'text-gray-600 hover:bg-white' : 'text-gray-400 hover:bg-white/5'
-                  }`}
-                >
-                  <Folder className="h-3.5 w-3.5" /> Classic files
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
         {statusNotice && (
           <div className={`px-4 py-2 border-b text-[11px] font-semibold ${
             isLightMode
@@ -398,6 +357,39 @@ export default function DolphinWindow({
 
         {/* Explorer Content */}
         <div className="flex-1 flex overflow-hidden relative">
+          {activeTab === 'about' && (
+            <div className={`absolute right-3 top-2 z-20 transition-all duration-300 sm:right-5 sm:top-3 ${
+              showHomeViewControl ? 'translate-y-0 opacity-100' : '-translate-y-2 pointer-events-none opacity-0'
+            }`}>
+              <div className={`grid grid-cols-2 rounded-lg border p-0.5 shadow-lg backdrop-blur-md ${
+                isLightMode ? 'border-gray-200 bg-white/90' : 'border-[#3a3a3a] bg-[#111]/90'
+              }`} role="group" aria-label="Home page display mode">
+                <button
+                  onClick={() => setShowHomeFiles(false)}
+                  aria-pressed={!showHomeFiles}
+                  className={`flex items-center justify-center gap-1 rounded-md px-2 py-1.5 text-[9px] font-semibold transition sm:px-3 ${
+                    !showHomeFiles
+                      ? isLightMode ? 'bg-orange-50 text-[#C84418]' : 'bg-[#E95420]/15 text-orange-300'
+                      : isLightMode ? 'text-gray-500 hover:bg-gray-50' : 'text-gray-400 hover:bg-white/5'
+                  }`}
+                >
+                  <User className="h-3 w-3" /> Overview
+                </button>
+                <button
+                  onClick={() => setShowHomeFiles(true)}
+                  aria-pressed={showHomeFiles}
+                  className={`flex items-center justify-center gap-1 rounded-md px-2 py-1.5 text-[9px] font-semibold transition sm:px-3 ${
+                    showHomeFiles
+                      ? isLightMode ? 'bg-orange-50 text-[#C84418]' : 'bg-[#E95420]/15 text-orange-300'
+                      : isLightMode ? 'text-gray-500 hover:bg-gray-50' : 'text-gray-400 hover:bg-white/5'
+                  }`}
+                >
+                  <Folder className="h-3 w-3" /> Files
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Sidebar */}
           <div className={`${activeTab === 'about' ? 'hidden md:block' : 'w-36 sm:w-44'} md:w-44 border-r p-1.5 sm:p-2 space-y-0.5 overflow-y-auto shrink-0 ${
             isLightMode ? 'bg-[#eaeaea] border-gray-300' : 'bg-[#141414] border-[#2b2b2b]'
@@ -423,7 +415,13 @@ export default function DolphinWindow({
           </div>
 
           {/* Directory Viewer */}
-          <div className={`flex-1 p-4 md:p-6 overflow-y-auto ${
+          <div
+            onScroll={(event) => {
+              if (activeTab === 'about' && event.currentTarget.scrollTop > 24) {
+                setShowHomeViewControl(true);
+              }
+            }}
+            className={`flex-1 p-4 md:p-6 overflow-y-auto ${
             isLightMode ? 'bg-[#ffffff] text-gray-900' : 'bg-[#1e1e1e] text-gray-200'
           }`}>
             {activeTab === 'about' && !showHomeFiles ? (
