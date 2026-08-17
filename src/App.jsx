@@ -18,7 +18,7 @@ import {
   VolumeX, Grid, Globe, Film, Settings
 } from 'lucide-react';
 
-function DesktopIcon({ item, onDoubleClick, isMobile }) {
+function DesktopIcon({ item, onOpen, isLightMode }) {
   const nodeRef = useRef(null);
   const dragStartX = useRef(0);
   const dragStartY = useRef(0);
@@ -33,22 +33,18 @@ function DesktopIcon({ item, onDoubleClick, isMobile }) {
         dragStartY.current = data.y;
       }}
       onStop={(_event, data) => {
-        if (!isMobile) return;
-
         const distance = Math.hypot(data.x - dragStartX.current, data.y - dragStartY.current);
         if (distance < 5) {
-          // Use onDoubleClick handler so folders ('about', 'projects') correctly open Dolphin
-          onDoubleClick(item.id);
+          onOpen(item.id);
         }
       }}
     >
       <div
         ref={nodeRef}
-        onDoubleClick={() => !isMobile && onDoubleClick(item.id)}
         className="absolute w-20 flex flex-col items-center justify-center p-2 rounded hover:bg-white/10 cursor-grab active:cursor-grabbing text-center space-y-1 group transition-colors select-none"
       >
         <Icon className={`w-10 h-10 ${item.color} filter drop-shadow group-hover:scale-105 transition-transform`} />
-        <span className="text-xs text-white font-medium drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
+        <span className={`text-xs font-semibold ${isLightMode ? 'text-gray-900 drop-shadow-[0_1px_2px_rgba(255,255,255,0.9)]' : 'text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]'}`}>
           {item.label}
         </span>
       </div>
@@ -59,9 +55,9 @@ function DesktopIcon({ item, onDoubleClick, isMobile }) {
 export default function App() {
   const isMobile = useIsMobile(768);
 
-  // Global Appearance State (Jammy Dark Purple default)
-  const [isLightMode, setIsLightMode] = useState(false);
-  const [bgPreset, setBgPreset] = useState('#2C001E'); // Passed into ParticleBackground
+  // Start with a recruiter-friendly light canvas; visitors can still switch themes.
+  const [isLightMode, setIsLightMode] = useState(true);
+  const [bgPreset, setBgPreset] = useState('#EEE8DC'); // Warm Ubuntu-inspired neutral
 
   // Window visibility states
   const [isWindowOpen, setIsWindowOpen] = useState(true);
@@ -74,7 +70,7 @@ export default function App() {
 
   const [isPdfOpen, setIsPdfOpen] = useState(false);
   const [isPdfMinimized, setIsPdfMinimized] = useState(false);
-  const [currentPdfFile, setCurrentPdfFile] = useState('cv.pdf');
+  const [currentPdfFile, setCurrentPdfFile] = useState('docs/CV_EN.pdf');
 
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isEditorMinimized, setIsEditorMinimized] = useState(false);
@@ -91,7 +87,7 @@ export default function App() {
   const [isMediaOpen, setIsMediaOpen] = useState(false);
   const [isMediaMinimized, setIsMediaMinimized] = useState(false);
   const [mediaState, setMediaState] = useState({
-    src: '/sample_video.mp4',
+    src: '/devsecops_juice_shop/juice-shop-demo.mp4',
     title: 'Project Demo',
     type: 'video' // 'video' | 'image' | 'gif'
   });
@@ -196,7 +192,7 @@ export default function App() {
     if (appId === 'terminal') {
       openWindow('terminal', setIsTermOpen, setIsTermMinimized);
     } else if (appId === 'cv' || appId === 'pdf') {
-      openWindow('pdf', setIsPdfOpen, setIsPdfMinimized, () => setCurrentPdfFile('cv.pdf'));
+      openWindow('pdf', setIsPdfOpen, setIsPdfMinimized, () => setCurrentPdfFile('docs/CV_EN.pdf'));
     } else if (appId === 'editor') {
       openWindow('editor', setIsEditorOpen, setIsEditorMinimized);
     } else if (appId === 'video' || appId === 'media') {
@@ -216,11 +212,11 @@ export default function App() {
     openWindow('media', setIsMediaOpen, setIsMediaMinimized, () => setMediaState({ title, src, type }));
   };
 
-  const handleIconDoubleClick = (id) => {
+  const handleIconOpen = (id) => {
     if (id === 'terminal') {
       openWindow('terminal', setIsTermOpen, setIsTermMinimized);
     } else if (id === 'cv') {
-      openWindow('pdf', setIsPdfOpen, setIsPdfMinimized, () => setCurrentPdfFile('cv.pdf'));
+      openWindow('pdf', setIsPdfOpen, setIsPdfMinimized, () => setCurrentPdfFile('docs/CV_EN.pdf'));
     } else if (id === 'contact') {
       openWindow('contact', setIsContactOpen, setIsContactMinimized);
     } else {
@@ -286,15 +282,17 @@ export default function App() {
         isLightMode={isLightMode}
       />
 
-      <SystemMonitorWindow currentAccent={accentColor} isWidgetMode={true} isLightMode={isLightMode} isMobile={isMobile} />
+      {!isMobile && activeTab !== 'about' && (
+        <SystemMonitorWindow currentAccent={accentColor} isWidgetMode={true} isLightMode={isLightMode} isMobile={isMobile} />
+      )}
 
       <div className="relative z-10 pt-8">
         {desktopIcons.map((item) => (
   <DesktopIcon
     key={item.id}
     item={item}
-    onDoubleClick={handleIconDoubleClick}
-    isMobile={isMobile}
+    onOpen={handleIconOpen}
+    isLightMode={isLightMode}
   />
 ))}
       </div>
@@ -466,7 +464,7 @@ export default function App() {
             <Mail className="w-4 h-4 text-sky-500" />
             <span>Contact Mail</span>
           </button>
-          <button onClick={() => { openMediaViewer('Portfolio Demo', '/sample_video.mp4', 'video'); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#E95420]/20 rounded text-left">
+          <button onClick={() => { openMediaViewer('DevSecOps Pipeline Demo', '/devsecops_juice_shop/juice-shop-demo.mp4', 'video'); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 p-2 hover:bg-[#E95420]/20 rounded text-left">
             <Film className="w-4 h-4 text-purple-500" />
             <span>Media Player</span>
           </button>

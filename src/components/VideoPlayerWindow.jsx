@@ -8,10 +8,9 @@ export default function VideoPlayerWindow({
   isMinimized, 
   onClose, 
   onMinimize, 
-  onFocus, 
-  videoTitle = 'Demo Reel / Research Overview', 
-  videoSrc = '/sample_video.mp4',
-  currentAccent = '#77216F',
+  onFocus,
+  videoTitle = 'Demo Reel / Research Overview',
+  videoSrc = '/devsecops_juice_shop/juice-shop-demo.mp4',
   isLightMode = false,
   zIndex = 25
 }) {

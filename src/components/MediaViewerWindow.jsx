@@ -12,10 +12,9 @@ export default function MediaViewerWindow({
   onClose, 
   onMinimize, 
   onFocus, 
-  mediaTitle = 'Media Preview', 
-  mediaSrc = '/sample_video.mp4',
+  mediaTitle = 'Media Preview',
+  mediaSrc = '/devsecops_juice_shop/juice-shop-demo.mp4',
   mediaType = 'video', // 'video' | 'image' | 'gif'
-  currentAccent = '#77216F',
   isLightMode = false,
   zIndex = 25
 }) {
