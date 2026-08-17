@@ -13,10 +13,26 @@ import QuickSettingsMenu from './components/QuickSettingsMenu';
 import SettingsWindow from './components/SettingsWindow';
 import ContextMenu from './components/ContextMenu';
 import useIsMobile from './hooks/useIsMobile';
-import { 
+import {
   Folder, FileText, Mail, Terminal, Wifi, Volume2, 
   VolumeX, Grid, Globe, Film, Settings
 } from 'lucide-react';
+
+function GitHubMark({ className = '' }) {
+  return (
+    <span className={`${className} inline-flex items-center justify-center rounded-full bg-slate-600/85 font-sans text-xs font-bold text-white shadow-sm`}>
+      GH
+    </span>
+  );
+}
+
+function LinkedInMark({ className = '' }) {
+  return (
+    <span className={`${className} inline-flex items-center justify-center rounded-md bg-[#3977a8]/85 font-sans text-base font-bold leading-none text-white shadow-sm`}>
+      in
+    </span>
+  );
+}
 
 function DesktopIcon({ item, onOpen, isLightMode }) {
   const nodeRef = useRef(null);
@@ -181,6 +197,8 @@ export default function App() {
     { id: 'cv', label: 'cv.pdf', icon: FileText, color: 'text-red-400', defaultPos: { x: 30, y: 230 } },
     { id: 'terminal', label: 'Terminal', icon: Terminal, color: 'text-green-400', defaultPos: { x: 30, y: 330 } },
     { id: 'contact', label: 'Contact', icon: Mail, color: 'text-sky-400', defaultPos: { x: 30, y: 430 } },
+    { id: 'github', label: 'GitHub', icon: GitHubMark, color: 'text-slate-600', defaultPos: { x: 30, y: 530 } },
+    { id: 'linkedin', label: 'LinkedIn', icon: LinkedInMark, color: 'text-[#3977a8]', defaultPos: { x: 30, y: 630 } },
   ];
 
   const handleContextMenu = (e) => {
@@ -219,6 +237,10 @@ export default function App() {
       openWindow('pdf', setIsPdfOpen, setIsPdfMinimized, () => setCurrentPdfFile('docs/CV_EN.pdf'));
     } else if (id === 'contact') {
       openWindow('contact', setIsContactOpen, setIsContactMinimized);
+    } else if (id === 'github') {
+      openWindow('browser', setIsBrowserOpen, setIsBrowserMinimized, () => setBrowserUrl('https://github.com/Owasamly'));
+    } else if (id === 'linkedin') {
+      openWindow('browser', setIsBrowserOpen, setIsBrowserMinimized, () => setBrowserUrl('https://www.linkedin.com/in/osama-nurhussen/'));
     } else {
       openWindow('files', setIsWindowOpen, setIsWindowMinimized, () => setActiveTab(id));
     }
@@ -282,7 +304,7 @@ export default function App() {
         isLightMode={isLightMode}
       />
 
-      {!isMobile && activeTab !== 'about' && (
+      {!isMobile && (
         <SystemMonitorWindow currentAccent={accentColor} isWidgetMode={true} isLightMode={isLightMode} isMobile={isMobile} />
       )}
 
