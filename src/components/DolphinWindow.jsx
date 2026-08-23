@@ -75,7 +75,7 @@ function RecruiterHome({ isLightMode, onProjects, onCv, onContact, onClassicView
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-7">
             <img
               src="/osama-portfolio-headshot-v2.png"
-              alt="Osama Nurhussen Kahsay, DevSecOps and cybersecurity engineer"
+              alt="Osama Nurhussen Kahsay, AI Automation, DevSecOps & Cybersecurity"
               className="mx-auto h-32 w-32 shrink-0 rounded-2xl border-2 border-white object-cover shadow-md ring-1 ring-[#E95420]/25 sm:order-2 sm:mx-0 sm:h-40 sm:w-40"
             />
             <div className="min-w-0 flex-1 sm:order-1">
@@ -85,7 +85,7 @@ function RecruiterHome({ isLightMode, onProjects, onCv, onContact, onClassicView
               </h1>
               <h2 className="mt-2 text-base font-bold text-[#E95420] sm:text-lg">DevSecOps &amp; Cybersecurity Engineer</h2>
               <p className={`mt-3 max-w-2xl text-[12px] leading-6 ${isLightMode ? 'text-gray-600' : 'text-gray-300'}`}>
-                I build secure cloud infrastructure and automated delivery pipelines, with hands-on work across Kubernetes, GitOps, policy-as-code and runtime security.
+                I build LLM-powered workflows, practical automations, and secure cloud-native systems, with hands-on work across Python, APIs, Kubernetes, GitOps, and runtime security.
               </p>
 
               <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
