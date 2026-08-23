@@ -83,7 +83,7 @@ function RecruiterHome({ isLightMode, onProjects, onCv, onContact, onClassicView
               <h1 className={`text-2xl font-black tracking-tight sm:text-3xl ${isLightMode ? 'text-gray-950' : 'text-white'}`}>
                 Osama Nurhussen Kahsay
               </h1>
-              <h2 className="mt-2 text-base font-bold text-[#E95420] sm:text-lg">DevSecOps &amp; Cybersecurity Engineer</h2>
+              <h2 className="mt-2 text-base font-bold text-[#E95420] sm:text-lg">AI Automation, DevSecOps &amp; Cybersecurity </h2>
               <p className={`mt-3 max-w-2xl text-[12px] leading-6 ${isLightMode ? 'text-gray-600' : 'text-gray-300'}`}>
                 I build LLM-powered workflows, practical automations, and secure cloud-native systems, with hands-on work across Python, APIs, Kubernetes, GitOps, and runtime security.
               </p>
