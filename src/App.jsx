@@ -34,7 +34,16 @@ function LinkedInMark({ className = '' }) {
   );
 }
 
-function DesktopIcon({ item, onOpen, isLightMode, isMobile }) {
+function hasDarkBackground(hexColor) {
+  const hex = hexColor.replace('#', '');
+  const channels = [0, 2, 4].map((index) => parseInt(hex.slice(index, index + 2), 16) / 255);
+  const [red, green, blue] = channels.map((channel) =>
+    channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4
+  );
+  return (0.2126 * red) + (0.7152 * green) + (0.0722 * blue) < 0.42;
+}
+
+function DesktopIcon({ item, onOpen, useLightText, isMobile }) {
   const nodeRef = useRef(null);
   const dragStartX = useRef(0);
   const dragStartY = useRef(0);
@@ -60,7 +69,7 @@ function DesktopIcon({ item, onOpen, isLightMode, isMobile }) {
         className="absolute w-20 flex flex-col items-center justify-center p-2 rounded hover:bg-white/10 cursor-grab active:cursor-grabbing text-center space-y-1 group transition-colors select-none"
       >
         <Icon className={`w-10 h-10 ${item.color} filter drop-shadow group-hover:scale-105 transition-transform`} />
-        <span className={`text-xs font-semibold ${isLightMode ? 'text-gray-900 drop-shadow-[0_1px_2px_rgba(255,255,255,0.9)]' : 'text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]'}`}>
+        <span className={`text-xs font-semibold ${useLightText ? 'text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]' : 'text-gray-900 drop-shadow-[0_1px_2px_rgba(255,255,255,0.9)]'}`}>
           {item.label}
         </span>
       </div>
@@ -81,6 +90,8 @@ export default function App() {
   const isLightMode = themeMode === 'system' ? !systemPrefersDark : themeMode === 'light';
   const [bgPreset, setBgPreset] = useState('#EFE2CF'); // Warm sand without the previous grey cast
   const [darkBgPreset, setDarkBgPreset] = useState('#2C001E'); // Ubuntu aubergine is the default, not a forced wallpaper
+  const activeBgPreset = isLightMode ? bgPreset : darkBgPreset;
+  const desktopUsesLightText = hasDarkBackground(activeBgPreset);
 
   useEffect(() => {
     const colorScheme = window.matchMedia('(prefers-color-scheme: dark)');
@@ -279,7 +290,7 @@ export default function App() {
   }`}
 >
       {/* 1. Canvas Background dynamically updates when bgPreset changes */}
-      <ParticleBackground bgPreset={isLightMode ? bgPreset : darkBgPreset} />
+      <ParticleBackground bgPreset={activeBgPreset} />
 
       <ContextMenu 
         position={contextMenuPos} 
@@ -341,7 +352,7 @@ export default function App() {
     key={item.id}
     item={item}
     onOpen={handleIconOpen}
-    isLightMode={isLightMode}
+    useLightText={desktopUsesLightText}
     isMobile={isMobile}
   />
 ))}
@@ -357,7 +368,7 @@ export default function App() {
         isLightMode={isLightMode}
         themeMode={themeMode}
         setThemeMode={setThemeMode}
-        bgPreset={isLightMode ? bgPreset : darkBgPreset}
+        bgPreset={activeBgPreset}
         setBgPreset={isLightMode ? setBgPreset : setDarkBgPreset}
         zIndex={zIndices.settings}
         isMobile={isMobile}
