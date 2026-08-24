@@ -201,6 +201,7 @@ export const directoryContents = {
     directory('DevSecOps_Juice_Shop', 'devsecops_juice_shop'),
     directory('MK_Delivery', 'mk_delivery_project'),
     directory('Snippy_AI_Cursor', 'snippy_ai_cursor', { badge: 'Prototype', badgeTone: 'amber' }),
+    directory('Agentic_Job_Search', 'agentic_job_search', { badge: 'In progress', badgeTone: 'amber' }),
     directory('Vault_OIDC_Secrets', null, {
       badge: 'In progress',
       badgeTone: 'amber',
@@ -350,6 +351,47 @@ export const directoryContents = {
       },
     ),
     webLink('GitHub.url', `${GITHUB}/Snippy-app`),
+  ],
+
+  agentic_job_search: [
+    textFile(
+      'Project_Overview.txt',
+      projectOverview({
+        title: 'Agentic Job Search & Resume Tailoring',
+        summary: 'A local, human-in-the-loop workflow for turning a job description and verified master resume into structured, role-specific content, then assisting with visible browser-based resume editing.',
+        stack: 'Node.js, browser automation, LLM APIs, structured JSON, validation, persistent local browser sessions',
+        highlights: '- Produces reviewable structured resume content\n- Keeps generated claims grounded in verified source material\n- Matches known resume concepts to visible editor fields\n- Requires human review before content is used\n- Keeps credentials and browser-profile data local',
+      }),
+    ),
+    jsonFile(
+      'Current_Status.json',
+      {
+        status: 'Local prototype / actively in progress',
+        implemented: [
+          'Job-description and master-resume input workflow',
+          'Provider-configurable LLM generation',
+          'Structured resume-content review',
+          'Visible browser session with persistent local profile',
+          'Conservative matching for headline, summary and skills fields',
+        ],
+        safety_boundaries: [
+          'No automatic job submission',
+          'No credentials stored in source code',
+          'Human review required for generated claims and filled fields',
+          'Private repository while personal-data handling is refined',
+        ],
+        next_steps: [
+          'Add site-specific mappings for rich-text resume sections',
+          'Separate reusable candidate data from generated role variants',
+          'Add repeatable evaluation cases for factuality and field matching',
+          'Expand from resume tailoring into tracked, approval-based application assistance',
+        ],
+      },
+    ),
+    textFile(
+      'Why_It_Matters.txt',
+      `This project explores the less glamorous parts of agentic automation: grounding, validation, browser-state handling, safe failure and explicit human approval.\n\nIt is intentionally presented as an in-progress local prototype. The goal is dependable assistance rather than unsupervised application volume.`,
+    ),
   ],
 
   experience: [

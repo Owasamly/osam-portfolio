@@ -73,7 +73,7 @@ export default function App() {
 
   // Start with a recruiter-friendly light canvas; visitors can still switch themes.
   const [isLightMode, setIsLightMode] = useState(true);
-  const [bgPreset, setBgPreset] = useState('#E7E0D5'); // Softer, lower-contrast warm neutral
+  const [bgPreset, setBgPreset] = useState('#EFE2CF'); // Warm sand without the previous grey cast
 
   // Window visibility states
   const [isWindowOpen, setIsWindowOpen] = useState(true);
