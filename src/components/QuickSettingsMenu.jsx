@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Wifi, Volume2, VolumeX, Sun, Moon, Bluetooth, Shield, Power, Settings } from 'lucide-react';
+import { Wifi, Volume2, VolumeX, Sun, Moon, Bluetooth, Shield, Power, Settings, Monitor } from 'lucide-react';
 
 export default function QuickSettingsMenu({ 
   isOpen, 
@@ -12,7 +12,8 @@ export default function QuickSettingsMenu({
   volume, 
   setVolume,
   isLightMode = false,
-  setIsLightMode,
+  themeMode = 'system',
+  setThemeMode,
   onOpenSettings,
 }) {
   const [isMuted, setIsMuted] = useState(false);
@@ -88,35 +89,49 @@ export default function QuickSettingsMenu({
             </div>
           </button>
 
-          {/* Appearance Toggle */}
-          <button
-            onClick={() => setIsLightMode?.(!isLightMode)}
-            aria-pressed={!isLightMode}
-            className={`col-span-2 flex items-center justify-between gap-3 rounded-xl border p-3 transition-all ${
+          {/* Appearance Mode */}
+          <div
+            className={`col-span-2 rounded-xl border p-3 ${
               isLightMode
                 ? 'bg-gray-100 border-gray-300 text-gray-900 shadow-sm'
                 : 'bg-[#2a2a2a] border-[#3d3d3d] text-white shadow-sm'
             }`}
           >
-            <div className="flex min-w-0 items-center space-x-3">
+            <div className="mb-3 flex min-w-0 items-center space-x-3">
               <div className={`rounded-lg p-2 ${isLightMode ? 'bg-white shadow-xs' : 'bg-[#1e1e1e] shadow-xs'}`}>
-                {isLightMode
+                {themeMode === 'system' ? <Monitor className="h-4 w-4" style={{ color: currentAccent }} /> : isLightMode
                   ? <Sun className="h-4 w-4" style={{ color: currentAccent }} />
                   : <Moon className="h-4 w-4" style={{ color: currentAccent }} />}
               </div>
               <div className="text-left">
                 <div className="text-[11px] font-bold">Appearance</div>
                 <div className={`text-[10px] ${isLightMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                  {isLightMode ? 'Light mode' : 'Dark mode'}
+                  {themeMode === 'system' ? `Following system · ${isLightMode ? 'Light' : 'Dark'}` : `${themeMode[0].toUpperCase()}${themeMode.slice(1)} mode`}
                 </div>
               </div>
             </div>
-            <span className={`rounded-full px-2.5 py-1 text-[9px] font-bold uppercase tracking-wide ${
-              isLightMode ? 'bg-white text-gray-600' : 'bg-[#141414] text-gray-300'
-            }`}>
-              Switch to {isLightMode ? 'dark' : 'light'}
-            </span>
-          </button>
+            <div className={`grid grid-cols-3 gap-1 rounded-lg p-1 ${isLightMode ? 'bg-gray-200' : 'bg-[#141414]'}`}>
+              {[
+                ['system', 'System', Monitor],
+                ['light', 'Light', Sun],
+                ['dark', 'Dark', Moon],
+              ].map(([mode, label, Icon]) => (
+                <button
+                  key={mode}
+                  onClick={() => setThemeMode?.(mode)}
+                  aria-pressed={themeMode === mode}
+                  className={`flex items-center justify-center gap-1.5 rounded-md px-2 py-2 text-[10px] font-bold transition-colors ${
+                    themeMode === mode
+                      ? isLightMode ? 'bg-white text-gray-900 shadow-sm' : 'bg-[#333333] text-white shadow-sm'
+                      : isLightMode ? 'text-gray-500 hover:text-gray-800' : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  <Icon className="h-3 w-3" />
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
 
           {/* Settings Launcher */}
           <button

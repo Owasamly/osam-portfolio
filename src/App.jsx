@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Draggable from 'react-draggable';
 import ParticleBackground from './components/ParticleBackground';
 import DolphinWindow from './components/DolphinWindow';
@@ -71,9 +71,29 @@ function DesktopIcon({ item, onOpen, isLightMode, isMobile }) {
 export default function App() {
   const isMobile = useIsMobile(768);
 
-  // Start with a recruiter-friendly light canvas; visitors can still switch themes.
-  const [isLightMode, setIsLightMode] = useState(true);
+  const [themeMode, setThemeMode] = useState(() => {
+    const savedTheme = localStorage.getItem('portfolio-theme');
+    return ['system', 'light', 'dark'].includes(savedTheme) ? savedTheme : 'system';
+  });
+  const [systemPrefersDark, setSystemPrefersDark] = useState(
+    () => window.matchMedia('(prefers-color-scheme: dark)').matches
+  );
+  const isLightMode = themeMode === 'system' ? !systemPrefersDark : themeMode === 'light';
   const [bgPreset, setBgPreset] = useState('#EFE2CF'); // Warm sand without the previous grey cast
+
+  useEffect(() => {
+    const colorScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    const syncSystemTheme = (event) => setSystemPrefersDark(event.matches);
+
+    setSystemPrefersDark(colorScheme.matches);
+    colorScheme.addEventListener('change', syncSystemTheme);
+    return () => colorScheme.removeEventListener('change', syncSystemTheme);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('portfolio-theme', themeMode);
+    document.documentElement.style.colorScheme = isLightMode ? 'light' : 'dark';
+  }, [themeMode, isLightMode]);
 
   // Window visibility states
   const [isWindowOpen, setIsWindowOpen] = useState(true);
@@ -302,7 +322,8 @@ export default function App() {
         volume={volume}
         setVolume={setVolume}
         isLightMode={isLightMode}
-        setIsLightMode={setIsLightMode}
+        themeMode={themeMode}
+        setThemeMode={setThemeMode}
         onOpenSettings={() => {
           setIsQuickSettingsOpen(false);
           handleOpenApp('settings');
@@ -333,7 +354,8 @@ export default function App() {
         onMinimize={() => toggleWindowMinimized('settings', setIsSettingsMinimized, isSettingsMinimized)}
         onFocus={() => focusWindow('settings', setIsSettingsMinimized)}
         isLightMode={isLightMode}
-        setIsLightMode={setIsLightMode}
+        themeMode={themeMode}
+        setThemeMode={setThemeMode}
         bgPreset={bgPreset}
         setBgPreset={setBgPreset}
         zIndex={zIndices.settings}

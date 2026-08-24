@@ -7,9 +7,10 @@ export default function SettingsWindow({
   isOpen, 
   isMinimized, 
   onClose, 
-  onMinimize, 
+  onMinimize,
   isLightMode,
-  setIsLightMode,
+  themeMode = 'system',
+  setThemeMode,
   bgPreset,
   setBgPreset,
   onFocus,
@@ -100,20 +101,29 @@ export default function SettingsWindow({
                 <h3 className="text-xs font-bold mb-1">Global System Theme</h3>
                 <p className="text-[11px] text-gray-500 mb-3">Applies light or dark mode across all windows and menus.</p>
                 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-3 gap-3">
                   <button
-                    onClick={() => setIsLightMode(false)}
+                    onClick={() => setThemeMode('system')}
                     className={`p-4 rounded-lg border flex flex-col items-center justify-center space-y-2 transition-all ${
-                      !isLightMode ? 'border-[#E95420] bg-black/40 text-white font-bold ring-1 ring-[#E95420]' : 'border-gray-300 bg-gray-200 text-gray-700'
+                      themeMode === 'system' ? 'border-[#E95420] bg-[#E95420]/10 font-bold ring-1 ring-[#E95420]' : isLightMode ? 'border-gray-300 bg-gray-200 text-gray-700' : 'border-[#333333] bg-[#181818] text-gray-400'
+                    }`}
+                  >
+                    <Monitor className="w-5 h-5 text-[#E95420]" />
+                    <span>System</span>
+                  </button>
+                  <button
+                    onClick={() => setThemeMode('dark')}
+                    className={`p-4 rounded-lg border flex flex-col items-center justify-center space-y-2 transition-all ${
+                      themeMode === 'dark' ? 'border-[#E95420] bg-black/40 text-white font-bold ring-1 ring-[#E95420]' : isLightMode ? 'border-gray-300 bg-gray-200 text-gray-700' : 'border-[#333333] bg-[#181818] text-gray-400'
                     }`}
                   >
                     <Moon className="w-5 h-5 text-purple-400" />
                     <span>Dark Yaru</span>
                   </button>
                   <button
-                    onClick={() => setIsLightMode(true)}
+                    onClick={() => setThemeMode('light')}
                     className={`p-4 rounded-lg border flex flex-col items-center justify-center space-y-2 transition-all ${
-                      isLightMode ? 'border-[#E95420] bg-white text-gray-900 font-bold shadow ring-1 ring-[#E95420]' : 'border-[#333333] bg-[#181818] text-gray-400'
+                      themeMode === 'light' ? 'border-[#E95420] bg-white text-gray-900 font-bold shadow ring-1 ring-[#E95420]' : isLightMode ? 'border-gray-300 bg-gray-200 text-gray-700' : 'border-[#333333] bg-[#181818] text-gray-400'
                     }`}
                   >
                     <Sun className="w-5 h-5 text-amber-500" />
