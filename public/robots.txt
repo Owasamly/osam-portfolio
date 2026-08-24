@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://osam-portfolio.vercel.app/sitemap.xml
+Sitemap: https://osamakahsay.dev/sitemap.xml
