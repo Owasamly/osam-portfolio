@@ -469,6 +469,12 @@ export const directoryContents = {
   ],
 
   pictures: [
+    imageFile('Education_Timeline.png', 'image', '/timelines/education-timeline.png', {
+      darkSrc: '/timelines/education-timeline-dark.png',
+    }),
+    imageFile('Experience_Timeline.png', 'image', '/timelines/experience-timeline.png', {
+      darkSrc: '/timelines/experience-timeline-dark.png',
+    }),
     imageFile('GitOps_Architecture.png', 'image', '/local_kubernetes_gitops/local-kubernetes-gitops-architecture.png'),
     imageFile('ArgoCD_Synchronized.png', 'fileImage', '/local_kubernetes_gitops/argocd-synced-resources.png'),
     imageFile('OPA_Policy_Rejection.png', 'images', '/devsecops_policy_as_code/policy-violations-detected.png'),
