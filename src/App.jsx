@@ -80,6 +80,7 @@ export default function App() {
   );
   const isLightMode = themeMode === 'system' ? !systemPrefersDark : themeMode === 'light';
   const [bgPreset, setBgPreset] = useState('#EFE2CF'); // Warm sand without the previous grey cast
+  const [darkBgPreset, setDarkBgPreset] = useState('#2C001E'); // Ubuntu aubergine is the default, not a forced wallpaper
 
   useEffect(() => {
     const colorScheme = window.matchMedia('(prefers-color-scheme: dark)');
@@ -278,7 +279,7 @@ export default function App() {
   }`}
 >
       {/* 1. Canvas Background dynamically updates when bgPreset changes */}
-      <ParticleBackground bgPreset={isLightMode ? bgPreset : '#2C001E'} />
+      <ParticleBackground bgPreset={isLightMode ? bgPreset : darkBgPreset} />
 
       <ContextMenu 
         position={contextMenuPos} 
@@ -356,8 +357,8 @@ export default function App() {
         isLightMode={isLightMode}
         themeMode={themeMode}
         setThemeMode={setThemeMode}
-        bgPreset={bgPreset}
-        setBgPreset={setBgPreset}
+        bgPreset={isLightMode ? bgPreset : darkBgPreset}
+        setBgPreset={isLightMode ? setBgPreset : setDarkBgPreset}
         zIndex={zIndices.settings}
         isMobile={isMobile}
       />
