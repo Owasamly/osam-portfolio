@@ -22,21 +22,18 @@ export default function SettingsWindow({
 
   if (!isOpen || isMinimized) return null;
 
-  const wallPapers = isLightMode
-    ? [
-        { id: 'warm-sand', name: 'Warm Sand', color: '#EFE2CF' },
-        { id: 'soft-ivory', name: 'Soft Ivory', color: '#F7F1E8' },
-        { id: 'cool-mist', name: 'Cool Mist', color: '#DCE7EE' },
-        { id: 'sage-cloud', name: 'Sage Cloud', color: '#DDE8D5' },
-        { id: 'peach-haze', name: 'Peach Haze', color: '#F4D8C8' },
-        { id: 'lavender-air', name: 'Lavender Air', color: '#E6DFF2' },
-      ]
-    : [
-        { id: 'jammy-jellyfish', name: 'Jammy Dark Purple', color: '#2C001E' },
-        { id: 'dark-space', name: 'Deep Space Black', color: '#0d1117' },
-        { id: 'baltic-blue', name: 'Baltic Slate Blue', color: '#0f2027' },
-        { id: 'nord-night', name: 'Nordic Dark Cyan', color: '#1a2332' },
-      ];
+  const wallPapers = [
+    { id: 'warm-sand', name: 'Warm Sand', color: '#EFE2CF' },
+    { id: 'soft-ivory', name: 'Soft Ivory', color: '#F7F1E8' },
+    { id: 'cool-mist', name: 'Cool Mist', color: '#DCE7EE' },
+    { id: 'sage-cloud', name: 'Sage Cloud', color: '#DDE8D5' },
+    { id: 'peach-haze', name: 'Peach Haze', color: '#F4D8C8' },
+    { id: 'lavender-air', name: 'Lavender Air', color: '#E6DFF2' },
+    { id: 'jammy-jellyfish', name: 'Jammy Dark Purple', color: '#2C001E' },
+    { id: 'dark-space', name: 'Deep Space Black', color: '#0d1117' },
+    { id: 'baltic-blue', name: 'Baltic Slate Blue', color: '#0f2027' },
+    { id: 'nord-night', name: 'Nordic Dark Cyan', color: '#1a2332' },
+  ];
 
   return (
     <Draggable handle=".settings-header" nodeRef={nodeRef} disabled={isMobile}>
@@ -146,7 +143,7 @@ export default function SettingsWindow({
               <div>
                 <h3 className="text-xs font-bold mb-1">Desktop Wallpaper Color</h3>
                 <p className="text-[11px] text-gray-500 mb-3">
-                  Choose a {isLightMode ? 'light' : 'dark'} wallpaper for the current theme.
+                  Choose any wallpaper independently of the current theme.
                 </p>
                 
                 <div className="space-y-2">
