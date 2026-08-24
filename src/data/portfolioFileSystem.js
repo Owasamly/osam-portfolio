@@ -32,8 +32,9 @@ const jsonFile = (name, data, extras = {}) =>
  */
 const normalizeAssetPath = (src) => src ? `/${src.replace(/^\/+/, '')}` : null;
 
-const imageFile = (name, icon = 'image', src) => {
+const imageFile = (name, icon = 'image', src, extras = {}) => {
   const extension = name.split('.').pop()?.toLowerCase();
+  const { darkSrc, ...fileExtras } = extras;
   const typeLabels = {
     gif: 'GIF Image',
     jpeg: 'JPEG Image',
@@ -51,8 +52,10 @@ const imageFile = (name, icon = 'image', src) => {
     action: 'media',
     mediaType: extension === 'gif' ? 'gif' : 'image',
     src: normalizeAssetPath(src),
+    darkSrc: normalizeAssetPath(darkSrc),
     disabled: !src,
     statusMessage: !src ? `${name} has not been added to the portfolio yet.` : undefined,
+    ...fileExtras,
   };
 };
 
@@ -154,7 +157,7 @@ export const directoryContents = {
     },
     textFile(
       'About_Me.txt',
-      `Osama Nurhussen Kahsay\nMunich, Germany\n\nCybersecurity master's student focused on DevSecOps, cloud-native security and practical automation. I build hands-on systems that connect CI/CD security, policy-as-code, GitOps and Kubernetes runtime monitoring.\n\nExplore Projects for implementation evidence, Experience for shipped work, or open the CV for the complete profile.`,
+      `Osama Nurhussen Kahsay\nMunich, Germany\n\nCybersecurity master's student building across AI automation, cloud infrastructure, DevSecOps and cybersecurity. I connect Python and API workflows with CI/CD, policy-as-code, GitOps, Kubernetes and runtime security—bringing an automation mindset to both product and platform problems.\n\nExplore Projects for implementation evidence, Experience for shipped work, or open the CV for the complete profile.`,
     ),
     directory('Projects', 'projects'),
     directory('Experience', 'experience'),
@@ -163,6 +166,7 @@ export const directoryContents = {
       'Technical_Skills.json',
         {
           programming_and_scripting: ['Python', 'JavaScript', 'TypeScript', 'Node.js', 'Bash'],
+          ai_automation_and_agents: ['LLM APIs', 'Structured outputs', 'Tool calling', 'Browser automation', 'Human-in-the-loop validation', 'MCP concepts'],
           containers_and_infrastructure: ['Docker', 'Docker Compose', 'Kubernetes', 'Helm', 'k3d', 'Terraform', 'LocalStack'],
           devsecops_and_security: ['GitHub Actions', 'Argo CD', 'OPA/Rego', 'Falco', 'Trivy', 'Semgrep', 'TruffleHog'],
           development_and_data: ['REST APIs', 'PostgreSQL', 'MySQL', 'MongoDB', 'Firebase'],
@@ -195,29 +199,24 @@ export const directoryContents = {
       color: 'text-emerald-500',
       action: 'terminal',
     },
+    directory('Agentic_Job_Search', 'agentic_job_search', { badge: 'In progress', badgeTone: 'amber' }),
     directory('Kubernetes_Runtime_Security', 'kubernetes_runtime_security'),
     directory('Local_Kubernetes_GitOps', 'local_kubernetes_gitops'),
     directory('Terraform_OPA_Guardrails', 'terraform_opa_guardrails'),
     directory('DevSecOps_Juice_Shop', 'devsecops_juice_shop'),
     directory('MK_Delivery', 'mk_delivery_project'),
     directory('Snippy_AI_Cursor', 'snippy_ai_cursor', { badge: 'Prototype', badgeTone: 'amber' }),
-    directory('Vault_OIDC_Secrets', null, {
+    directory('Vault_OIDC_Secrets', 'vault_oidc_secrets', {
       badge: 'In progress',
       badgeTone: 'amber',
-      disabled: true,
-      statusMessage: 'Zero-Trust Ephemeral Secrets Pipeline is currently in progress.',
     }),
-    directory('Secure_Supply_Chain', null, {
+    directory('Secure_Supply_Chain', 'secure_supply_chain', {
       badge: 'In progress',
       badgeTone: 'amber',
-      disabled: true,
-      statusMessage: 'Cryptographic Software Supply Chain Gatekeeper is currently in progress.',
     }),
-    directory('AI_Auto_Remediation', null, {
+    directory('AI_Auto_Remediation', 'ai_auto_remediation', {
       badge: 'In progress',
       badgeTone: 'amber',
-      disabled: true,
-      statusMessage: 'ASPM Aggregator and Local AI Auto-Remediation is currently in progress.',
     }),
     webLink('GitHub.url', GITHUB),
   ],
@@ -310,7 +309,7 @@ export const directoryContents = {
   mk_delivery_project: [
     textFile(
       'Role_and_Overview.txt',
-      `MK Delivery\n===========\n\nA food-delivery product created for restaurants and customers in Mekelle. The application reached more than 3,000 users/downloads and provided practical experience building and operating a real product.\n\nRole\n----\nFounder and developer, covering product planning, application development, restaurant onboarding and iteration based on real user needs.`,
+      `MK Delivery\n===========\n\nA food-delivery product created for restaurants and customers in Mekelle. The application reached 3,000+ registered users and 1,000+ Google Play installs, providing practical experience building and operating a real product.\n\nRole\n----\nCo-Founder and Software Developer, covering product planning, application development, releases, restaurant onboarding and iteration based on real user needs.`,
     ),
     imageFile('App_Home.jpg', 'camera', '/mk_delivery/Home.png'),
     imageFile('Restaurant_View.png', 'fileImage', '/mk_delivery/Restaurant.png'),
@@ -352,11 +351,97 @@ export const directoryContents = {
     webLink('GitHub.url', `${GITHUB}/Snippy-app`),
   ],
 
+  agentic_job_search: [
+    textFile(
+      'Project_Overview.txt',
+      projectOverview({
+        title: 'Agentic Job Search & Resume Tailoring',
+        summary: 'A local, human-in-the-loop workflow for turning a job description and verified master resume into structured, role-specific content, then assisting with visible browser-based resume editing.',
+        stack: 'Node.js, browser automation, LLM APIs, structured JSON, validation, persistent local browser sessions',
+        highlights: '- Produces reviewable structured resume content\n- Keeps generated claims grounded in verified source material\n- Matches known resume concepts to visible editor fields\n- Requires human review before content is used\n- Keeps credentials and browser-profile data local',
+      }),
+    ),
+    jsonFile(
+      'Current_Status.json',
+      {
+        status: 'Local prototype / actively in progress',
+        implemented: [
+          'Job-description and master-resume input workflow',
+          'Provider-configurable LLM generation',
+          'Structured resume-content review',
+          'Visible browser session with persistent local profile',
+          'Conservative matching for headline, summary and skills fields',
+        ],
+        safety_boundaries: [
+          'No automatic job submission',
+          'No credentials stored in source code',
+          'Human review required for generated claims and filled fields',
+          'Private repository while personal-data handling is refined',
+        ],
+        next_steps: [
+          'Add site-specific mappings for rich-text resume sections',
+          'Separate reusable candidate data from generated role variants',
+          'Add repeatable evaluation cases for factuality and field matching',
+          'Expand from resume tailoring into tracked, approval-based application assistance',
+        ],
+      },
+    ),
+    imageFile('Workflow_Architecture.svg', 'image', '/agentic_job_search/workflow-architecture.svg'),
+    textFile(
+      'Why_It_Matters.txt',
+      `This project explores the less glamorous parts of agentic automation: grounding, validation, browser-state handling, safe failure and explicit human approval.\n\nIt is intentionally presented as an in-progress local prototype. The goal is dependable assistance rather than unsupervised application volume.`,
+    ),
+  ],
+
+  vault_oidc_secrets: [
+    jsonFile(
+      'Current_Status.json',
+      {
+        project: 'Zero-Trust Ephemeral Secrets Pipeline',
+        status: 'Design and implementation in progress',
+        goal: 'Replace long-lived CI/CD credentials with short-lived, identity-bound secrets.',
+        planned_stack: ['HashiCorp Vault', 'OpenID Connect', 'GitHub Actions', 'Kubernetes'],
+        planned_evidence: ['OIDC trust flow', 'Short-lived credential issuance', 'Policy boundaries', 'Rotation and failure tests'],
+        disclaimer: 'Planned work is listed separately from completed implementation evidence.',
+      },
+    ),
+  ],
+
+  secure_supply_chain: [
+    jsonFile(
+      'Current_Status.json',
+      {
+        project: 'Cryptographic Software Supply Chain Gatekeeper',
+        status: 'Design and implementation in progress',
+        goal: 'Verify build provenance, signatures and policy compliance before Kubernetes deployment.',
+        planned_stack: ['Syft', 'Cosign', 'GitHub Actions', 'Kyverno', 'Kubernetes'],
+        planned_evidence: ['SBOM generation', 'Image signing', 'Admission-policy rejection', 'Verified deployment path'],
+        disclaimer: 'Planned work is listed separately from completed implementation evidence.',
+      },
+    ),
+  ],
+
+  ai_auto_remediation: [
+    jsonFile(
+      'Current_Status.json',
+      {
+        project: 'ASPM Aggregator and Local AI Auto-Remediation',
+        status: 'Research and architecture in progress',
+        goal: 'Aggregate security findings, propose bounded remediations and require explicit approval before changes.',
+        planned_stack: ['Python', 'Security scanner APIs', 'Local LLM', 'Structured outputs', 'DefectDojo'],
+        planned_evidence: ['Finding normalization', 'Grounded remediation proposal', 'Approval gate', 'Validation and rollback checks'],
+        disclaimer: 'No autonomous production remediation is claimed.',
+      },
+    ),
+  ],
+
   experience: [
-    imageFile('Experience_Timeline.png'),
+    imageFile('Experience_Timeline.png', 'image', '/timelines/experience-timeline.png', {
+      darkSrc: '/timelines/experience-timeline-dark.png',
+    }),
     textFile(
       'MK_Delivery.txt',
-      `Founder and Developer — MK Delivery\n\nBuilt and operated a food-delivery application in Mekelle that reached more than 3,000 users/downloads. Worked across product development, restaurant onboarding and iteration based on practical feedback.\n\nOpen Projects/MK_Delivery for the full case study.`,
+      `Co-Founder and Software Developer — MK Delivery\n\nBuilt and operated a food-delivery application in Mekelle that reached 3,000+ registered users and 1,000+ Google Play installs. Worked across product development, releases, restaurant onboarding and iteration based on operational feedback.\n\nOpen Projects/MK_Delivery for the full case study.`,
     ),
     jsonFile(
       'Mekelle_University_ICT.json',
@@ -370,7 +455,9 @@ export const directoryContents = {
   ],
 
   education: [
-    imageFile('Education_Timeline.jpeg', 'fileImage'),
+    imageFile('Education_Timeline.png', 'image', '/timelines/education-timeline.png', {
+      darkSrc: '/timelines/education-timeline-dark.png',
+    }),
     jsonFile(
       'HDBW_MSc_Cybersecurity.json',
       {
@@ -384,7 +471,10 @@ export const directoryContents = {
       'Bachelors_Degree.txt',
       `Bachelor's Degree\n\nSoftware-development foundation covering programming, databases, web and mobile development, networking and practical information systems.`,
     ),
-    pdfFile('FABA_Research_Paper.pdf'),
+    textFile(
+      'Research_Direction_FABA.txt',
+      `Feedback-Driven Autonomous Binary Analysis (FABA)\n=================================================\n\nA proposed research direction for combining iterative binary analysis with explicit feedback and validation loops. This is a thesis/research interest, not a completed paper.`,
+    ),
   ],
 
   documents: [
@@ -396,7 +486,6 @@ export const directoryContents = {
         ideas: ['Feedback-driven autonomous binary analysis (FABA)', 'Agentic DevSecOps auditing and monitoring', 'AI-assisted vulnerability aggregation and remediation'],
       },
     ),
-    pdfFile('FABA_Research_Paper.pdf'),
     jsonFile(
       'DevSecOps_Learning_Path.json',
       {
@@ -420,11 +509,21 @@ export const directoryContents = {
   ],
 
   pictures: [
+    imageFile('Education_Timeline.png', 'image', '/timelines/education-timeline.png', {
+      darkSrc: '/timelines/education-timeline-dark.png',
+    }),
+    imageFile('Experience_Timeline.png', 'image', '/timelines/experience-timeline.png', {
+      darkSrc: '/timelines/experience-timeline-dark.png',
+    }),
+    imageFile('Agentic_Workflow_Architecture.svg', 'image', '/agentic_job_search/workflow-architecture.svg'),
     imageFile('GitOps_Architecture.png', 'image', '/local_kubernetes_gitops/local-kubernetes-gitops-architecture.png'),
     imageFile('ArgoCD_Synchronized.png', 'fileImage', '/local_kubernetes_gitops/argocd-synced-resources.png'),
     imageFile('OPA_Policy_Rejection.png', 'images', '/devsecops_policy_as_code/policy-violations-detected.png'),
     imageFile('Falco_Alert.png', 'fileImage', '/runtime_security/falco-runtime-alerts.png'),
     imageFile('MK_Delivery_Home.png', 'camera', '/mk_delivery/Home.png'),
+    imageFile('MK_Delivery_Details.png', 'camera', '/mk_delivery/Detail.png'),
+    imageFile('MK_Delivery_Checkout.png', 'camera', '/mk_delivery/Checkout.png'),
+    imageFile('MK_Delivery_Order_Success.png', 'camera', '/mk_delivery/Order_successful.png'),
   ],
 
   videos: [
@@ -434,11 +533,9 @@ export const directoryContents = {
   ],
 
   music: [
-    webLink('Focus_Playlist.url', 'https://open.spotify.com', { ext: 'Music Playlist', icon: 'music', color: 'text-pink-500' }),
-    webLink('Favourite_Music.url', 'https://open.spotify.com', { ext: 'Music Playlist', icon: 'music', color: 'text-pink-500' }),
     textFile(
       'About_These_Playlists.txt',
-      `Music is part of this desktop because the portfolio is meant to feel personal and lived-in, not like a generic project grid. The final playlist links will replace the current Spotify placeholders.`,
+      `Music is part of this desktop because the portfolio is meant to feel personal and lived-in, not like a generic project grid. Public playlist links are intentionally not included until a curated selection is ready.`,
     ),
   ],
 

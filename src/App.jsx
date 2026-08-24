@@ -34,7 +34,7 @@ function LinkedInMark({ className = '' }) {
   );
 }
 
-function DesktopIcon({ item, onOpen, isLightMode }) {
+function DesktopIcon({ item, onOpen, isLightMode, isMobile }) {
   const nodeRef = useRef(null);
   const dragStartX = useRef(0);
   const dragStartY = useRef(0);
@@ -42,7 +42,7 @@ function DesktopIcon({ item, onOpen, isLightMode }) {
 
   return (
     <Draggable
-      defaultPosition={item.defaultPos}
+      defaultPosition={isMobile ? item.mobilePos : item.defaultPos}
       nodeRef={nodeRef}
       onStart={(_event, data) => {
         dragStartX.current = data.x;
@@ -73,7 +73,7 @@ export default function App() {
 
   // Start with a recruiter-friendly light canvas; visitors can still switch themes.
   const [isLightMode, setIsLightMode] = useState(true);
-  const [bgPreset, setBgPreset] = useState('#EEE8DC'); // Warm Ubuntu-inspired neutral
+  const [bgPreset, setBgPreset] = useState('#EFE2CF'); // Warm sand without the previous grey cast
 
   // Window visibility states
   const [isWindowOpen, setIsWindowOpen] = useState(true);
@@ -189,16 +189,16 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('about');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const accentColor = '#E95420';
+  const accentColor = '#C65D3B';
 
   const desktopIcons = [
-    { id: 'about', label: 'Home', icon: Folder, color: 'text-amber-400', defaultPos: { x: 30, y: 30 } },
-    { id: 'projects', label: 'Projects', icon: Folder, color: 'text-amber-400', defaultPos: { x: 30, y: 130 } },
-    { id: 'cv', label: 'cv.pdf', icon: FileText, color: 'text-red-400', defaultPos: { x: 30, y: 230 } },
-    { id: 'terminal', label: 'Terminal', icon: Terminal, color: 'text-green-400', defaultPos: { x: 30, y: 330 } },
-    { id: 'contact', label: 'Contact', icon: Mail, color: 'text-sky-400', defaultPos: { x: 30, y: 430 } },
-    { id: 'github', label: 'GitHub', icon: GitHubMark, color: 'text-slate-600', defaultPos: { x: 30, y: 530 } },
-    { id: 'linkedin', label: 'LinkedIn', icon: LinkedInMark, color: 'text-[#3977a8]', defaultPos: { x: 30, y: 630 } },
+    { id: 'about', label: 'Home', icon: Folder, color: 'text-amber-600', defaultPos: { x: 30, y: 30 }, mobilePos: { x: 12, y: 16 } },
+    { id: 'projects', label: 'Projects', icon: Folder, color: 'text-amber-600', defaultPos: { x: 30, y: 130 }, mobilePos: { x: 12, y: 96 } },
+    { id: 'cv', label: 'cv.pdf', icon: FileText, color: 'text-rose-600', defaultPos: { x: 30, y: 230 }, mobilePos: { x: 12, y: 176 } },
+    { id: 'terminal', label: 'Terminal', icon: Terminal, color: 'text-emerald-700', defaultPos: { x: 30, y: 330 }, mobilePos: { x: 12, y: 256 } },
+    { id: 'contact', label: 'Contact', icon: Mail, color: 'text-sky-700', defaultPos: { x: 30, y: 430 }, mobilePos: { x: 12, y: 336 } },
+    { id: 'github', label: 'GitHub', icon: GitHubMark, color: 'text-slate-600', defaultPos: { x: 30, y: 530 }, mobilePos: { x: 12, y: 416 } },
+    { id: 'linkedin', label: 'LinkedIn', icon: LinkedInMark, color: 'text-[#3977a8]', defaultPos: { x: 30, y: 630 }, mobilePos: { x: 12, y: 496 } },
   ];
 
   const handleContextMenu = (e) => {
@@ -302,6 +302,7 @@ export default function App() {
         volume={volume}
         setVolume={setVolume}
         isLightMode={isLightMode}
+        setIsLightMode={setIsLightMode}
       />
 
       {!isMobile && (
@@ -315,6 +316,7 @@ export default function App() {
     item={item}
     onOpen={handleIconOpen}
     isLightMode={isLightMode}
+    isMobile={isMobile}
   />
 ))}
       </div>

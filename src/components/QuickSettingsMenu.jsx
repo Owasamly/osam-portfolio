@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Wifi, Volume2, VolumeX, Sun, Bluetooth, Shield, Power } from 'lucide-react';
+import { Wifi, Volume2, VolumeX, Sun, Moon, Bluetooth, Shield, Power } from 'lucide-react';
 
 export default function QuickSettingsMenu({ 
   isOpen, 
@@ -11,7 +11,8 @@ export default function QuickSettingsMenu({
   setIsBluetoothOn, 
   volume, 
   setVolume,
-  isLightMode = false
+  isLightMode = false,
+  setIsLightMode,
 }) {
   const [isMuted, setIsMuted] = useState(false);
   const [brightness, setBrightness] = useState(100);
@@ -35,7 +36,7 @@ export default function QuickSettingsMenu({
         {/* Quick Toggles Grid */}
         <div className="grid grid-cols-2 gap-2">
           {/* Wi-Fi Toggle */}
-          <button 
+          <button
             onClick={() => setIsWifiOn(!isWifiOn)}
             className={`flex items-center space-x-3 p-3 rounded-xl border transition-all ${
               isWifiOn 
@@ -84,6 +85,36 @@ export default function QuickSettingsMenu({
               <div className="font-bold text-[11px] truncate">Bluetooth</div>
               <div className={`text-[10px] truncate ${isLightMode ? 'text-gray-500' : 'text-gray-400'}`}>{isBluetoothOn ? 'Connected' : 'Off'}</div>
             </div>
+          </button>
+
+          {/* Appearance Toggle */}
+          <button
+            onClick={() => setIsLightMode?.(!isLightMode)}
+            aria-pressed={!isLightMode}
+            className={`col-span-2 flex items-center justify-between gap-3 rounded-xl border p-3 transition-all ${
+              isLightMode
+                ? 'bg-gray-100 border-gray-300 text-gray-900 shadow-sm'
+                : 'bg-[#2a2a2a] border-[#3d3d3d] text-white shadow-sm'
+            }`}
+          >
+            <div className="flex min-w-0 items-center space-x-3">
+              <div className={`rounded-lg p-2 ${isLightMode ? 'bg-white shadow-xs' : 'bg-[#1e1e1e] shadow-xs'}`}>
+                {isLightMode
+                  ? <Sun className="h-4 w-4" style={{ color: currentAccent }} />
+                  : <Moon className="h-4 w-4" style={{ color: currentAccent }} />}
+              </div>
+              <div className="text-left">
+                <div className="text-[11px] font-bold">Appearance</div>
+                <div className={`text-[10px] ${isLightMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                  {isLightMode ? 'Light mode' : 'Dark mode'}
+                </div>
+              </div>
+            </div>
+            <span className={`rounded-full px-2.5 py-1 text-[9px] font-bold uppercase tracking-wide ${
+              isLightMode ? 'bg-white text-gray-600' : 'bg-[#141414] text-gray-300'
+            }`}>
+              Switch to {isLightMode ? 'dark' : 'light'}
+            </span>
           </button>
         </div>
 

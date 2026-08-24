@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Draggable from 'react-draggable';
-import { 
-  X, Minus, Folder, FileText, ChevronLeft, ChevronRight, 
-  LayoutGrid, List, Download, Music, Image, Video, 
-  Briefcase, User, Archive, GraduationCap, Trash2, 
+import {
+  X, Minus, Folder, FileText, ChevronLeft, ChevronRight,
+  LayoutGrid, List, Download, Music, Image, Video,
+  Briefcase, User, Archive, GraduationCap, Trash2,
   Terminal, Mail, FileCode, Globe, Camera, Images,
   FileImage, Film, Clapperboard, MonitorPlay, ArrowRight, MapPin, ShieldCheck
 } from 'lucide-react';
@@ -51,9 +51,9 @@ const badgeClasses = {
 
 function RecruiterHome({ isLightMode, onProjects, onCv, onContact, onClassicView }) {
   const strengths = [
-    ['Secure delivery', 'Security checks integrated into CI/CD before software reaches production.'],
-    ['Cloud-native security', 'Kubernetes controls, runtime monitoring and infrastructure guardrails.'],
-    ['Practical automation', 'Repeatable systems using GitOps, Terraform and policy-as-code.'],
+    ['AI & practical automation', 'Python workflows, LLM APIs, structured outputs, validation and human approval.'],
+    ['Cloud & platform delivery', 'REST APIs, containers, Kubernetes, GitOps and repeatable infrastructure workflows.'],
+    ['DevSecOps & cybersecurity', 'CI/CD security, policy gates, infrastructure guardrails and runtime monitoring.'],
   ];
 
   return (
@@ -61,10 +61,10 @@ function RecruiterHome({ isLightMode, onProjects, onCv, onContact, onClassicView
       <section className={`relative overflow-hidden rounded-2xl border p-5 sm:p-7 ${
         isLightMode ? 'border-orange-200 bg-[#fffaf3]' : 'border-[#4a332b] bg-[#211b19]'
       }`}>
-        <div className="absolute -right-12 -top-12 h-40 w-40 rounded-full bg-[#E95420]/10" />
+        <div className="absolute -right-12 -top-12 h-40 w-40 rounded-full bg-[#C65D3B]/10" />
         <div className="relative">
-          <div className="mb-4 flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-[0.16em] text-[#E95420]">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#E95420]/25 bg-[#E95420]/10 px-2.5 py-1">
+          <div className="mb-4 flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-[0.16em] text-[#C65D3B]">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#C65D3B]/25 bg-[#C65D3B]/10 px-2.5 py-1">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Open to opportunities
             </span>
             <span className={`inline-flex items-center gap-1 ${isLightMode ? 'text-gray-500' : 'text-gray-400'}`}>
@@ -75,27 +75,27 @@ function RecruiterHome({ isLightMode, onProjects, onCv, onContact, onClassicView
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-7">
             <img
               src="/osama-portfolio-headshot-v2.png"
-              alt="Osama Nurhussen Kahsay, AI Automation, DevSecOps & Cybersecurity"
-              className="mx-auto h-32 w-32 shrink-0 rounded-2xl border-2 border-white object-cover shadow-md ring-1 ring-[#E95420]/25 sm:order-2 sm:mx-0 sm:h-40 sm:w-40"
+              alt="Osama Nurhussen Kahsay, AI automation, cloud, DevSecOps and cybersecurity engineer"
+              className="mx-auto h-32 w-32 shrink-0 rounded-2xl border-2 border-white object-cover shadow-md ring-1 ring-[#C65D3B]/25 sm:order-2 sm:mx-0 sm:h-40 sm:w-40"
             />
             <div className="min-w-0 flex-1 sm:order-1">
               <p className={`mb-1 text-xs font-semibold ${isLightMode ? 'text-gray-500' : 'text-gray-400'}`}>Hello, I’m</p>
               <h1 className={`text-2xl font-black tracking-tight sm:text-3xl ${isLightMode ? 'text-gray-950' : 'text-white'}`}>
                 Osama Nurhussen Kahsay
               </h1>
-              <h2 className="mt-2 text-base font-bold text-[#E95420] sm:text-lg">AI Automation, DevSecOps &amp; Cybersecurity </h2>
+              <h2 className="mt-2 text-base font-bold text-[#C65D3B] sm:text-lg">AI Automation · Cloud · DevSecOps · Cybersecurity</h2>
               <p className={`mt-3 max-w-2xl text-[12px] leading-6 ${isLightMode ? 'text-gray-600' : 'text-gray-300'}`}>
-                I build LLM-powered workflows, practical automations, and secure cloud-native systems, with hands-on work across Python, APIs, Kubernetes, GitOps, and runtime security.
+                I build across AI automation, cloud infrastructure and secure software delivery—with hands-on work in Python, APIs, CI/CD, Kubernetes, GitOps and cloud-native security.
               </p>
 
               <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-                <button onClick={onProjects} className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#E95420] px-4 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-[#cf4318]">
+                <button onClick={onProjects} className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#C65D3B] px-4 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-[#A94D31]">
                   View selected projects <ArrowRight className="h-3.5 w-3.5" />
                 </button>
-                <button onClick={onCv} className={`inline-flex items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-xs font-bold transition ${isLightMode ? 'border-gray-300 bg-white text-gray-800 hover:border-[#E95420]' : 'border-[#444] bg-[#161616] text-gray-100 hover:border-[#E95420]'}`}>
+                <button onClick={onCv} className={`inline-flex items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-xs font-bold transition ${isLightMode ? 'border-gray-300 bg-white text-gray-800 hover:border-[#C65D3B]' : 'border-[#444] bg-[#161616] text-gray-100 hover:border-[#C65D3B]'}`}>
                   <Download className="h-3.5 w-3.5" /> View CV
                 </button>
-                <button onClick={onContact} className={`inline-flex items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-xs font-bold transition ${isLightMode ? 'border-gray-300 bg-white text-gray-800 hover:border-[#E95420]' : 'border-[#444] bg-[#161616] text-gray-100 hover:border-[#E95420]'}`}>
+                <button onClick={onContact} className={`inline-flex items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-xs font-bold transition ${isLightMode ? 'border-gray-300 bg-white text-gray-800 hover:border-[#C65D3B]' : 'border-[#444] bg-[#161616] text-gray-100 hover:border-[#C65D3B]'}`}>
                   <Mail className="h-3.5 w-3.5" /> Contact me
                 </button>
               </div>
@@ -107,7 +107,7 @@ function RecruiterHome({ isLightMode, onProjects, onCv, onContact, onClassicView
       <section>
         <div className="mb-3 flex items-end justify-between gap-3">
           <div>
-            <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#E95420]">At a glance</p>
+            <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#C65D3B]">At a glance</p>
             <h3 className={`mt-1 text-sm font-bold sm:text-base ${isLightMode ? 'text-gray-900' : 'text-white'}`}>What I can bring to your team</h3>
           </div>
           <span className={`hidden text-[10px] sm:block ${isLightMode ? 'text-gray-400' : 'text-gray-500'}`}>profile_summary.md</span>
@@ -115,7 +115,7 @@ function RecruiterHome({ isLightMode, onProjects, onCv, onContact, onClassicView
         <div className="grid gap-3 sm:grid-cols-3">
           {strengths.map(([title, description]) => (
             <article key={title} className={`rounded-xl border p-4 ${isLightMode ? 'border-gray-200 bg-white' : 'border-[#333] bg-[#181818]'}`}>
-              <ShieldCheck className="mb-2 h-5 w-5 text-[#E95420]" />
+              <ShieldCheck className="mb-2 h-5 w-5 text-[#C65D3B]" />
               <h4 className={`text-xs font-bold ${isLightMode ? 'text-gray-900' : 'text-gray-100'}`}>{title}</h4>
               <p className={`mt-1.5 text-[10px] leading-4 ${isLightMode ? 'text-gray-500' : 'text-gray-400'}`}>{description}</p>
             </article>
@@ -128,7 +128,7 @@ function RecruiterHome({ isLightMode, onProjects, onCv, onContact, onClassicView
           <p className={`text-[11px] font-bold ${isLightMode ? 'text-gray-800' : 'text-gray-200'}`}>Want the full Linux experience?</p>
           <p className={`mt-0.5 text-[10px] ${isLightMode ? 'text-gray-500' : 'text-gray-400'}`}>Browse the portfolio as files, folders and terminal commands.</p>
         </div>
-        <button onClick={onClassicView} className="shrink-0 text-[10px] font-bold text-[#E95420] hover:underline">Open classic file view →</button>
+        <button onClick={onClassicView} className="shrink-0 text-[10px] font-bold text-[#C65D3B] hover:underline">Open classic file view →</button>
       </div>
     </div>
   );
@@ -245,7 +245,8 @@ export default function DolphinWindow({
     } else if (item.action === 'text') {
       if (onTextEditorOpen) onTextEditorOpen(item.name, item.content || '');
     } else if (item.action === 'media') {
-      if (onMediaOpen) onMediaOpen(item.name, item.src, item.mediaType);
+      const themedSrc = !isLightMode && item.darkSrc ? item.darkSrc : item.src;
+      if (onMediaOpen) onMediaOpen(item.name, themedSrc, item.mediaType);
     } else if (item.action === 'browser' && item.url) {
       if (onBrowserOpen) {
         onBrowserOpen(item.url);

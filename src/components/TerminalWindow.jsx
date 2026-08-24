@@ -14,6 +14,7 @@ PROTOTYPE
   ◇ Snippy_AI_Cursor
 
 IN PROGRESS
+  ◌ Agentic_Job_Search
   ◌ Vault_OIDC_Secrets
   ◌ Secure_Supply_Chain
   ◌ AI_Auto_Remediation
@@ -21,6 +22,7 @@ IN PROGRESS
 Use "open projects" to browse the project folders.`;
 
 const SKILLS_OUTPUT = `Programming       Python · JavaScript · TypeScript · Node.js · Bash
+AI Automation     LLM APIs · structured outputs · tool calling · browser automation · validation
 Containers        Docker · Kubernetes · k3d · Helm
 Infrastructure    Terraform · LocalStack · OPA/Rego
 CI/CD & GitOps    GitHub Actions · Argo CD
@@ -66,12 +68,16 @@ const TREE_OUTPUT = `~
 ├── cv.pdf
 ├── Projects/
 │   ├── 00_PROJECT_INDEX.sh
+│   ├── Agentic_Job_Search/ [in progress]
 │   ├── Kubernetes_Runtime_Security/
 │   ├── Local_Kubernetes_GitOps/
 │   ├── Terraform_OPA_Guardrails/
 │   ├── DevSecOps_Juice_Shop/
 │   ├── MK_Delivery/
-│   └── Snippy_AI_Cursor/
+│   ├── Snippy_AI_Cursor/
+│   ├── Vault_OIDC_Secrets/ [in progress]
+│   ├── Secure_Supply_Chain/ [in progress]
+│   └── AI_Auto_Remediation/ [in progress]
 ├── Experience/
 ├── Education/
 ├── Documents/
@@ -82,27 +88,28 @@ const TREE_OUTPUT = `~
 
 const FILE_SYSTEM = {
   '~': ['00_START_HERE.sh', 'about.txt', 'skills.json', 'cv.pdf', 'Projects/', 'Experience/', 'Education/', 'Documents/', 'Downloads/', 'Pictures/', 'Videos/', 'Music/'],
-  '~/Projects': ['00_PROJECT_INDEX.sh', 'Kubernetes_Runtime_Security/', 'Local_Kubernetes_GitOps/', 'Terraform_OPA_Guardrails/', 'DevSecOps_Juice_Shop/', 'MK_Delivery/', 'Snippy_AI_Cursor/', 'Vault_OIDC_Secrets [in progress]', 'Secure_Supply_Chain [in progress]', 'AI_Auto_Remediation [in progress]'],
+  '~/Projects': ['00_PROJECT_INDEX.sh', 'Agentic_Job_Search [in progress]', 'Kubernetes_Runtime_Security/', 'Local_Kubernetes_GitOps/', 'Terraform_OPA_Guardrails/', 'DevSecOps_Juice_Shop/', 'MK_Delivery/', 'Snippy_AI_Cursor/', 'Vault_OIDC_Secrets [in progress]', 'Secure_Supply_Chain [in progress]', 'AI_Auto_Remediation [in progress]'],
   '~/Experience': ['MK_Delivery.txt', 'Mekelle_University_ICT.json'],
-  '~/Education': ['HDBW_MSc_Cybersecurity.json', 'Bachelors_Degree.txt', 'FABA_Research_Paper.pdf'],
-  '~/Documents': ['Osama_Kahsay_CV_EN.pdf', 'Master_Thesis_Ideas.json', 'FABA_Research_Paper.pdf', 'DevSecOps_Learning_Path.json', 'Portfolio_README.txt'],
+  '~/Education': ['HDBW_MSc_Cybersecurity.json', 'Bachelors_Degree.txt', 'Research_Direction_FABA.txt'],
+  '~/Documents': ['Osama_Kahsay_CV_EN.pdf', 'Master_Thesis_Ideas.json', 'DevSecOps_Learning_Path.json', 'Portfolio_README.txt'],
   '~/Downloads': ['Osama_Kahsay_CV_EN.pdf', 'Osama_Kahsay_CV_DE.pdf'],
-  '~/Pictures': ['Osama_Kahsay.jpg', 'GitOps_Architecture.png', 'ArgoCD_Synchronized.jpeg', 'OPA_Policy_Rejection.webp', 'MK_Delivery.gif'],
+  '~/Pictures': ['Education_Timeline.png', 'Experience_Timeline.png', 'Agentic_Workflow_Architecture.svg', 'GitOps_Architecture.png', 'ArgoCD_Synchronized.png', 'OPA_Policy_Rejection.png', 'Falco_Alert.png', 'MK_Delivery_Home.png', 'MK_Delivery_Details.png', 'MK_Delivery_Checkout.png', 'MK_Delivery_Order_Success.png'],
   '~/Videos': ['Portfolio_Tour.mp4', 'GitOps_Self_Healing.webm', 'Falco_Detection.mkv', 'MK_Delivery_Demo.mov'],
-  '~/Music': ['Focus_Playlist.url', 'Favourite_Music.url', 'About_These_Playlists.txt'],
+  '~/Music': ['About_These_Playlists.txt'],
 };
 
 const FILE_CONTENTS = {
-  '~/about.txt': 'Osama Nurhussen Kahsay\nCybersecurity master\'s student in Munich focused on DevSecOps, cloud-native security and practical automation.',
+  '~/about.txt': 'Osama Nurhussen Kahsay\nCybersecurity master\'s student in Munich building across AI automation, cloud infrastructure, DevSecOps and cybersecurity.',
   '~/skills.json': JSON.stringify({
     programming: ['Python', 'JavaScript', 'TypeScript', 'Node.js', 'Bash'],
+    ai_automation: ['LLM APIs', 'Structured outputs', 'Tool calling', 'Browser automation', 'Human-in-the-loop validation'],
     cloud_native: ['Docker', 'Kubernetes', 'k3d', 'Helm', 'Terraform'],
     security: ['OPA/Rego', 'Falco', 'Trivy', 'Semgrep', 'TruffleHog'],
     delivery: ['GitHub Actions', 'Argo CD'],
   }, null, 2),
   '~/00_START_HERE.sh': '#!/usr/bin/env bash\n# Guided introduction to Osama\'s interactive portfolio\nabout\nprojects\nskills',
   '~/Projects/00_PROJECT_INDEX.sh': '#!/usr/bin/env bash\n# Print project completion status\nprojects',
-  '~/Experience/MK_Delivery.txt': 'Founder and developer of a food-delivery application that reached more than 3,000 users/downloads.',
+  '~/Experience/MK_Delivery.txt': 'Co-Founder and Software Developer of a food-delivery application that reached 3,000+ registered users and 1,000+ Google Play installs.',
   '~/Experience/Mekelle_University_ICT.json': JSON.stringify({ role: 'ICT Intern', project: 'ICT Resource Management System' }, null, 2),
   '~/Education/HDBW_MSc_Cybersecurity.json': JSON.stringify({ degree: 'M.Sc. Cybersecurity', institution: 'HDBW', location: 'Munich' }, null, 2),
   '~/Education/Bachelors_Degree.txt': 'Software-development foundation covering programming, databases, web and mobile development, networking and information systems.',
@@ -314,7 +321,7 @@ export default function TerminalWindow({
           break;
         case 'about':
         case 'whoami':
-          response = 'Osama Nurhussen Kahsay\nCybersecurity master\'s student in Munich focused on DevSecOps, cloud-native security and practical automation.';
+          response = 'Osama Nurhussen Kahsay\nCybersecurity master\'s student in Munich building across AI automation, cloud infrastructure, DevSecOps and cybersecurity.';
           break;
         case 'projects':
           response = PROJECT_INDEX;
@@ -323,13 +330,13 @@ export default function TerminalWindow({
           response = SKILLS_OUTPUT;
           break;
         case 'experience':
-          response = 'MK Delivery — founder and developer; reached 3,000+ users/downloads.\nMekelle University ICT — internship and ICT Resource Management System development.';
+          response = 'MK Delivery — Co-Founder and Software Developer; reached 3,000+ registered users and 1,000+ Google Play installs.\nMekelle University ICT — IT Security & Development internship and ICT Resource Management System development.';
           break;
         case 'education':
-          response = 'M.Sc. Cybersecurity — HDBW, Munich\nBachelor\'s degree — software-development and information-systems foundation';
+          response = 'M.Sc. Cybersecurity — HDBW, Munich — ongoing — current grade 1.4 (German scale)\nB.Sc. Electrical & Computer Engineering — Mekelle University — GPA 3.67 / 4.00';
           break;
         case 'status':
-          response = 'Portfolio: online\nCompleted projects: 5\nPrototype: 1\nIn-progress projects: 3\nLocation: Munich, Germany';
+          response = 'Portfolio: online\nCompleted projects: 5\nPrototype: 1\nIn-progress projects: 4\nFocus: AI automation, cloud, DevSecOps, cybersecurity\nLocation: Munich, Germany';
           break;
         case 'ls': {
           const directory = args.length ? resolveDirectory(args[0], currentPath) : currentPath;
