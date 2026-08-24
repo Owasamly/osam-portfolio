@@ -302,6 +302,7 @@ export default function App() {
         volume={volume}
         setVolume={setVolume}
         isLightMode={isLightMode}
+        setIsLightMode={setIsLightMode}
       />
 
       {!isMobile && (
