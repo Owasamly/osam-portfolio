@@ -221,7 +221,7 @@ export default function BrowserWindow({
         onMouseDownCapture={onFocus}
         onPointerDownCapture={onFocus}
         style={{ zIndex: isMobile ? 100 : zIndex }}
-        className={`border shadow-2xl flex flex-col overflow-hidden font-mono text-xs select-none backdrop-blur-md ${
+        className={`desktop-window-resizable border shadow-2xl flex flex-col overflow-hidden font-mono text-xs select-none backdrop-blur-md ${
           isMobile ? 'fixed inset-0 w-full h-[100dvh] rounded-none' : 'absolute top-16 left-28 w-[860px] h-[580px] rounded-t-lg'
         } ${
           isLightMode 

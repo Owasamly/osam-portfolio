@@ -35,7 +35,7 @@ export default function SettingsWindow({
         onMouseDownCapture={onFocus}
         onPointerDownCapture={onFocus}
         style={{ zIndex: isMobile ? 100 : zIndex }}
-        className={`border shadow-2xl flex flex-col overflow-hidden font-mono text-xs select-none backdrop-blur-md ${
+        className={`desktop-window-resizable border shadow-2xl flex flex-col overflow-hidden font-mono text-xs select-none backdrop-blur-md ${
           isMobile ? 'fixed inset-0 w-full h-[100dvh] rounded-none' : 'absolute top-20 left-1/3 w-[520px] rounded-t-lg'
         } ${
           isLightMode ? 'bg-[#f4f4f4] text-gray-800 border-gray-300' : 'bg-[#1e1e1e]/95 text-gray-200 border-[#333333]'

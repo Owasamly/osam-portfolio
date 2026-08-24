@@ -103,7 +103,7 @@ export default function ContactWindow({
         onMouseDownCapture={onFocus}
         onPointerDownCapture={onFocus}
         style={{ zIndex: isMobile ? 100 : zIndex }}
-        className={`border shadow-2xl flex flex-col overflow-hidden font-mono text-xs select-none backdrop-blur-md ${
+        className={`desktop-window-resizable border shadow-2xl flex flex-col overflow-hidden font-mono text-xs select-none backdrop-blur-md ${
           isMobile
             ? 'fixed inset-0 w-full h-[100dvh] rounded-none'
             : 'absolute top-24 left-1/3 w-[460px] rounded-t-lg'

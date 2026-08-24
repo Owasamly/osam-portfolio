@@ -17,6 +17,16 @@ body {
   overflow: hidden; /* Prevents scrollbars over canvas */
 }
 
+@media (min-width: 768px) {
+  .desktop-window-resizable {
+    min-width: 22rem;
+    min-height: 16rem;
+    max-width: calc(100vw - 1rem);
+    max-height: calc(100dvh - 3rem);
+    resize: both;
+  }
+}
+
 .quick-settings-slider {
   appearance: none;
   height: 0.375rem;

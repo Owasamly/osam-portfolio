@@ -472,7 +472,7 @@ export default function TerminalWindow({
         onMouseDownCapture={onFocus}
         onPointerDownCapture={onFocus}
         style={{ display: isMinimized ? 'none' : 'flex', zIndex: isMobile ? 100 : zIndex }}
-        className={`border shadow-2xl flex-col overflow-hidden font-mono text-xs select-none backdrop-blur-xl ${
+        className={`desktop-window-resizable border shadow-2xl flex-col overflow-hidden font-mono text-xs select-none backdrop-blur-xl ${
           isMobile ? 'fixed inset-0 w-full h-[100dvh] rounded-none' : 'absolute top-20 left-20 w-[760px] h-[500px] rounded-lg'
         } ${
           isLightMode ? 'bg-[#f7f7f7]/95 border-gray-300 text-gray-900' : 'bg-[#0d1117]/95 border-[#30363d] text-[#c9d1d9]'

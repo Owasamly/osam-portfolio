@@ -51,7 +51,7 @@ export default function TextEditorWindow({
         onMouseDownCapture={onFocus}
         onPointerDownCapture={onFocus}
         style={{ display: isMinimized ? 'none' : 'flex', zIndex: isMobile ? 100 : zIndex }}
-        className={`border shadow-2xl flex-col overflow-hidden font-mono text-xs select-none backdrop-blur-md ${
+        className={`desktop-window-resizable border shadow-2xl flex-col overflow-hidden font-mono text-xs select-none backdrop-blur-md ${
           isMobile ? 'fixed inset-0 w-full h-[100dvh] rounded-none' : 'absolute top-24 left-1/4 w-[640px] h-[480px] rounded-t-lg'
         } ${
           isLightMode 

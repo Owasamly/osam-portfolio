@@ -267,7 +267,7 @@ export default function DolphinWindow({
         onMouseDownCapture={onFocus}
         onPointerDownCapture={onFocus}
         style={{ display: isMinimized ? 'none' : 'flex', zIndex: isMobile ? 100 : zIndex }}
-        className={`border shadow-2xl flex-col overflow-hidden font-mono text-xs select-none backdrop-blur-md ${
+        className={`desktop-window-resizable border shadow-2xl flex-col overflow-hidden font-mono text-xs select-none backdrop-blur-md ${
           isMobile ? 'fixed inset-0 w-full h-[100dvh] rounded-none' : 'absolute top-10 left-1/2 -translate-x-1/2 w-[min(1080px,calc(100vw-150px))] h-[min(720px,calc(100vh-80px))] rounded-t-lg'
         } ${
           isLightMode ? 'bg-[#fafafa] text-gray-800 border-gray-300' : 'bg-[#1e1e1e]/95 text-gray-200 border-[#333333]'

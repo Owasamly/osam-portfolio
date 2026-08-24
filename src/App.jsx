@@ -258,7 +258,7 @@ export default function App() {
   }`}
 >
       {/* 1. Canvas Background dynamically updates when bgPreset changes */}
-      <ParticleBackground bgPreset={bgPreset} />
+      <ParticleBackground bgPreset={isLightMode ? bgPreset : '#2C001E'} />
 
       <ContextMenu 
         position={contextMenuPos} 
@@ -303,6 +303,10 @@ export default function App() {
         setVolume={setVolume}
         isLightMode={isLightMode}
         setIsLightMode={setIsLightMode}
+        onOpenSettings={() => {
+          setIsQuickSettingsOpen(false);
+          handleOpenApp('settings');
+        }}
       />
 
       {!isMobile && (

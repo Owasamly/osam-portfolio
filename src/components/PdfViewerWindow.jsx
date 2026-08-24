@@ -34,7 +34,7 @@ export default function PdfViewerWindow({
         onMouseDownCapture={onFocus}
         onPointerDownCapture={onFocus}
         style={{ display: isMinimized ? 'none' : 'flex', zIndex: isMobile ? 100 : zIndex }}
-        className={`border shadow-2xl flex-col overflow-hidden font-mono text-xs select-none backdrop-blur-md ${
+        className={`desktop-window-resizable border shadow-2xl flex-col overflow-hidden font-mono text-xs select-none backdrop-blur-md ${
           isMobile ? 'fixed inset-0 w-full h-[100dvh] rounded-none' : 'absolute top-16 left-1/3 w-[720px] h-[620px] rounded-t-lg'
         } ${
           isLightMode 

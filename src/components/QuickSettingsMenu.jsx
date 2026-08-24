@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Wifi, Volume2, VolumeX, Sun, Moon, Bluetooth, Shield, Power } from 'lucide-react';
+import { Wifi, Volume2, VolumeX, Sun, Moon, Bluetooth, Shield, Power, Settings } from 'lucide-react';
 
 export default function QuickSettingsMenu({ 
   isOpen, 
@@ -13,6 +13,7 @@ export default function QuickSettingsMenu({
   setVolume,
   isLightMode = false,
   setIsLightMode,
+  onOpenSettings,
 }) {
   const [isMuted, setIsMuted] = useState(false);
   const [brightness, setBrightness] = useState(100);
@@ -115,6 +116,29 @@ export default function QuickSettingsMenu({
             }`}>
               Switch to {isLightMode ? 'dark' : 'light'}
             </span>
+          </button>
+
+          {/* Settings Launcher */}
+          <button
+            onClick={onOpenSettings}
+            className={`col-span-2 flex items-center justify-between gap-3 rounded-xl border p-3 transition-all ${
+              isLightMode
+                ? 'bg-gray-50 border-gray-200 text-gray-800 hover:bg-gray-100'
+                : 'bg-[#141414] border-[#282828] text-gray-200 hover:bg-[#1f1f1f]'
+            }`}
+          >
+            <div className="flex items-center space-x-3">
+              <div className={`rounded-lg p-2 ${isLightMode ? 'bg-white shadow-xs' : 'bg-[#252525]'}`}>
+                <Settings className="h-4 w-4" style={{ color: currentAccent }} />
+              </div>
+              <div className="text-left">
+                <div className="text-[11px] font-bold">Settings</div>
+                <div className={`text-[10px] ${isLightMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                  Background, accent and appearance
+                </div>
+              </div>
+            </div>
+            <span className={isLightMode ? 'text-gray-400' : 'text-gray-500'}>Open</span>
           </button>
         </div>
 

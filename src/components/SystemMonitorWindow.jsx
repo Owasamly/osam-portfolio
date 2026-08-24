@@ -122,7 +122,7 @@ export default function SystemMonitorWindow({
         onMouseDown={onFocus}
         onPointerDownCapture={onFocus}
         style={{ zIndex: isMobile ? 100 : zIndex }}
-        className={`backdrop-blur-md border shadow-2xl flex flex-col overflow-hidden font-mono text-xs select-none ${
+        className={`desktop-window-resizable backdrop-blur-md border shadow-2xl flex flex-col overflow-hidden font-mono text-xs select-none ${
           isMobile ? 'fixed inset-0 w-full h-[100dvh] rounded-none' : 'absolute top-24 right-20 w-[340px] rounded-t-lg'
         } ${
           isLightMode ? 'bg-[#fafafa] border-gray-300 text-gray-900' : 'bg-[#1e1e1e]/95 border-[#333333] text-gray-200'
