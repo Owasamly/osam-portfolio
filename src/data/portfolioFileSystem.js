@@ -395,7 +395,7 @@ export const directoryContents = {
   ],
 
   experience: [
-    imageFile('Experience_Timeline.png'),
+    imageFile('Experience_Timeline.png', 'image', '/timelines/experience-timeline.png'),
     textFile(
       'MK_Delivery.txt',
       `Founder and Developer — MK Delivery\n\nBuilt and operated a food-delivery application in Mekelle that reached more than 3,000 users/downloads. Worked across product development, restaurant onboarding and iteration based on practical feedback.\n\nOpen Projects/MK_Delivery for the full case study.`,
@@ -412,7 +412,7 @@ export const directoryContents = {
   ],
 
   education: [
-    imageFile('Education_Timeline.jpeg', 'fileImage'),
+    imageFile('Education_Timeline.png', 'image', '/timelines/education-timeline.png'),
     jsonFile(
       'HDBW_MSc_Cybersecurity.json',
       {
