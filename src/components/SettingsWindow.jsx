@@ -23,16 +23,16 @@ export default function SettingsWindow({
   if (!isOpen || isMinimized) return null;
 
   const wallPapers = [
-    { id: 'warm-sand', name: 'Warm Sand', color: '#EFE2CF' },
+    { id: 'jammy-jellyfish', name: 'Jammy Purple', color: '#2C001E' },
     { id: 'soft-ivory', name: 'Soft Ivory', color: '#F7F1E8' },
-    { id: 'cool-mist', name: 'Cool Mist', color: '#DCE7EE' },
-    { id: 'sage-cloud', name: 'Sage Cloud', color: '#DDE8D5' },
+    { id: 'baltic-blue', name: 'Baltic Blue', color: '#0f2027' },
+    { id: 'warm-sand', name: 'Warm Sand', color: '#EFE2CF' },
     { id: 'peach-haze', name: 'Peach Haze', color: '#F4D8C8' },
-    { id: 'lavender-air', name: 'Lavender Air', color: '#E6DFF2' },
-    { id: 'jammy-jellyfish', name: 'Jammy Dark Purple', color: '#2C001E' },
     { id: 'dark-space', name: 'Deep Space Black', color: '#0d1117' },
-    { id: 'baltic-blue', name: 'Baltic Slate Blue', color: '#0f2027' },
+    { id: 'cool-mist', name: 'Cool Mist', color: '#DCE7EE' },
     { id: 'nord-night', name: 'Nordic Dark Cyan', color: '#1a2332' },
+    { id: 'lavender-air', name: 'Lavender Air', color: '#E6DFF2' },
+    { id: 'sage-cloud', name: 'Sage Cloud', color: '#DDE8D5' },
   ];
 
   return (
@@ -146,23 +146,27 @@ export default function SettingsWindow({
                   Choose any wallpaper independently of the current theme.
                 </p>
                 
-                <div className="space-y-2">
+                <div className="grid grid-cols-2 gap-2">
                   {wallPapers.map((bg) => (
                     <button
                       key={bg.id}
                       onClick={() => setBgPreset(bg.color)}
-                      className={`w-full flex items-center justify-between p-3 rounded-lg border transition-all ${
-                        bgPreset === bg.color 
-                          ? 'border-[#E95420] ring-1 ring-[#E95420] bg-[#E95420]/10 font-bold' 
+                      className={`group relative overflow-hidden rounded-lg border p-2 text-left transition-all ${
+                        bgPreset === bg.color
+                          ? 'border-[#E95420] ring-1 ring-[#E95420] bg-[#E95420]/10 font-bold'
                           : isLightMode ? 'border-gray-300 bg-white hover:bg-gray-50' : 'border-[#2b2b2b] bg-[#181818] hover:bg-[#222222]'
                       }`}
                     >
-                      <div className="flex items-center space-x-3">
-                        <div className="w-6 h-6 rounded border border-white/20 shadow" style={{ backgroundColor: bg.color }} />
-                        <span>{bg.name}</span>
+                      <div
+                        className="mb-2 h-12 w-full rounded-md border border-black/10 shadow-inner transition-transform group-hover:scale-[1.02]"
+                        style={{ backgroundColor: bg.color }}
+                      />
+                      <div className="min-w-0">
+                        <div className="truncate text-[10px] font-bold">{bg.name}</div>
+                        <div className={`text-[9px] uppercase ${isLightMode ? 'text-gray-500' : 'text-gray-400'}`}>{bg.color}</div>
                       </div>
                       {bgPreset === bg.color && (
-                        <span className="text-[10px] px-2 py-0.5 rounded bg-[#E95420] text-white">Active</span>
+                        <span className="absolute right-3 top-3 rounded bg-[#E95420] px-1.5 py-0.5 text-[8px] font-bold text-white shadow">Active</span>
                       )}
                     </button>
                   ))}
