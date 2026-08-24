@@ -32,8 +32,9 @@ const jsonFile = (name, data, extras = {}) =>
  */
 const normalizeAssetPath = (src) => src ? `/${src.replace(/^\/+/, '')}` : null;
 
-const imageFile = (name, icon = 'image', src) => {
+const imageFile = (name, icon = 'image', src, extras = {}) => {
   const extension = name.split('.').pop()?.toLowerCase();
+  const { darkSrc, ...fileExtras } = extras;
   const typeLabels = {
     gif: 'GIF Image',
     jpeg: 'JPEG Image',
@@ -51,8 +52,10 @@ const imageFile = (name, icon = 'image', src) => {
     action: 'media',
     mediaType: extension === 'gif' ? 'gif' : 'image',
     src: normalizeAssetPath(src),
+    darkSrc: normalizeAssetPath(darkSrc),
     disabled: !src,
     statusMessage: !src ? `${name} has not been added to the portfolio yet.` : undefined,
+    ...fileExtras,
   };
 };
 
@@ -395,7 +398,9 @@ export const directoryContents = {
   ],
 
   experience: [
-    imageFile('Experience_Timeline.png', 'image', '/timelines/experience-timeline.png'),
+    imageFile('Experience_Timeline.png', 'image', '/timelines/experience-timeline.png', {
+      darkSrc: '/timelines/experience-timeline-dark.png',
+    }),
     textFile(
       'MK_Delivery.txt',
       `Founder and Developer — MK Delivery\n\nBuilt and operated a food-delivery application in Mekelle that reached more than 3,000 users/downloads. Worked across product development, restaurant onboarding and iteration based on practical feedback.\n\nOpen Projects/MK_Delivery for the full case study.`,
@@ -412,7 +417,9 @@ export const directoryContents = {
   ],
 
   education: [
-    imageFile('Education_Timeline.png', 'image', '/timelines/education-timeline.png'),
+    imageFile('Education_Timeline.png', 'image', '/timelines/education-timeline.png', {
+      darkSrc: '/timelines/education-timeline-dark.png',
+    }),
     jsonFile(
       'HDBW_MSc_Cybersecurity.json',
       {

@@ -245,7 +245,8 @@ export default function DolphinWindow({
     } else if (item.action === 'text') {
       if (onTextEditorOpen) onTextEditorOpen(item.name, item.content || '');
     } else if (item.action === 'media') {
-      if (onMediaOpen) onMediaOpen(item.name, item.src, item.mediaType);
+      const themedSrc = !isLightMode && item.darkSrc ? item.darkSrc : item.src;
+      if (onMediaOpen) onMediaOpen(item.name, themedSrc, item.mediaType);
     } else if (item.action === 'browser' && item.url) {
       if (onBrowserOpen) {
         onBrowserOpen(item.url);
