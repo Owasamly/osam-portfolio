@@ -51,9 +51,9 @@ const badgeClasses = {
 
 function RecruiterHome({ isLightMode, onProjects, onCv, onContact, onClassicView }) {
   const strengths = [
-    ['AI & agentic automation', 'Python-based workflows with tool use, structured outputs, validation and testable steps.'],
-    ['Backend & integrations', 'REST APIs, databases and practical automation shaped around real product workflows.'],
-    ['Secure production delivery', 'Containers, CI/CD, Kubernetes, GitOps, policy gates and runtime monitoring.'],
+    ['AI & practical automation', 'Python workflows, LLM APIs, structured outputs, validation and human approval.'],
+    ['Cloud & platform delivery', 'REST APIs, containers, Kubernetes, GitOps and repeatable infrastructure workflows.'],
+    ['DevSecOps & cybersecurity', 'CI/CD security, policy gates, infrastructure guardrails and runtime monitoring.'],
   ];
 
   return (
@@ -75,7 +75,7 @@ function RecruiterHome({ isLightMode, onProjects, onCv, onContact, onClassicView
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-7">
             <img
               src="/osama-portfolio-headshot-v2.png"
-              alt="Osama Nurhussen Kahsay, AI automation, DevSecOps and cybersecurity engineer"
+              alt="Osama Nurhussen Kahsay, AI automation, cloud, DevSecOps and cybersecurity engineer"
               className="mx-auto h-32 w-32 shrink-0 rounded-2xl border-2 border-white object-cover shadow-md ring-1 ring-[#C65D3B]/25 sm:order-2 sm:mx-0 sm:h-40 sm:w-40"
             />
             <div className="min-w-0 flex-1 sm:order-1">
@@ -83,9 +83,9 @@ function RecruiterHome({ isLightMode, onProjects, onCv, onContact, onClassicView
               <h1 className={`text-2xl font-black tracking-tight sm:text-3xl ${isLightMode ? 'text-gray-950' : 'text-white'}`}>
                 Osama Nurhussen Kahsay
               </h1>
-              <h2 className="mt-2 text-base font-bold text-[#C65D3B] sm:text-lg">AI Automation, DevSecOps &amp; Cybersecurity</h2>
+              <h2 className="mt-2 text-base font-bold text-[#C65D3B] sm:text-lg">AI Automation · Cloud · DevSecOps · Cybersecurity</h2>
               <p className={`mt-3 max-w-2xl text-[12px] leading-6 ${isLightMode ? 'text-gray-600' : 'text-gray-300'}`}>
-                I build practical automation from APIs and agentic workflows through to secure delivery, with hands-on work across Python, CI/CD, Kubernetes and cloud-native security.
+                I build across AI automation, cloud infrastructure and secure software delivery—with hands-on work in Python, APIs, CI/CD, Kubernetes, GitOps and cloud-native security.
               </p>
 
               <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
